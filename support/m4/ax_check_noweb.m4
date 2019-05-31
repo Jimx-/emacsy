@@ -40,7 +40,7 @@ AC_SUBST([GREP])
 
 noweb_home=`AS_DIRNAME(["$noweb"])`/..
 
-AC_PATH_PROG([markup], markup, no, [$PATH:$noweb_home/libexec/noweb:$noweb_home/lib/noweb])
+AC_PATH_PROG([markup], markup, no, [$PATH:$noweb_home/libexec/noweb:$noweb_home/lib/noweb:$noweb_home/lib])
 if test "$markup" = "no"; then
   AC_MSG_ERROR([Must have noweb's markup installed to alter literate source code.])
 fi
