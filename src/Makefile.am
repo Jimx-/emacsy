@@ -9,7 +9,11 @@ CLEANFILES = $(NOWEB_CLEANFILES)
 BUILT_SOURCES = $(NOWEB_BUILT_FILES)
 EXTRA_DIST = convenience-lambda.scm cursor-list.scm $(NOWEB_EXTRA_DIST)
 
-guilemoduledir = $(prefix)/share/guile/site/
-dist_guilemodule_DATA = line-pragma.scm convenience-lambda.scm cursor-list.scm
+SCHEME_FILES = line-pragma.scm convenience-lambda.scm cursor-list.scm
+GOBJECTS = $(SCHEME_FILES:%.scm=%.go)
+
+dist_guilemodule_DATA = $(SCHEME_FILES)
+guileobject_DATA = $(GOBJECTS)
 
 include $(top_srcdir)/support/automake/noweb.am
+include $(top_srcdir)/support/automake/guile.am

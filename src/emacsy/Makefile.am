@@ -85,8 +85,11 @@ include_HEADERS = emacsy.h
 DISTCLEANFILES = $(PARTIAL_TEX) _emacsy.tex
 MAINTAINERCLEANFILES = Makefile.in config.h.in 
 
-guilemoduledir = $(prefix)/share/guile/site/$(PACKAGE_TARNAME)
-dist_guilemodule_DATA = $(SCHEME_FILES) $(GOBJECTS)
+emacsymoduledir = $(guilemoduledir)/emacsy
+emacsyobjectdir = $(guileobjectdir)/emacsy
+
+dist_emacsymodule_DATA = $(SCHEME_FILES)
+emacsyobject_DATA = $(GOBJECTS)
 
 AM_ETAGSFLAGS = -l scheme
 ETAGS_ARGS = $(SCHEME_FILES) $(SCHEME_TESTS)
@@ -102,7 +105,8 @@ include $(top_srcdir)/support/automake/guile.am
 
 emacsy.h emacsy.c : emacsy-c-api.nw
 
+if PDFLATEX
 dist-hook: _emacsy.pdf
 	cp $(builddir)/_emacsy.pdf $(top_distdir)/emacsy.pdf
-
+endif
 

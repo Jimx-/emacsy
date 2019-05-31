@@ -19,18 +19,34 @@ AC_PROG_CC_C_O
 AC_PROG_LIBTOOL
 AX_CHECK_NOWEB
 AX_CHECK_OPEN
-GUILE_PROGS
 AC_PATH_PROG([PERL], [perl])
 AC_SUBST([PERL])
 
 AC_PATH_PROG([BASH], [bash])
 AC_SUBST([BASH])
 
+GUILE_PKG([2.2 2.0])
+GUILE_PROGS
+GUILE_FLAGS
+AC_ARG_VAR([GUILD], [guild (Guile compiler) command])
+AS_IF([test "x$GUILD" = "x"],
+  [PKG_CHECK_VAR([GUILD], [guile-$GUILE_EFFECTIVE_VERSION], [guild], [],
+    [AC_MSG_ERROR(m4_normalize([
+      'guild' binary not found; please check your Guile installation.]))])])
 AC_PATH_PROG([guile_snarf], guile-snarf)
 AC_SUBST(guile_snarf)
 
-# Checks for libraries.
-PKG_CHECK_MODULES([GUILE], [guile-2.0])
+dnl Check for guile-lib.
+GUILE_MODULE_AVAILABLE([have_guile_lib], [(debugging assert)])
+if test "x$have_guile_lib" != "xyes"; then
+  AC_MSG_ERROR([guile-lib is missing; please install it.])
+fi
+
+dnl Installation directories for .scm and .go files.
+guilemoduledir="${datarootdir}/guile/site/$GUILE_EFFECTIVE_VERSION"
+guileobjectdir="${libdir}/guile/$GUILE_EFFECTIVE_VERSION/site-ccache"
+AC_SUBST([guilemoduledir])
+AC_SUBST([guileobjectdir])
 
 AM_CONDITIONAL([HELLO_EMACSY], [test -f example/hello-emacsy/README.md])
 

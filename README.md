@@ -20,7 +20,7 @@ Not meant for general consumption yet.  Contributors, welcome.
 Dependencies
 ------------
 
-* [GNU Guile Scheme 2.0](http://www.gnu.org/software/guile/)
+* [GNU Guile Scheme 2.2](http://www.gnu.org/software/guile/)
 
 * [guile-lib](http://www.nongnu.org/guile-lib/)
 
@@ -58,7 +58,6 @@ Building from github (harder)
     $ ./autogen.sh
     $ ./configure
     $ make
-
 
 Running 
 -------
