@@ -53,7 +53,7 @@
   (let ((job (%make-job next-job-id 'baby #f #f)))
    (define (handler cont key . args)
      (define (resume . args)
-       #;(format #t "resuming job ~a~%" (job-id job))       
+       ;; (format #t "resuming job ~a~%" (job-id job))
        ;; Call continuation that resumes the procedure.
        (call-with-prompt 'coroutine-prompt 
                          (lambda () (apply cont args))
@@ -63,9 +63,10 @@
            (apply resume args)
            (begin
              (set-job-cont! job job-resume)
-             #;(format #t "job ~a unable to resume because it is ~a~%" 
-                     (job-id job)
-                     (job-state job)))))
+             ;; (format #t "job ~a unable to resume because it is ~a~%"
+             ;;         (job-id job)
+             ;; (job-state job))
+             )))
      (case key
        ((callback)
         (when (procedure? (car args))
@@ -79,7 +80,7 @@
       (if (eq? (job-state job) 'baby)
           (begin 
             (set-job-state! job 'running)
-            #;(format #t "starting job ~a~%" (job-id job))
+            ;;(format #t "starting job ~a~%" (job-id job))
             (call-with-prompt 'coroutine-prompt 
                               (lambda () (job-exit (thunk))) 
                               handler))

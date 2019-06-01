@@ -217,11 +217,20 @@ its children.
 <<Procedures>>=
 (define-method (update-window (window <internal-window>))
  #f
- #;(let ((children (window-children window)))
-  (if (eq? (orientation window) 'vertical)
-    <<Update vertical window.>>
-    <<Update horizontal window.>>)))
-@ 
+ (when #f
+   (let ((children (window-children window)))
+      (if (eq? (orientation window) 'vertical)
+      <<Update vertical window.>>
+      <<Update horizontal window.>>))))
+@
+
+<<Update vertical window.>>=
+#t
+@
+
+<<Update horizontal window.>>=
+#t
+@
 
 Let's project a point in the current window to the point in its
 ultimate parent window.  
@@ -308,11 +317,11 @@ ultimate parent window.
         ;; XXX We will want to divest ourselves of any internal-windows
         ;; that only contain one child. Not sure if we want to do that here
         ;; or in another method though.
-        #;(if (= 1 (length new-children))
-            (car new-children)
-            (begin
-              
-              #t))))))
+        ;;(if (= 1 (length new-children))
+        ;;    (car new-children)
+        ;;    (begin
+        ;;      #t))
+))))
 
 (define-interactive (delete-other-windows #:optional (window (selected-window)))
   (set! root-window (make <internal-window> #:window-children (list window)))

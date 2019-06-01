@@ -161,24 +161,25 @@ invoke recursive minibuffers.
       (primitive-command-tick prompt 
                               #:keymaps (list ua-keymap)
                               #:undefined-command my-undefined-command))
-    #;(let loop ((input (read-key prompt)))
-        ;; We only admit numbers and a dash
-        (if (and (is-a? input <key-event>)
-                 (null? (modifier-keys input))
-                 (char-set-contains? acceptable-chars (command-char input)))
-            (begin 
-              (cond
-               ((char=? (command-char input) #\-)
-                (add-to-prompt "-")
-                (set! count (- count)))
-               (else
-                (process-arg (string->number (string (command-char input))))))
-              (loop (read-key prompt)))
-            (begin 
-              (if (= count 0)
-                  (universal-argument-push! 4)
-                  (universal-argument-push! count))
-              (emacsy-event-unread input))))))
+    (when #f
+      (let loop ((input (read-key prompt)))
+          ;; We only admit numbers and a dash
+          (if (and (is-a? input <key-event>)
+                   (null? (modifier-keys input))
+                   (char-set-contains? acceptable-chars (command-char input)))
+              (begin
+                (cond
+                 ((char=? (command-char input) #\-)
+                  (add-to-prompt "-")
+                  (set! count (- count)))
+                 (else
+                  (process-arg (string->number (string (command-char input))))))
+                (loop (read-key prompt)))
+              (begin
+                (if (= count 0)
+                    (universal-argument-push! 4)
+                    (universal-argument-push! count))
+                (emacsy-event-unread input)))))))
 @ 
 
 
@@ -521,12 +522,13 @@ If we ever run out of command loops due to errors, we start a new one.
             (lambda args
               (format #t "stopping non-interactive command loop ~a" args)))
           (exit 0)
-          #;(quit-application))
+          ;;(quit-application)
+          )
 
 ;(agenda-schedule restart-command-loop)
 
 (define-public (emacsy-initialize interactive?)
-  #;(when interactive? 
+  (when (and #f interactive?)
     (agenda-schedule restart-command-loop))
   (agenda-schedule (if interactive? 
                        restart-command-loop

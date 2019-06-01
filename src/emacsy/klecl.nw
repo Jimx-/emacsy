@@ -59,14 +59,14 @@ front of the queue rather than the rear.
 will block if there are no events to read.
 
 <<klecl:procedure>>=
-#;(define*-public (read-event #:optional (prompt #f))
-  (if prompt
-      (message prompt))
-  ;(if (q-empty? event-queue)
-  (block-while (lambda () (q-empty? event-queue)) #t)
-  (let ((event (deq! event-queue)))
-    (run-hook read-event-hook event)
-    event))
+;; (define*-public (read-event #:optional (prompt #f))
+;;   (if prompt
+;;       (message prompt))
+;;   ;;;;(if (q-empty? event-queue)
+;;   (block-while (lambda () (q-empty? event-queue)) #t)
+;;   (let ((event (deq! event-queue)))
+;;     (run-hook read-event-hook event)
+;;     event))
 
 (define (raw-read-event prompt)
   (if prompt
@@ -411,7 +411,7 @@ loop sets up a fair amount of state.
               (set! handler
                     (sigaction SIGALRM
                       (lambda (sig)
-                        #;(block-yield)
+                        ;;(block-yield)
                         (scm-error 'signal #f "Alarm interrupt" '()
                                    (list sig))))))
             thunk

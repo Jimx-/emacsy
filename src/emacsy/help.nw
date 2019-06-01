@@ -26,7 +26,7 @@
               "Describe variable: "
               (emacsy-collect-kind (current-module) 'variable 1)
               #:to-string symbol->string)))
-  #;(message "Describing variable ~a: ~a" symbol (variable-documentation symbol))
+  ;;(message "Describing variable ~a: ~a" symbol (variable-documentation symbol))
   (message "~a" (variable-documentation symbol)))
 
 (define-interactive 
@@ -36,7 +36,7 @@
               "Describe command: "
               (emacsy-collect-kind (current-module) 'command 1)
               #:to-string symbol->string)))
-  #;(message "Describing variable ~a: ~a" symbol (variable-documentation symbol))
+  ;;(message "Describing variable ~a: ~a" symbol (variable-documentation symbol))
   (message "~a" (procedure-documentation (module-ref (current-module) symbol))))
 @
 

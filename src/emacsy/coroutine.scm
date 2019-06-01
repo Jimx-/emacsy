@@ -107,41 +107,41 @@ coroutine."
 ;; emacs: (put 'codefine* 'scheme-indent-function 1)
   "Syntactic sugar for defining a procedure with optional and
 keyword arguments that is run as a coroutine."
-#;(define-syntax codefine*
-  (lambda (x)
-    (syntax-case x ()
-      ((codefine* (name . args) . body) 
-       (with-syntax ((callable-args (strip-optargs #'args))) 
-         #'(define* (name . args)
-             ;; Create an inner procedure with the same signature so that a
-             ;; recursive procedure call does not create a new prompt.
-             (define* (name . args) . body)
-             (coroutine
-              (lambda () (name . callable-args)))))))))
+;; (define-syntax codefine*
+;;   (lambda (x)
+;;     (syntax-case x ()
+;;       ((codefine* (name . args) . body)
+;;        (with-syntax ((callable-args (strip-optargs #'args)))
+;;          #'(define* (name . args)
+;;              ;; Create an inner procedure with the same signature so that a
+;;              ;; recursive procedure call does not create a new prompt.
+;;              (define* (name . args) . body)
+;;              (coroutine
+;;               (lambda () (name . callable-args)))))))))
 
 ;; emacs: (put 'codefine* 'scheme-indent-function 1)
-#;(define-syntax-rule (codefine* (name . formals) . body)
-  "Syntactic sugar for defining a procedure that is run as a
-coroutine."
-  (define (name . args)
-    ;; Create an inner procedure with the same signature so that a
-    ;; recursive procedure call does not create a new prompt.
-    (define* (name . formals) . body)
-    (coroutine
-     (lambda () (apply name args)))))
+;; (define-syntax-rule (codefine* (name . formals) . body)
+;;   "Syntactic sugar for defining a procedure that is run as a
+;; coroutine."
+;;   (define (name . args)
+;;     ;; Create an inner procedure with the same signature so that a
+;;     ;; recursive procedure call does not create a new prompt.
+;;     (define* (name . formals) . body)
+;;     (coroutine
+;;      (lambda () (apply name args)))))
 
 ;; emacs: (put 'codefine* 'scheme-indent-function 1)
 ;; Thank Mark Weaver for defining this little gem without
 ;; the crazy syntax-case I originally did. -SEC
-#;(define-syntax-rule (codefine* (name . formals) . body)
-  "Syntactic sugar for defining a procedure that is run as a
-coroutine."
-  (define (name . args)
-    ;; Create an inner procedure with the same signature so that a
-    ;; recursive procedure call does not create a new prompt.
-    (define* (name . formals) . body)
-    (coroutine
-     (lambda () (apply name args)))))
+;; (define-syntax-rule (codefine* (name . formals) . body)
+;;   "Syntactic sugar for defining a procedure that is run as a
+;; coroutine."
+;;   (define (name . args)
+;;     ;; Create an inner procedure with the same signature so that a
+;;     ;; recursive procedure call does not create a new prompt.
+;;     (define* (name . formals) . body)
+;;     (coroutine
+;;      (lambda () (apply name args)))))
 
 ;; Syntactic sugar for defining a procedure that is run as a
 ;; coroutine.

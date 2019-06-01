@@ -189,7 +189,7 @@ handle any user interaction.
     (if (pair? result)
      (cdr result)
      ;(variable-ref (make-undefined-variable))
-     #f #;(throw 'no-such-local-variable symbol)))) ;; how can I throw an undefined value?
+     (throw 'no-such-local-variable symbol))))
 
 ;; If buffers were in their own modules I could dynamically add variables
 ;; to their namespace.  Interesting idea.
@@ -309,7 +309,7 @@ a minibuffer, but probably shouldn't be used for anything bigger.
       (let* ((string (gb->string gb))
              (pt (gb-point gb))
              (match (regexp-exec regex string (- pt 1))))
-        #;(format #t "match ~a ~%" match)
+        ;;(format #t "match ~a ~%" match)
         (if match
             (begin 
               (gb-goto-char gb (+ 1 (match:end match 0)))
@@ -343,7 +343,7 @@ a minibuffer, but probably shouldn't be used for anything bigger.
                  (gb-goto-char gb (1+ last-match-start))
                  (gb-re-search-backward gb regex bound no-error? (1- repeat)))
                (my-error)))
-         #;(format #t "match ~a ~%" match)
+         ;;(format #t "match ~a ~%" match)
          (if match
              (if (< (match:start match 0) (1- pt))
                  ;; continue searching
@@ -479,10 +479,10 @@ This macro requires a procedure [[in-out-guard]] defined in the
   ;if debug-on-error?
   ;; Don't run this as robustly so that we can debug the errors
   ;; more easily.
-  #;
-  (receive (result . my-values) (run-thunk thunk)
-  (run-thunk out)
-  (apply values result my-values))
+  (when #f
+    (receive (result . my-values) (run-thunk thunk)
+    (run-thunk out)
+    (apply values result my-values)))
   
   (receive (result . my-values) 
       (catch #t

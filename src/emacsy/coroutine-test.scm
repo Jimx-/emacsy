@@ -4,10 +4,10 @@
 (define a (make-coroutine 
            (lambda ()
              (couser-data)
-             #;(yield (lambda (resume)
-                      (resume 'b)
-                      ))
-             ;'a
+             ;; (yield (lambda (resume)
+             ;;          (resume 'b)
+             ;;          ))
+             ;;'a
              )
            'a
            'a-user-data))
