@@ -4,6 +4,8 @@
 
 
 <<file:help.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy help)
   #:use-module (emacsy self-doc)
   #:use-module (emacsy keymap)
@@ -47,6 +49,8 @@
 @ 
 
 <<file:help-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (check)
              (emacsy help))
 (use-private-modules (emacsy help))

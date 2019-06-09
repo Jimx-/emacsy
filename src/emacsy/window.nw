@@ -7,7 +7,8 @@ Emacsy.  If you want to offer windows that behave like Emacs windows,
 you can, but you aren't required to.  
 
 <<file:window.scm>>=
-<<+ Lisp File Header>>
+<<+ Copyright>>
+<<+ License>>
 <<Module>>
 <<Classes>>
 <<State>>
@@ -347,7 +348,8 @@ behavior of Emacs.
 
 (define-key global-map "C-x o" 'other-window)
 <<file:window-test.scm>>=
-<<+ Lisp File Header>>  
+<<+ Copyright>>
+<<+ License>>
 <<+ Test Preamble>>
 
 (use-modules (emacsy window))

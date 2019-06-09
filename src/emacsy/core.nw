@@ -552,6 +552,8 @@ And if we have warning, we emit then through [[emacsy-log-warning]].
 \subsection*{File Layout} 
 
 <<file:core.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy core)
   #:use-module (ice-9 format)
   #:use-module (ice-9 q)
@@ -591,6 +593,8 @@ And if we have warning, we emit then through [[emacsy-log-warning]].
 
 Layout for tests.
 <<file:core-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (check)
              (emacsy core)
              (emacsy event)

@@ -518,6 +518,8 @@ This macro requires a procedure [[in-out-guard]] defined in the
 \subsection*{File Layout}
 
 <<file:buffer.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy buffer)
   #:use-module (ice-9 optargs)
   #:use-module (ice-9 q)
@@ -545,6 +547,8 @@ This macro requires a procedure [[in-out-guard]] defined in the
 
 Layout for tests.
 <<file:buffer-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (check)
              (emacsy mru-stack)
              (emacsy buffer)

@@ -456,6 +456,8 @@ partitioned modules individually, we'll expose a facade module that
 re-exports all of the public interfaces for each module.
 
 <<file:emacsy.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy emacsy)
   #:use-module (convenience-lambda)  
   #:use-module (emacsy util)
@@ -508,7 +510,8 @@ re-exports all of the public interfaces for each module.
 @ 
 
 <<file:emacsy-test.scm>>=
-<<+ Lisp File Header>>  
+<<+ Copyright>>
+<<+ License>>
 <<+ Test Preamble>>
 (eval-when (compile load eval)
            (module-use! (current-module) (resolve-module '(emacsy)))) 
@@ -526,8 +529,6 @@ DO NOT EDIT - automatically generated from emacsy.w.
 <<+ Copyright>>
 <<+ License>>
 |#
-<<+ Copyright>>=
-Copyright (C) 2012 Shane Celis 
 @ 
 
 %\input{_window} 

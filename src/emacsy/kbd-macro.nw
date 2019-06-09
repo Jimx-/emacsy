@@ -145,6 +145,8 @@ recorded.
 \subsection*{File Layout} 
 
 <<file:kbd-macro.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy kbd-macro)
   #:use-module (ice-9 q)
   #:use-module (srfi srfi-1)
@@ -163,6 +165,8 @@ recorded.
 
 Layout for tests.
 <<file:kbd-macro-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy kbd-macro)
              (emacsy event)
              (emacsy command)     

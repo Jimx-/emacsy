@@ -479,6 +479,8 @@ temporal macros.
 \subsection*{File Layout}
 
 <<file:event.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy event)
   #:use-module (ice-9 q)
   #:use-module (ice-9 regex)
@@ -497,6 +499,8 @@ temporal macros.
 
 Layout for tests.
 <<file:event-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy event)
              (oop goops)
              )

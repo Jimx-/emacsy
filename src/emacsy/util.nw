@@ -64,6 +64,8 @@ used.
 @ 
 
 <<file:util.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy util)
   #:use-module (ice-9 optargs)
   #:use-module (oop goops)

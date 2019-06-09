@@ -33,8 +33,7 @@ _%.tex : %.nw
 %.html : %.nw 
 	$(AM_V_GEN) $(noweave) $(NOWEAVE_HTML_FLAGS) $^ | cpif $@
 
-#warn_notangle = $(top_builddir)/bin/warn-notangle
-warn_notangle = @nountangle@
+warn_notangle = $(top_builddir)/bin/warn-notangle
 
 %.h : %.nw $(NOWEB_INCLUDES)
 	$(AM_V_GEN) $(warn_notangle) -o $@ $(WARN_NOTANGLE_C_FLAGS) -- $(NOTANGLE_H_FLAGS) -R"file:$@" $^ 
@@ -42,7 +41,7 @@ warn_notangle = @nountangle@
 %-test.c %.c %.cpp : %.nw $(NOWEB_INCLUDES)
 	$(AM_V_GEN) $(warn_notangle) -o $@ $(WARN_NOTANGLE_C_FLAGS) -- $(NOTANGLE_C_FLAGS)  -R"file:$@" $^
 
-%-test.scm %.scm : %.nw $(NOWEB_INCLUDES)
+%-test.scm %.scm : %.nw $(NOWEB_SCM_INCLUDES)
 	$(AM_V_GEN)	$(warn_notangle) -o $@ $(WARN_NOTANGLE_LISP_FLAGS) -- $(NOTANGLE_LISP_FLAGS) -R"file:$@" $^
 
 all.defs: $(NOWEB_DEFS)

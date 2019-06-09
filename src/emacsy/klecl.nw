@@ -589,6 +589,8 @@ have to worry about any ``pollution'' of Emacs-isms.
 \subsection*{File Layout} 
 
 <<file:klecl.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy klecl)
   #:use-module (ice-9 optargs)
   #:use-module (ice-9 match)
@@ -617,6 +619,8 @@ have to worry about any ``pollution'' of Emacs-isms.
 
 Layout for tests.
 <<file:klecl-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy klecl)
              (emacsy event)
              (check)

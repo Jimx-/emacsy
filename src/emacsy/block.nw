@@ -355,6 +355,8 @@ The [[incr!]] macro is just a little bit of syntactic sugar.
 \subsection*{File Layout} 
 
 <<file:block.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy block)
   #:use-module (ice-9 optargs)
   #:use-module (oop goops)
@@ -368,6 +370,8 @@ The [[incr!]] macro is just a little bit of syntactic sugar.
 
 Layout for tests.
 <<file:block-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy block)
              (oop goops))
 

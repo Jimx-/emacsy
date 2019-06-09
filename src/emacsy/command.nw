@@ -355,6 +355,8 @@ associated with commands.
 \subsection*{File Layout}
 
 <<file:command.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy command)
   #:use-module (string completion)
   #:use-module (oop goops)
@@ -373,6 +375,8 @@ associated with commands.
 
 Layout for tests.
 <<file:command-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy command)
              (emacsy event)
              (oop goops))

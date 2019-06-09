@@ -4,6 +4,8 @@ The buffers are kept in a most recently used stack that has the
 following operators: add!, remove!, contains?, recall!, and list.
 
 <<file:mru-stack.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy mru-stack)
   #:use-module (ice-9 q)
   #:use-module (oop goops)
@@ -90,6 +92,8 @@ around.
 @ 
 
 <<file:mru-stack-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy mru-stack)
              (check))
 

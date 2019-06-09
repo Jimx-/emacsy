@@ -69,6 +69,8 @@ another reader extension that will strip out any \#l lines within it.
                   (set! accum (cons entry accum))
                   (loop (read-char port)))))))))
 <<file:line-pragma.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (line-pragma)
   #:use-module (ice-9 rdelim))
 

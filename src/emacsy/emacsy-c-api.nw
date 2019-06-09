@@ -53,12 +53,8 @@ int emacsy_load_module(const char *module_name);
 SCM modifier_key_flags_to_list(int modifier_key_flags);
 @ 
 <<file:emacsy.h>>=
-/* emacsy.h
-
 <<+ Copyright>>
-
 <<+ License>>
-*/
 
 <<Begin Header Guard>>
 
@@ -269,6 +265,8 @@ int emacsy_terminate()
   return 0;
 }  
 <<file:emacsy.c>>=
+<<+ Copyright>>
+<<+ License>>
 #include "emacsy.h"
 #include <libguile.h>
 

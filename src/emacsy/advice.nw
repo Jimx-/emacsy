@@ -13,6 +13,8 @@ that run before, after, or around an already defined function.  This
 provides a good example.
 
 <<file:advice.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy advice)
   #:use-module (srfi srfi-9)  
   )
@@ -234,6 +236,8 @@ procedure."
 @ 
 
 <<file:advice-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy advice)
              (emacsy event)
              (emacsy klecl)

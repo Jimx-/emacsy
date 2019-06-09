@@ -273,6 +273,8 @@ for predicates which seems more natural.
 \subsection*{File Layout}
 
 <<file:keymap.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (define-module (emacsy keymap)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 optargs)
@@ -288,6 +290,8 @@ for predicates which seems more natural.
 
 Layout for tests.
 <<file:keymap-test.scm>>=
+<<+ Copyright>>
+<<+ License>>
 (use-modules (emacsy keymap)
              (emacsy event)
              (oop goops))
