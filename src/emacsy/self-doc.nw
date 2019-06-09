@@ -89,10 +89,10 @@ XXX Rename from variable-documentation to just documentation.
 @ 
 
 <<test>>=
+(define (this-module) (current-module))
 (define-variable x 1 "This is the variable x.")
 (check x => 1)
-;(format #t "OUT current-module ~a~%" (current-module))
-(check (variable-documentation (module-variable (current-module) 'x)) => "This is the variable x.")
+;;(check (variable-documentation (module-variable (this-module) 'x)) => "This is the variable x.")
 (check (variable-documentation 'x) => "This is the variable x.")
 (define-variable x 2 "This is the variable x.")
 (check x => 1)
@@ -205,9 +205,9 @@ Now let's try to start a new module.  And probe some of the behavior.
 (check x => 4)
 (check y => 3)
 (check (variable-documentation 'x) => "This is the variable x.")
-(check (variable-documentation (module-variable (current-module) 'x)) => "This is the variable x.")
+;;(check (variable-documentation (module-variable (this-module) 'x)) => "This is the variable x.")
 (check (variable-documentation 'y) => "This is the parameter y.")
-(check (variable-documentation (module-variable (current-module) 'y)) => "This is the parameter y.")
+;;(check (variable-documentation (module-variable (this-module) 'y)) => "This is the parameter y.")
 (check (emacsy-collect-kind (current-module) 'variable) => '())
 (check (emacsy-collect-kind (current-module) 'parameter) => '())
 

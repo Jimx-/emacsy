@@ -405,7 +405,7 @@ It can also work with a procedure.
 @ 
 
 <<minibuffer:test>>=
-(check (sort! (stream->list (readline-completer->stream command-completion-function "")) string<?) => (sort! '("switch-to-buffer" "eval-expression" "execute-extended-command" "load-file" "quit-application" "universal-argument") string<?))
+(check (sort (stream->list (readline-completer->stream command-completion-function "")) string<?) => (sort '("switch-to-buffer" "eval-expression" "execute-extended-command" "load-file" "quit-application" "universal-argument") string<?))
 @ 
 
 <<minibuffer:procedure>>=
@@ -713,7 +713,7 @@ We want to be able to look up filenames.
                       (stream->list (readline-completer->stream filename-completion-function string))
                       (filename-completion-function string #f)))))
 (check (dirname "bin/") => ".")
-(check (basename "bin/") => "bin")
+(check (basename "bin/") => "bin/")
 (check (basename "bin/f") => "f")
 (check (dirname "bin/f") => "bin")
 (check (my-dirname "bin/") => "bin/")

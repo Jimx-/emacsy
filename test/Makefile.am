@@ -1,6 +1,6 @@
 #TESTS_ENVIRONMENT = /bin/bash -x
 TEST_EXTENSIONS = .sh
-SH_LOG_COMPILER = /bin/bash -x
+SH_LOG_COMPILER = @BASH@ -x
 EXTRA_DIST = minibuffer-test-dir dummy.sh
 
 # These tests end up doing double the work because they create another

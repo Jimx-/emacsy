@@ -589,15 +589,16 @@ And if we have warning, we emit then through [[emacsy-log-warning]].
 
 Layout for tests.
 <<file:core-test.scm>>=
-(use-modules (emacsy core)
+(use-modules (check)
+             (emacsy core)
              (emacsy event)
              (emacsy klecl)
              (oop goops)
              (srfi srfi-11))
 
 (use-private-modules (emacsy core))
-
 (set! emacsy-interactive? #t)
+
 <<+ Test Preamble>>
 <<core:test>>
 <<+ Test Postscript>>
