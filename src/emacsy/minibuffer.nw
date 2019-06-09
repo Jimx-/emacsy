@@ -409,8 +409,10 @@ It can also work with a procedure.
 @ 
 
 <<minibuffer:procedure>>=
+(define (required-arguments proc)
+  (assoc-ref (program-arguments-alist proc) 'required))
 (define (readline-completer? proc)
-  (let ((req (arity:nreq (car (program-arities proc)))))
+  (let ((req (length (required-arguments proc))))
     (= req 2)))
 
 <<minibuffer:procedure>>=
