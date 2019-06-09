@@ -9,6 +9,7 @@ list is held in the conventional order.
 |#
 
 (define-module (cursor-list)
+  #:use-module (ice-9 format)
   #:use-module (ice-9 optargs)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)

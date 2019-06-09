@@ -551,6 +551,7 @@ And if we have warning, we emit then through [[emacsy-log-warning]].
 
 <<file:core.scm>>=
 (define-module (emacsy core)
+  #:use-module (ice-9 format)
   #:use-module (ice-9 q)
   #:use-module (ice-9 optargs)
   #:use-module (ice-9 readline)
