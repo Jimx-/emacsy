@@ -101,7 +101,7 @@ will block if there are no events to read.
 
 (codefine (fulfill-read-requests)
    (while #t
-     (format #t "fulfill-read-requests CHECK~%")
+     (when (getenv "EMACSY_DEBUG") (format #t "fulfill-read-requests CHECK~%"))
      (when (and (not (q-empty? event-queue)) 
                 (not (q-empty? reader-request-queue)))
        (format #t "fulfill-read-requests DO~%")

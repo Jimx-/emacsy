@@ -44,7 +44,7 @@
   (define cid cid-next)
   (define (handler cont key . args)
     (define (resume . args)
-      (format #t "resuming ~a cid ~a~%" name cid)
+      (when (getenv "EMACSY_DEBUG") (format #t "resuming ~a cid ~a~%" name cid))
       ;; Call continuation that resumes the procedure.
       (call-with-prompt 'coroutine-prompt 
                         (lambda () (apply cont args))
