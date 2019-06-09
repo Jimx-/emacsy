@@ -27,7 +27,7 @@ function notangle() {
   if [ $addPrefix -eq 1 ]; then
       echo "(use-modules (line-pragma))";
   fi
-  @notangle@ "$@";
+  @nountangle@ "$@";
 }
 
 if [ $# -eq 0 ]; then

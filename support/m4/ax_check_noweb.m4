@@ -35,6 +35,9 @@ AC_SUBST(notangle)
 AC_PATH_PROG([noroots], noroots)
 AC_SUBST(noroots)
 
+AC_PATH_PROG([nountangle], nountangle)
+AC_SUBST(nountangle)
+
 AC_PATH_PROG([GREP], [grep])
 AC_SUBST([GREP])
 
