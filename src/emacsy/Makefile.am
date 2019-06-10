@@ -14,7 +14,7 @@ NOWEB_DOCS = _emacsy.pdf
 NOWEAVE_HEADER = $(top_srcdir)/support/noweb/paper-header.nw
 NOWEAVE_FOOTER = $(top_srcdir)/support/noweb/paper-footer.nw
 
-PARTIAL_TEX = _emacsy-c-api.tex _event.tex _keymap.tex _command.tex _block.tex _klecl.tex _advice.tex _buffer.tex _minibuffer.tex _core.tex _window.tex _util.tex
+PARTIAL_TEX = _emacsy-c-api.tex _event.tex _keymap.tex _command.tex _block.tex _klecl.tex _advice.tex _buffer.tex _minibuffer.tex _core.tex _window.tex _util.tex _mru-stack.tex
 _emacsy.pdf : $(PARTIAL_TEX)
 
 # XXX this rule that pulls something from one of the examples is not working.
@@ -108,5 +108,11 @@ emacsy.h emacsy.c : emacsy-c-api.nw
 if PDFLATEX
 dist-hook: _emacsy.pdf
 	cp $(builddir)/_emacsy.pdf $(top_distdir)/emacsy.pdf
+
+# What is the idea of the underscore prefix _?
+dist_doc_DATA = emacsy.pdf
+
+emacsy.pdf: _emacsy.pdf
+	cp -f $^ $@
 endif
 
