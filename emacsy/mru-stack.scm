@@ -1,15 +1,6 @@
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-                     
-;;; \subsubsection{Most Recently Used Stack}                                
-;;; The buffers are kept in a most recently used stack that has the         
-;;; following operators: add!, remove!, contains?, recall!, and list.       
-;;;                                                                         
-;;;                                                                         
-;;; <file:mru-stack.scm>=                                                   
-;;; \subsection{Legal Stuff}                                                
-;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;; <+ License>=
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +13,11 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; \subsubsection{Most Recently Used Stack}
+;;; The buffers are kept in a most recently used stack that has the
+;;; following operators: add!, remove!, contains?, recall!, and list.
+
 (define-module (emacsy mru-stack)
   #:use-module (ice-9 q)
   #:use-module (oop goops)
@@ -38,15 +34,15 @@
             mru-prev!
             mru-list))
 
-;;; <mru-stack:class>=                                                      
+;;; <mru-stack:class>=
 (define-class <mru-stack> ()
   (queue #:accessor q #:init-thunk (lambda () (make-q)))
   (index #:accessor index #:init-value 0))
-;;; <mru-stack:procedure>=                                                  
+;;; <mru-stack:procedure>=
 (define-method (write (obj <mru-stack>) port)
 ;  (write (string-concatenate (list "#<mru-stack '" (buffer-name obj) "'>")) port)
   (format port "<mru-stack ~a>" (mru-list obj)))
-;;; <mru-stack:procedure>=                                                  
+;;; <mru-stack:procedure>=
 (define-method (mru-add! (s <mru-stack>) x)
   (q-push! (q s) x))
 (define-method (mru-remove! (s <mru-stack>) x)
@@ -78,15 +74,15 @@
   (q-empty? (q s)))
 (define-method (mru-contains? (s <mru-stack>) x)
   (memq x (mru-list s)))
-;;; The order of the elements may not change yet the index may be moved     
-;;; around.                                                                 
-;;;                                                                         
-;;;                                                                         
-;;; <mru-stack:procedure>=                                                  
+;;; The order of the elements may not change yet the index may be moved
+;;; around.
+;;;
+;;;
+;;; <mru-stack:procedure>=
 (define-method (mru-next! (s <mru-stack>) count)
   (when (not (mru-empty?  s))
-   (set! (index s) 
-         (modulo (+ (index s) count) 
+   (set! (index s)
+         (modulo (+ (index s) count)
                  (length (mru-list s))))
    (mru-ref s)))
 (define-method (mru-prev! (s <mru-stack>) count)

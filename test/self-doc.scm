@@ -1,9 +1,9 @@
-;;; <file:self-doc-test.scm>=                                               
-;;; \subsection{Legal Stuff}                                                
-;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; <file:self-doc-test.scm>=
+;;; \subsection{Legal Stuff}
+;;;
+;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;; <+ License>=
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
              (emacsy self-doc))
 (use-private-modules (emacsy self-doc))
 
-;;; <self-doc:test>=                                                        
+;;; <self-doc:test>=
 (define (this-module) (current-module))
 (define-variable x 1 "This is the variable x.")
 (check x => 1)
@@ -42,9 +42,9 @@
 (check (variable-documentation 'x) => "This is the variable x; it is!")
 
 (define-variable x 5 "This is the variable x.")
-;;; <self-doc:test>=                                                        
+;;; <self-doc:test>=
 (check (emacsy-collect-kind (current-module) 'variable) => '(x))
-;;; <self-doc:test>=                                                        
+;;; <self-doc:test>=
 (define-parameter y 1 "This is the parameter y.")
 (check y => 1)
 (check (variable-documentation 'y) => "This is the parameter y.")
@@ -59,10 +59,10 @@
 (define emacsy-collect-all-kind emacsy-collect-kind)
 (check (emacsy-collect-all-kind (current-module) 'parameter 0) => '(y))
 
-;;; Now let's try to start a new module.  And probe some of the behavior.   
-;;;                                                                         
-;;;                                                                         
-;;; <self-doc:test-this-last>=                                              
+;;; Now let's try to start a new module.  And probe some of the behavior.
+;;;
+;;;
+;;; <self-doc:test-this-last>=
 (define-module (test-this)
   #:use-module (check)
   #:use-module (emacsy self-doc))
@@ -94,8 +94,8 @@
 (check (emacsy-collect-all-kind (current-module) 'variable 1) => '(x))
 (check (emacsy-collect-all-kind (current-module) 'parameter 1) => '(y))
 
-(check (string-suffix? "emacsy/self-doc-test.scm" (assoc-ref (current-source-location) 'filename)) => #t)
-(check (current-filename) => #f)
+(check (string-suffix? "test/self-doc.scm" (assoc-ref (current-source-location) 'filename)) => #t)
+;;(check (current-filename) => #f)
 (check (source-properties x) => '())
 (check (source-properties 'x) => '())
 (check (source-properties (module-variable (current-module) 'x)) => '())

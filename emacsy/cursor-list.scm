@@ -1,12 +1,25 @@
-#| 
-cursor-list.scm
+;;; <+ Copyright>=
+;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
+;;; <+ License>=
+;;; Emacsy is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+;;;
+;;; Emacsy is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
 
-This module creates a list with a cursor, that is, a position
-within the list.  It's represented by two lists.  The "left" list is
-held in reverse order which has the preceding contents.  The "right"
-list is held in the conventional order.
+;; cursor-list.scm
 
-|#
+;; This module creates a list with a cursor, that is, a position
+;; within the list.  It's represented by two lists.  The "left" list is
+;; held in reverse order which has the preceding contents.  The "right"
+;; list is held in the conventional order.
 
 (define-module (emacsy cursor-list)
   #:use-module (ice-9 format)
@@ -92,6 +105,6 @@ list is held in the conventional order.
 
 (set-record-type-printer! <cursor-list>
   (lambda (clist port)
-    (format port "#<cursor-list ~{~s ~}| ~{~s ~}>" 
-            (reverse (left clist)) 
+    (format port "#<cursor-list ~{~s ~}| ~{~s ~}>"
+            (reverse (left clist))
             (right clist))))

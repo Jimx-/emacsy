@@ -1,3 +1,19 @@
+;;; <+ Copyright>=
+;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
+;;; <+ License>=
+;;; Emacsy is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+;;;
+;;; Emacsy is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (emacsy job)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
@@ -10,9 +26,9 @@
             get-job-id
             suspend-job
             continue-job))
- 
+
 (define-record-type <job>
-  (%make-job job-id job-state job-exit-value job-cont) 
+  (%make-job job-id job-state job-exit-value job-cont)
   job?
   (job-id job-id)
   (job-state job-state set-job-state!)
@@ -55,7 +71,7 @@
      (define (resume . args)
        ;; (format #t "resuming job ~a~%" (job-id job))
        ;; Call continuation that resumes the procedure.
-       (call-with-prompt 'coroutine-prompt 
+       (call-with-prompt 'coroutine-prompt
                          (lambda () (apply cont args))
                          handler))
      (define (job-resume . args)
@@ -75,14 +91,14 @@
         (resume job))))
    (set! next-job-id (1+ next-job-id))
    (set! *current-job-list* (cons job *current-job-list*))
-   (values 
-    (lambda () 
+   (values
+    (lambda ()
       (if (eq? (job-state job) 'baby)
-          (begin 
+          (begin
             (set-job-state! job 'running)
             ;;(format #t "starting job ~a~%" (job-id job))
-            (call-with-prompt 'coroutine-prompt 
-                              (lambda () (job-exit (thunk))) 
+            (call-with-prompt 'coroutine-prompt
+                              (lambda () (job-exit (thunk)))
                               handler))
           (throw 'job-already-started)))
     job)))
@@ -109,7 +125,7 @@
 
 (define (job-exit return-value)
   "Exit the job with the given return-value."
-  (let ((job (couser-data))) 
+  (let ((job (couser-data)))
     (set-job-state! job 'zombie)
     (set-job-exit-value! job return-value))
   (yield (lambda (resume)

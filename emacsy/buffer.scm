@@ -1,12 +1,12 @@
-;;; \subsection*{File Layout}                                               
-;;;                                                                         
-;;;                                                                         
-;;; <file:buffer.scm>=                                                      
-;;; \subsection{Legal Stuff}                                                
-;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; \subsection*{File Layout}
+;;;
+;;;
+;;; <file:buffer.scm>=
+;;; \subsection{Legal Stuff}
+;;;
+;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;; <+ License>=
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -37,10 +37,10 @@
   #:use-module (emacsy klecl)
   #:use-module (emacsy mode)
   #:use-module (rnrs base))
-;;; A convenience macro to work with a given buffer.                        
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:macro>=                                                         
+;;; A convenience macro to work with a given buffer.
+;;;
+;;;
+;;; <buffer:macro>=
 (define-syntax-public with-buffer
   (syntax-rules ()
     ((with-buffer buffer e ...)
@@ -49,21 +49,21 @@
          (lambda () (set-buffer! buffer))
          (lambda () e ...)
          (lambda () (set-buffer! old-buffer)))))))
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-                     
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-                     
-;;; \section{Buffer Module}                                                 
-;;;                                                                         
-;;; \epigraph{And when you gaze long into an abyss the abyss also gazes into you.}{Beyond Good and Evil \\Friedrich Nietzsche} 
-;;; \todo[inline]{This should be moved out of the KLECL chapter.}           
-;;;                                                                         
-;;; A buffer in Emacs represents text, including its mode, local            
-;;; variables, etc.  A Emacsy buffer is not necessarily text.  It can be    
-;;; extended to hold whatever the host application is interested in.        
-;;; Emacs' concepts of buffer, window, and mode are directly analogous to   
-;;; the model, view, and controller respectively---the MVC pattern.         
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:class>=                                                         
+;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
+;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
+;;; \section{Buffer Module}
+;;;
+;;; \epigraph{And when you gaze long into an abyss the abyss also gazes into you.}{Beyond Good and Evil \\Friedrich Nietzsche}
+;;; \todo[inline]{This should be moved out of the KLECL chapter.}
+;;;
+;;; A buffer in Emacs represents text, including its mode, local
+;;; variables, etc.  A Emacsy buffer is not necessarily text.  It can be
+;;; extended to hold whatever the host application is interested in.
+;;; Emacs' concepts of buffer, window, and mode are directly analogous to
+;;; the model, view, and controller respectively---the MVC pattern.
+;;;
+;;;
+;;; <buffer:class>=
 (define-class-public <buffer> ()
   (name #:init-keyword #:name)
   (keymap #:accessor local-keymap #:init-keyword #:keymap #:init-form (make-keymap))
@@ -74,38 +74,38 @@
   (buffer-exit-hook #:accessor buffer-exit-hook #:init-form (make-hook 0))
   (buffer-modes #:accessor buffer-modes #:init-form '()))
 (export local-keymap local-variables buffer-enter-hook buffer-exit-hook before-buffer-change-hook after-buffer-change-hook after-change-hook before-change-hook buffer-modified-tick buffer-modes)
-;;; \subsection{Text Buffer}                                                
-;;;                                                                         
-;;; Our minibuffer and messages buffer require a text buffer.               
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:class>=                                                         
+;;; \subsection{Text Buffer}
+;;;
+;;; Our minibuffer and messages buffer require a text buffer.
+;;;
+;;;
+;;; <buffer:class>=
 (define-class-public <text-buffer> (<buffer>)
   (gap-buffer #:accessor gap-buffer #:init-form (make-gap-buffer "")))
 (export gap-buffer)
-;;; <buffer:state>=                                                         
+;;; <buffer:state>=
 (define-variable before-buffer-change-hook (make-hook 1) "This hook is called prior to the buffer being changed with one argument, the buffer.")
 (define-variable after-buffer-change-hook (make-hook 1) "This hook is called after to the buffer has changed with one argument, the buffer.")
-;;; \subsection{Buffer List}                                                
-;;; The buffer module also keeps track of the live buffers and the current  
-;;; one.                                                                    
-;;;                                                                         
-;;; \input{_mru-stack}                                                      
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:state>=                                                         
+;;; \subsection{Buffer List}
+;;; The buffer module also keeps track of the live buffers and the current
+;;; one.
+;;;
+;;; \input{_mru-stack}
+;;;
+;;;
+;;; <buffer:state>=
 (define-public buffer-stack (make <mru-stack>))
 (define-public last-buffer #f)
-;;; <buffer:state>=                                                         
+;;; <buffer:state>=
 (define-public aux-buffer #f)
-;;; Buffer's have a name, and there is always a current buffer or it's      
-;;; false.  Note that methods do not work as easily with optional           
-;;; arguments.  It seems best to define each method with a different        
-;;; number of arguments as shown below.                                     
-;;;                                                                         
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; Buffer's have a name, and there is always a current buffer or it's
+;;; false.  Note that methods do not work as easily with optional
+;;; arguments.  It seems best to define each method with a different
+;;; number of arguments as shown below.
+;;;
+;;;
+;;;
+;;; <buffer:procedure>=
 (define-method-public (buffer-name)
   (buffer-name (current-buffer)))
 
@@ -126,28 +126,28 @@
 
 (define-method (write (obj <buffer>) port)
   (write (string-concatenate (list "#<buffer '" (buffer-name obj) "'>")) port))
-;;; \subsection{Emacs Compatibility}                                        
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; \subsection{Emacs Compatibility}
+;;;
+;;;
+;;; <buffer:procedure>=
 (define-public (current-local-map)
   (local-keymap (current-buffer)))
 
 (define-public (use-local-map keymap)
   (set! (local-keymap (current-buffer)) keymap))
-;;; <buffer:procedure>=                                                     
+;;; <buffer:procedure>=
 (define-public (buffer-list)
   (mru-list buffer-stack))
-;;; <buffer:procedure>=                                                     
+;;; <buffer:procedure>=
 (define-public (current-buffer)
   ;; Perhaps instead of returning #f for no buffer there should be an
   ;; immutable void-buffer class.
   (or aux-buffer
       (mru-ref buffer-stack)))
-;;; <buffer:procedure>=                                                     
+;;; <buffer:procedure>=
 (define-public (add-buffer! buffer)
   (mru-add! buffer-stack buffer))
-;;; <buffer:procedure>=                                                     
+;;; <buffer:procedure>=
 (define-public (remove-buffer! buffer)
   (mru-remove! buffer-stack buffer))
 
@@ -169,11 +169,11 @@
 
 (define-interactive (other-buffer #:optional (count 1))
   (next-buffer count))
-;;; This is our primitive procedure for switching buffers.  It does not     
-;;; handle any user interaction.                                            
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; This is our primitive procedure for switching buffers.  It does not
+;;; handle any user interaction.
+;;;
+;;;
+;;; <buffer:procedure>=
 (define (primitive-switch-to-buffer buffer)
   (emacsy-log-debug "Running exit hook for ~a" (current-buffer))
   (run-hook (buffer-exit-hook (current-buffer)))
@@ -183,18 +183,18 @@
         (emacsy-log-debug "Recall buffer ~a" buffer)
         (mru-recall! buffer-stack buffer)
         (set! aux-buffer #f))
-      (begin 
+      (begin
         (emacsy-log-debug "Set buffer to ~a" buffer)
         (set-buffer! buffer)))
   (emacsy-log-debug "Running enter hook for ~a" (current-buffer))
   (run-hook (buffer-enter-hook (current-buffer)))
   (current-buffer))
 
-(define-public switch-to-buffer primitive-switch-to-buffer) 
-;;; \subsubsection{Local Variables}                                         
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+(define-public switch-to-buffer primitive-switch-to-buffer)
+;;; \subsubsection{Local Variables}
+;;;
+;;;
+;;; <buffer:procedure>=
 (define (local-var-ref symbol)
   (let ((result (assq symbol (local-variables (current-buffer)))))
     (if (pair? result)
@@ -206,21 +206,21 @@
 ;; to their namespace.  Interesting idea.
 
 (define (local-var-set! symbol value)
-  (slot-set! (current-buffer) 
-             'locals 
+  (slot-set! (current-buffer)
+             'locals
              (assq-set! (local-variables (current-buffer)) symbol value)))
 
-(define-public local-var 
+(define-public local-var
                (make-procedure-with-setter local-var-ref local-var-set!))
-;;; <buffer:procedure>=                                                     
+;;; <buffer:procedure>=
 (define-method-public (buffer-string (buffer <text-buffer>))
   (gb->string (gap-buffer buffer)))
-;;; \subsubsection{Point}                                                   
-;;; Now, let's implement the point procedures that control where the        
-;;; insertion point is within the buffer.                                   
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; \subsubsection{Point}
+;;; Now, let's implement the point procedures that control where the
+;;; insertion point is within the buffer.
+;;;
+;;;
+;;; <buffer:procedure>=
 (define-method-public (point)
   (point (current-buffer)))
 
@@ -238,23 +238,23 @@
 
 (define-method-public (point-max (buffer <text-buffer>))
   (gb-point-max (gap-buffer buffer)))
-;;; Move the point around.  It's very tempting to change the name from      
-;;; [[goto-char]] to [[goto-point!]] because [[goto-char]] is misleading.   
-;;; You don't actually go to a character, you go to a place between         
-;;; characters, a point.  \todo{Change goto-char to goto-point!}            
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; Move the point around.  It's very tempting to change the name from
+;;; [[goto-char]] to [[goto-point!]] because [[goto-char]] is misleading.
+;;; You don't actually go to a character, you go to a place between
+;;; characters, a point.  \todo{Change goto-char to goto-point!}
+;;;
+;;;
+;;; <buffer:procedure>=
 (define-method-public (goto-char point)
   (goto-char point (current-buffer)))
 
 (define-method-public (goto-char point (buffer <text-buffer>))
   (gb-goto-char (gap-buffer buffer) point))
 ;(define goto-point! goto-char)
-;;; Let's add the procedures [[char-before]] and [[char-after]] to inspect  
-;;; the characters before and after a point.                                
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; Let's add the procedures [[char-before]] and [[char-after]] to inspect
+;;; the characters before and after a point.
+;;;
+;;; <buffer:procedure>=
 ;; XXX define-method needs to allow for the definition of optional arguments.
 ;; This is getting ridiculous.
 (define-method-public (char-before)
@@ -287,16 +287,16 @@
 (define-method-public (char-after point (buffer <text-buffer>))
   (gb-char-after (gap-buffer buffer) point))
 
-;;; There is                                                                
+;;; There is
 ;;; \href{http://gnuvola.org/software/guile/doc/Gap-Buffer.html}{documentation}
-;;; which suggests that [[(ice-9 gap-buffer)]] module has some nice regex   
-;;; search features.  However, I can't find the implementation anywhere,    
-;;; so I implemented them pretty sloppily here.  They should work find for  
-;;; a minibuffer, but probably shouldn't be used for anything bigger.       
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
-(define*-public (gb-re-search-forward gb regex 
+;;; which suggests that [[(ice-9 gap-buffer)]] module has some nice regex
+;;; search features.  However, I can't find the implementation anywhere,
+;;; so I implemented them pretty sloppily here.  They should work find for
+;;; a minibuffer, but probably shouldn't be used for anything bigger.
+;;;
+;;;
+;;; <buffer:procedure>=
+(define*-public (gb-re-search-forward gb regex
                                       #:optional (bound #f) (no-error? #f) (repeat 1))
   ;; This could be done better in the gap-buffer.scm itself.
   (if (= repeat 0)
@@ -306,16 +306,16 @@
              (match (regexp-exec regex string (- pt 1))))
         ;;(format #t "match ~a ~%" match)
         (if match
-            (begin 
+            (begin
               (gb-goto-char gb (+ 1 (match:end match 0)))
               (gb-re-search-forward gb regex bound no-error? (1- repeat)))
             (if no-error?
                 #f
                 (scm-error 'no-match 'gb-re-search-forward
-                           
+
                            "No match found for regex '~a' in ~s after point ~a" (list regex string pt) #f))))))
 
-(define*-public (gb-re-search-backward gb regex 
+(define*-public (gb-re-search-backward gb regex
                                        #:optional (bound #f) (no-error? #f) (repeat 1))
   ;; This could be done better in the gap-buffer.scm itself.
   (if (= repeat 0)
@@ -328,13 +328,13 @@
          (define (my-error)
            (if no-error?
                #f
-               (scm-error 
+               (scm-error
                 'no-match 'gb-re-search-forward
-                "No match found for regex '~a' in ~s before point ~a" 
+                "No match found for regex '~a' in ~s before point ~a"
                 (list regex string pt) #f)))
          (define (finish)
            (if last-match-start
-               (begin 
+               (begin
                  (gb-goto-char gb (1+ last-match-start))
                  (gb-re-search-backward gb regex bound no-error? (1- repeat)))
                (my-error)))
@@ -345,10 +345,10 @@
                  (loop (match:end match 0) (match:start match 0))
                  (finish))
              (finish))))))
-;;; Some commands to move the point around and insert or delete characters. 
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; Some commands to move the point around and insert or delete characters.
+;;;
+;;;
+;;; <buffer:procedure>=
 (define-interactive (kill-line #:optional (n 1))
   (gb-delete-char! (gap-buffer (current-buffer)) (- (point-max) (point))))
 
@@ -383,14 +383,14 @@
 
 (define-interactive (backward-char #:optional (n 1))
   (forward-char (- n)))
-;;; Finally, we can insert text.                                            
-;;;                                                                         
-;;;                                                                         
-;;; <buffer:procedure>=                                                     
+;;; Finally, we can insert text.
+;;;
+;;;
+;;; <buffer:procedure>=
 (define*-public (insert #:rest args)
   (and (current-buffer)
    (if (null? args)
-       0 
+       0
        (let ((arg (car args)))
          (run-hook before-buffer-change-hook (current-buffer))
          (cond
@@ -402,7 +402,7 @@
          (set! (buffer-modified? (current-buffer)) #t)
          (incr! (buffer-modified-tick (current-buffer)))
          (run-hook after-buffer-change-hook (current-buffer))))))
-;;; <buffer:procedure>=                                                     
+;;; <buffer:procedure>=
 (define-interactive (self-insert-command #:optional (n 1))
   (if (< n 1)
       ;; We're done.
@@ -410,4 +410,3 @@
       (let* ((event this-command-event))
         ;; Do I have to do anything for shifted characters?
         (insert (command-char event)))))
-

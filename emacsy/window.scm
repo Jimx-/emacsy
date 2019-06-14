@@ -1,15 +1,3 @@
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
-;;; \section{Windows (Optional)}
-;;;
-;;; Emacsy aims to offer the minimal amount of intrusion to acquire big
-;;; gains in program functionality.  Windows is an optional module for
-;;; Emacsy.  If you want to offer windows that behave like Emacs windows,
-;;; you can, but you aren't required to.
-;;;
-;;;
-;;; <file:window.scm>=
-;;; \subsection{Legal Stuff}
-;;;
 ;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
 ;;; <+ License>=
@@ -26,6 +14,14 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
 ;;; <window:Module>=
+
+;;; \section{Windows (Optional)}
+;;;
+;;; Emacsy aims to offer the minimal amount of intrusion to acquire big
+;;; gains in program functionality.  Windows is an optional module for
+;;; Emacsy.  If you want to offer windows that behave like Emacs windows,
+;;; you can, but you aren't required to.
+
 (define-module (emacsy window)
   #:use-module (oop goops)
   #:use-module (emacsy emacsy)

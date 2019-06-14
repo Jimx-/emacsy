@@ -1,12 +1,6 @@
-;;; \subsection*{File Layout}                                               
-;;;                                                                         
-;;;                                                                         
-;;; <file:kbd-macro.scm>=                                                   
-;;; \subsection{Legal Stuff}                                                
-;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;; <+ License>=
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -30,101 +24,101 @@
   #:use-module (emacsy block))
 
 
-;;; <kbd-macro:state>=                                                      
+;;; <kbd-macro:state>=
 (define-public defining-kbd-macro?  #f)
 (define-public last-kbd-macro '())
-;;; <kbd-macro:state>=                                                      
+;;; <kbd-macro:state>=
 (define-public executing-kbd-macro? #f)
 (define-public kbd-macro-termination-hook (make-hook))
-;;; <kbd-macro:state>=                                                      
+;;; <kbd-macro:state>=
 (define-public executing-temporal-kbd-macro-hook (make-hook 1))
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-                     
-;;; \section{Keyboard Macro Module}                                         
-;;;                                                                         
-;;;                                                                         
-;;; \epigraph{...}{...}                                                     
-;;;                                                                         
-;;; We will now add a keyboard macro facility familiar to Emacs users.  We  
-;;; hook into the [[read-event]] procedure using a hook.                    
-;;;                                                                         
-;;;                                                                         
-;;; <kbd-macro:procedure>=                                                  
+;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
+;;; \section{Keyboard Macro Module}
+;;;
+;;;
+;;; \epigraph{...}{...}
+;;;
+;;; We will now add a keyboard macro facility familiar to Emacs users.  We
+;;; hook into the [[read-event]] procedure using a hook.
+;;;
+;;;
+;;; <kbd-macro:procedure>=
 ;; XXX This also may record the key event that stops the keyboard
 ;; macro, which it shouldn't.
 (define (kbd-read-event-hook event)
   (when defining-kbd-macro?
       (message "RECORDING ~a" event)
       (cons! event last-kbd-macro)))
-;;; \subsection{kmacro-start-macro}                                         
-;;;                                                                         
-;;;                                                                         
-;;; <kbd-macro:procedure>=                                                  
+;;; \subsection{kmacro-start-macro}
+;;;
+;;;
+;;; <kbd-macro:procedure>=
 (define-interactive (kmacro-start-macro)
   (set! last-kbd-macro '())
   (set! defining-kbd-macro? #t))
-;;; \subsection{kmacro-end-macro}                                           
-;;;                                                                         
-;;;                                                                         
-;;; <kbd-macro:procedure>=                                                  
+;;; \subsection{kmacro-end-macro}
+;;;
+;;;
+;;; <kbd-macro:procedure>=
 (define-interactive (kmacro-end-macro)
   (set! defining-kbd-macro? #f))
-;;; \subsection{kmacro-end-and-call-macro}                                  
-;;;                                                                         
-;;; <kbd-macro:procedure>=                                                  
+;;; \subsection{kmacro-end-and-call-macro}
+;;;
+;;; <kbd-macro:procedure>=
 (define-interactive (kmacro-end-and-call-macro)
   (if defining-kbd-macro?
       (kmacro-end-macro))
   (execute-kbd-macro last-kbd-macro))
-;;; \subsection{execute-kbd-macro}                                          
-;;;                                                                         
-;;;                                                                         
-;;; <kbd-macro:procedure>=                                                  
-(define-interactive 
-  (execute-kbd-macro #:optional 
+;;; \subsection{execute-kbd-macro}
+;;;
+;;;
+;;; <kbd-macro:procedure>=
+(define-interactive
+  (execute-kbd-macro #:optional
                      (kbd-macro last-kbd-macro)
                      (count 1) (loopfunc #f))
   (let ((orig-event-queue event-queue)
         (new-event-queue  (make-q)))
-    (for-each (lambda (x) 
-               (enq! new-event-queue x)) 
+    (for-each (lambda (x)
+               (enq! new-event-queue x))
              (reverse kbd-macro))
     (in-out-guard
      (lambda ()
        (set! event-queue new-event-queue)
        (set! executing-kbd-macro? #t))
-     (lambda () 
+     (lambda ()
        (command-loop (lambda args (not (q-empty? event-queue)))))
      ;; Turn off the executing-kbd-macro?.
-     (lambda () 
+     (lambda ()
        (set! executing-kbd-macro? #f)
        (set! event-queue orig-event-queue)
        (run-hook kbd-macro-termination-hook)))))
-;;; \subsection{execute-temporal-kbd-macro}                                 
-;;;                                                                         
-;;; In addition to regular keyboard macros, Emacsy can execute keyboard     
-;;; macros such that they reproduce the keys at the same pace as they were  
-;;; recorded.                                                               
-;;;                                                                         
-;;;                                                                         
-;;; <kbd-macro:procedure>=                                                  
-(define-interactive 
-  (execute-temporal-kbd-macro #:optional (kbd-macro last-kbd-macro)) 
+;;; \subsection{execute-temporal-kbd-macro}
+;;;
+;;; In addition to regular keyboard macros, Emacsy can execute keyboard
+;;; macros such that they reproduce the keys at the same pace as they were
+;;; recorded.
+;;;
+;;;
+;;; <kbd-macro:procedure>=
+(define-interactive
+  (execute-temporal-kbd-macro #:optional (kbd-macro last-kbd-macro))
   (in-out
    (set! executing-kbd-macro? #t)
    (let* ((start-time (emacsy-time))
           (macro-start-time (time (last kbd-macro))))
      (let loop ((macro (reverse kbd-macro)))
        (when (not (null? macro))
-         (block-until (lambda () 
+         (block-until (lambda ()
                        (let ((duration (- (emacsy-time) start-time) ))
                          (run-hook executing-temporal-kbd-macro-hook duration)
                          (>= duration
                              (- (time (car macro)) macro-start-time)))))
          (emacsy-event (car macro))
          (loop (cdr macro)))))
-   (begin 
+   (begin
      (set! executing-kbd-macro? #f)
      (run-hook kbd-macro-termination-hook))))
-;;; <kbd-macro:process>=                                                    
+;;; <kbd-macro:process>=
 ;; How do I ensure this only happens once?
 (add-hook! read-event-hook kbd-read-event-hook)

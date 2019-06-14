@@ -1,2 +1,2 @@
-#!/bin/sh
-autoreconf --force --install -I support/m4
+#! /bin/sh
+autoreconf -vif

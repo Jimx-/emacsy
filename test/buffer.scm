@@ -1,11 +1,11 @@
-;;; Layout for tests.                                                       
-;;;                                                                         
-;;; <file:buffer-test.scm>=                                                 
-;;; \subsection{Legal Stuff}                                                
-;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; Layout for tests.
+;;;
+;;; <file:buffer-test.scm>=
+;;; \subsection{Legal Stuff}
+;;;
+;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;; <+ License>=
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -21,7 +21,7 @@
 (use-modules (check)
              (emacsy mru-stack)
              (emacsy buffer)
-             (emacsy command)                  
+             (emacsy command)
              (emacsy event)
              (emacsy keymap)
              (oop goops)
@@ -29,23 +29,23 @@
 
 (use-private-modules (emacsy buffer))
 
-;;; <+ Test Preamble>=                                                      
+;;; <+ Test Preamble>=
 (use-modules (check))
 (use-modules (ice-9 pretty-print))
 (define test-errors '())
-;;; <buffer:test>=                                                          
+;;; <buffer:test>=
 (define b (make <buffer> #:name "*test-buffer*"))
 (check (buffer-name b) => "*test-buffer*")
 (check (object->string b) => "\"#<buffer '*test-buffer*'>\"")
 (check (current-buffer) => #f)
-;;; <buffer:test>=                                                          
+;;; <buffer:test>=
 (add-buffer! b)
 (check (buffer-name) => "*test-buffer*")
 (remove-buffer! b)
 (check (current-buffer) => #f)
-;;; Let's test this regex search in a gap buffer.                           
-;;;                                                                         
-;;; <buffer:test>=                                                          
+;;; Let's test this regex search in a gap buffer.
+;;;
+;;; <buffer:test>=
 (define c (make <text-buffer> #:name "*test-regex*"))
 (add-buffer! c)
 (check (current-buffer) => c)
@@ -54,7 +54,7 @@
 (insert "hellos these ard words!")
 (check (buffer-modified?) => #t)
 (check (buffer-modified-tick) => 1)
-;;       1    7     13  17             
+;;       1    7     13  17
 (check (point) => (point-max))
 (check (point-min) => 1)
 (goto-char (point-min))
@@ -74,11 +74,11 @@
 (check (char-after) => #\a)
 
 ;;#(!sdrow dra eseht solleh (17 . 24))
-;;  1      8   12    18                    
+;;  1      8   12    18
 ;; is               ^      ^
 ;; goto      ^
 ;; was     ^
-;;; <+ Test Postscript>=                                                    
+;;; <+ Test Postscript>=
 ;(run-tests)
 (check-report)
 '(if (> (length test-errors) 0)

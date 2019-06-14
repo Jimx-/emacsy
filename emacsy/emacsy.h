@@ -76,14 +76,14 @@ void emacsy_key_event(int char_code,
                       int modifier_key_flags);
 
 /* Enqueue a mouse event. */
-void emacsy_mouse_event(int x, int y, 
+void emacsy_mouse_event(int x, int y,
                         int state,
                         int button,
                         int modifier_key_flags);
 
-/* Run an iteration of Emacsy's event loop 
+/* Run an iteration of Emacsy's event loop
    (will not block). */
-int emacsy_tick(); 
+int emacsy_tick();
 
 /* Return the message or echo area. */
 char *emacsy_message_or_echo_area();
@@ -118,4 +118,3 @@ SCM modifier_key_flags_to_list(int modifier_key_flags);
 #ifdef __cplusplus
  }
 #endif
-

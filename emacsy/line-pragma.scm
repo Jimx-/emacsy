@@ -1,6 +1,3 @@
-;;; <file:line-pragma.scm>=                                                 
-;;; \subsection{Legal Stuff}                                                
-;;;                                                                         
 ;;; <+ Copyright>=                                                          
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
 ;;; <+ License>=                                                            

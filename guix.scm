@@ -49,11 +49,10 @@
              (gnu packages gnome)
              (gnu packages guile)
              (gnu packages guile-xyz)
-             (gnu packages noweb)
              (gnu packages perl)
              (gnu packages pkg-config)
-             (gnu packages tex)
              (gnu packages texinfo)
+             (gnu packages tex)
              (gnu packages webkit))
 
 (define %source-dir (dirname (current-filename)))
@@ -66,23 +65,12 @@
                       #:select? (git-predicate %source-dir)))
   (build-system gnu-build-system)
   (native-inputs
-   `(("emacsy-webkit-gtk"
-      ,(let ((dir (string-append %source-dir "/example/emacsy-webkit-gtk")))
-         (local-file dir
-                     #:recursive? #t
-                     #:select? (git-predicate dir))))
-     ("hello-emacsy"
-      ,(let ((dir (string-append %source-dir "/example/hello-emacsy")))
-         (local-file dir
-                     #:recursive? #t
-                     #:select? (git-predicate dir))))
-     ("autoconf" ,autoconf)
+   `(("autoconf" ,autoconf)
      ("automake" ,automake)
      ("bzip2" ,bzip2)
      ("guile" ,guile-2.2)
      ("gettext" ,gnu-gettext)
      ("libtool" ,libtool)
-     ("noweb" ,noweb)
      ("perl" ,perl)
      ("pkg-config" ,pkg-config)
      ("texinfo" ,texinfo)
@@ -97,13 +85,6 @@
   (arguments
    `(#:phases
      (modify-phases %standard-phases
-       (add-after 'unpack 'unpack-examples
-         (lambda _
-           (copy-recursively (assoc-ref %build-inputs "emacsy-webkit-gtk")
-                             "example/emacsy-webkit-gtk")
-           (copy-recursively (assoc-ref %build-inputs "hello-emacsy")
-                             "example/hello-emacsy")
-           #t))
        (add-before 'configure 'setenv
          (lambda _
            (setenv "GUILE_AUTO_COMPILE" "0")
@@ -115,6 +96,6 @@
 as extension language.  Emacsy can give a C program an Emacsy feel with
 keymaps, minibuffer, recordable macros, history, tab completion, major
 and minor modes, etc., and can also be used as a pure Guile library.  It
-comes with a simple counter example using GLUT and browser examples in C
-using gtk+-3 and webkitgtk.")
+comes with a simple counter example using FreeGLUT and browser examples
+in C using Gtk+-3 and WebKitGtk.")
   (license license:gpl3+))

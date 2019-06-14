@@ -29,7 +29,7 @@
 /*                                                                          */
 /*                                                                          */
 /* <emacsy-c-api:Utility Functions>=                                        */
-SCM load_module_try(void *data) 
+SCM load_module_try(void *data)
 {
   scm_c_use_module((const char *)data);
   return scm_list_1(SCM_BOOL_T);
@@ -44,14 +44,14 @@ SCM load_module_error(void *data, SCM key, SCM args)
 /*                                                                          */
 /*                                                                          */
 /* <emacsy-c-api:Utility Functions>=                                        */
-int emacsy_load_module(const char *module) 
+int emacsy_load_module(const char *module)
 {
-  SCM result = scm_internal_catch(SCM_BOOL_T, 
+  SCM result = scm_internal_catch(SCM_BOOL_T,
                                   load_module_try,   (void *) module,
                                   load_module_error, (void *) module);
   if (scm_is_false(scm_car(result))) {
     fprintf(stderr, "error: Unable to load module (%s); got error to key %s with args %s. Try setting the "
-                    "GUILE_LOAD_PATH environment variable.\n", module, 
+                    "GUILE_LOAD_PATH environment variable.\n", module,
                     scm_to_locale_string(scm_car(scm_cdr(result))),
                     scm_to_locale_string(scm_car(scm_cdr(scm_cdr(result))))
                     );
@@ -74,11 +74,11 @@ SCM modifier_key_flags_to_list(int modifier_key_flags)
       list = scm_cons(scm_c_string_to_symbol(modifiers[i]), list);
     }
   }
-  
+
   return list;
 }
 
-SCM_DEFINE(scm_modifier_key_flags_to_list, "modifier-key-flags->list", 
+SCM_DEFINE(scm_modifier_key_flags_to_list, "modifier-key-flags->list",
            1, 0, 0,
            (SCM flags),
            "Convert an integer of modifier key flags to a list of symbols.")
@@ -96,14 +96,14 @@ SCM_DEFINE(scm_modifier_key_flags_to_list, "modifier-key-flags->list",
 int emacsy_initialize(int init_flags)
 {
   /* Load the (emacsy emacsy) module. */
-  const char *module = "emacsy emacsy"; 
+  const char *module = "emacsy emacsy";
   int err = emacsy_load_module(module);
   if (err)
     return err;
-    
+
   (void) scm_call_1(scm_c_public_ref("emacsy emacsy", "emacsy-initialize"),
                     (init_flags & EMACSY_INTERACTIVE) ? SCM_BOOL_T : SCM_BOOL_F);
-  
+
   return err;
 }
 /* \section{emacsy\_key\_event}                                             */
@@ -126,9 +126,9 @@ void emacsy_key_event(int char_code,
 /*                                                                          */
 /*                                                                          */
 /* <emacsy-c-api:Functions>=                                                */
-void emacsy_mouse_event(int x, int y, 
+void emacsy_mouse_event(int x, int y,
                         int state,
-                        int button, 
+                        int button,
                         int modifier_key_flags)
 {
 
@@ -213,7 +213,7 @@ int emacsy_terminate()
   result = scm_call_0(scm_c_public_ref("emacsy emacsy",
                                        "emacsy-terminate"));
   return 0;
-}  
+}
 /* <emacsy-c-api:Functions>=                                                */
 int  emacsy_run_hook_0(const char *hook_name)
 {
@@ -222,7 +222,7 @@ int  emacsy_run_hook_0(const char *hook_name)
   SCM result;
   result = scm_call_1(scm_c_public_ref("emacsy emacsy",
                                        "emacsy-run-hook"),
-                      scm_c_private_ref("guile-user", 
+                      scm_c_private_ref("guile-user",
                                         hook_name));
   return 0;
 }
@@ -231,5 +231,5 @@ int  emacsy_minibuffer_point()
 {
   return scm_to_int(
     scm_call_0(scm_c_public_ref("emacsy emacsy",
-                                "emacsy-minibuffer-point")));  
+                                "emacsy-minibuffer-point")));
 }

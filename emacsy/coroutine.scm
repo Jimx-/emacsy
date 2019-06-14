@@ -33,7 +33,7 @@
             colambda
             codefine
             codefine*
-            couser-data) 
+            couser-data)
   #:replace (yield))
 
 (define cid-next 0)
@@ -46,12 +46,12 @@
     (define (resume . args)
       (when (getenv "EMACSY_DEBUG") (format #t "resuming ~a cid ~a~%" name cid))
       ;; Call continuation that resumes the procedure.
-      (call-with-prompt 'coroutine-prompt 
+      (call-with-prompt 'coroutine-prompt
                         (lambda () (apply cont args))
                         handler))
     (when name
-      (set-procedure-property! resume 
-                               'name (string->symbol 
+      (set-procedure-property! resume
+                               'name (string->symbol
                                       (format #f "~a-resume-~a" name cid))))
     (case key
       ((callback)
@@ -154,7 +154,7 @@ keyword arguments that is run as a coroutine."
            ;; recursive procedure call does not create a new prompt.
            (define* (name . formals) e0)
            (coroutine
-            (lambda () (apply name args)) 
+            (lambda () (apply name args))
             'name)))
       ;; Handle the case where there is a documentation string.
       ((_ (name . formals) e0 e1 . body)
