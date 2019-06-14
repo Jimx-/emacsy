@@ -1,4 +1,4 @@
-;;; Emacsy --- An embeddable Emacs-like library for Guile.
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile.
 ;;; Copyright © 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of Emacsy.
@@ -28,7 +28,8 @@
  (makefile-mode . ((indent-tabs-mode . t)))
 
  (nil . ((indent-tabs-mode . nil)
-         (fill-column . 72)))
+         (fill-column . 72)
+         (eval . (add-hook 'before-save-hook 'delete-trailing-whitespace nil t))))
 
  (scheme-mode
   .
