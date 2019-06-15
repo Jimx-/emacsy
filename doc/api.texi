@@ -1,0 +1,1900 @@
+
+@c snarfed from example/hello-emacsy.c:23
+
+@node Hello Emacsy
+@section Hello Emacsy
+
+I have received a lot of questions asking, what does
+Emacsy@footnote{Kickstarter page @url{http://kck.st/IY0Bau}} actually
+do?  What restrictions does it impose on the GUI toolkit?  How is it
+possible to not use any Emacs code? I thought it might be best if I
+were to provide a minimal example program, so that people can see
+code that illustrates Emacsy API usage.
+
+@c snarfed from example/hello-emacsy.c:35
+
+@image{images/minimal-emacsy-example,,,,.png}
+
+@c snarfed from example/hello-emacsy.c:39
+
+@subsection The Simplest Application Ever
+
+Let's exercise these functions in a minimal FreeGLUT program we'll call
+@verb{|hello-emacsy|}.@footnote{Note: Emacsy does not rely on FreeGLUT.
+One could use Gtk+, Ncurses, Qt, or whatever}.  This simple program
+will display an integer, the variable [[counter]], that one can
+increment or decrement.
+@c
+@c %\appendix
+@c \begin{subappendices}
+
+@c \section{Plaintext Please}
+@c Here are the plaintext files: \href{http://gnufoo.org/emacsy/emacsy.h}{emacsy.h}
+@c \href{http://gnufoo.org/emacsy/hello-emacsy.c}{hello-emacsy.c}
+@c \href{http://gnufoo.org/emacsy/emacsy-stub.c}{emacsy-stub.c}, and
+@c \href{http://gnufoo.org/emacsy/hello-emacsy.scm}{hello-emacsy.scm}. Or
+
+@c snarfed from example/hello-emacsy.c:72
+
+@defvar int counter = 0;
+Hello Emacsy's state is captured by one global variable.
+Hello Emacsy will display this number.
+@end defvar
+
+@c snarfed from example/hello-emacsy.c:81
+@deffn {Scheme Procedure}  char * try_load_startup (char const* prefix, char const* dir, char const* startup_script)
+Locate the @file{hello-emacsy.scm} Guile initialization and load it.
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:139
+@deffn {Scheme Procedure}  void display_func ()
+The function [[display_func]] is run for every frame that's
+drawn. It's effectively our runloop, even though the actual runloop is
+in FreeGLUT.
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:183
+@deffn {Scheme Procedure}  void draw_string (int x, int y, char *string)
+
+Draw a string function.
+Draws a string at (x, y) on the screen.
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:199
+
+At this point, our application can process key events, accept input on
+the minibuffer, and use nearly all of the facilities that Emacsy
+offers, but it can't change any application state, which makes it not
+very interesting yet.
+
+@c snarfed from example/hello-emacsy.c:206
+
+@subsection Plugging Into Your App
+
+@c snarfed from example/hello-emacsy.c:212
+
+@deffn {Scheme Procedure} get-counter
+@deffnx {C Function} SCM scm_get_counter ()
+Let's define a new primitive Scheme procedure [[get-counter]], so
+Emacsy can access the application's state.  This will define
+a [[C]] function [[SCM scm_get_counter (void)]] and a Scheme procedure
+[[ (get-counter)]].
+
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:233
+
+@deffn {Scheme Procedure} set-counter! value
+@deffnx {C Function} SCM scm_set_counter_x (SCM value)
+Let's define another primitive Scheme procedure to alter the
+application's state.
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:252
+@deffn {Scheme Procedure}  void primitives_init ()
+Once we have written these primitive procedures, we need to register
+them with the Scheme runtime.
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:264
+@deffn {Scheme Procedure}  int main ()
+Initialize everything in @var{main} and enter our runloop.
+@end deffn
+
+@c snarfed from example/hello-emacsy.c:309
+
+Now we can @verb{|telnet localhost 37146|} to get a REPL.
+
+@subsection Conclusion
+
+We implemented a simple interactive application that displays a
+number.  We embedded Emacsy into it: sending events to Emacsy and
+displaying the minibuffer.  We implemented primitive procedures so
+Emacsy could access and manipulate the application's state.  We
+extended the user interface to accept new commands @verb{|+|} and
+@verb{|-|} to change the state.
+
+@c snarfed from emacsy/emacsy.c:32
+
+@node C Api
+@section C Api
+
+@c snarfed from emacsy/emacsy.c:40
+
+Emacsy provides a C API to ease integration with C and C++
+programs. The C API is given below.
+
+@c snarfed from emacsy/emacsy.c:45
+@deffn {Scheme Procedure}  int emacsy_initialize (int init_flags)
+Initialize Emacsy.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:79
+@deffn {Scheme Procedure}  void emacsy_mouse_event (int x, int y, int state, int button, int modifier_key_flags)
+Enqueue a mouse event.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:109
+@deffn {Scheme Procedure}  int emacsy_tick ()
+Run an iteration of Emacsy's event loop, does not block.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:125
+@deffn {Scheme Procedure}  char *emacsy_message_or_echo_area ()
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:134
+@deffn {Scheme Procedure}  char *emacsy_mode_line ()
+Return the mode line.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:144
+@deffn {Scheme Procedure}  char *emacsy_current_buffer ()
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:154
+@deffn {Scheme Procedure}  int emacsy_run_hook_0 (char const *hook_name)
+Run a hook.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:168
+@deffn {Scheme Procedure}  int emacsy_minibuffer_point ()
+Return the minibuffer point.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:177
+@deffn {Scheme Procedure}  int emacsy_terminate ()
+Terminate Emacsy; run termination hook.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:188
+@deffn {Scheme Procedure}  SCM load_module_try (void* data)
+Attempt to load a module.
+
+The function @var{scm_c_use_module} throws an exception if it cannot
+find the module, so we have to split that functionality into a body
+function @var{load_module_try} and an error handler
+@var{load_module_error}.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:203
+@deffn {Scheme Procedure}  SCM load_module_error (void *data, SCM key, SCM args)
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:212
+@deffn {Scheme Procedure}  int emacsy_load_module (char const *module)
+Attempt to load a module.  Returns 0 if no errors, and non-zero otherwise.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:232
+@deffn {Scheme Procedure}  SCM modifier_key_flags_to_list (int modifier_key_flags)
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:246
+@deffn {Scheme Procedure}  SCM scm_c_string_to_symbol (char const* str)
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:254
+
+@deffn {Scheme Procedure} modifier-key-flags->list flags
+@deffnx {C Function} SCM scm_modifier_key_flags_to_list (flags)
+Convert integer @var{flags} to a list of symbols.
+@end deffn
+
+@c snarfed from emacsy/emacsy.c:270
+@deffn {Scheme Procedure}  SCM scm_c_emacsy_ref (char const* name)
+Ref @var{name} from emacsy module.
+@end deffn
+
+@node Emacsy Facade
+@section Emacsy Facade
+
+So that users of our library don't have to import all of our nicely
+partitioned modules individually, we'll expose a facade module that
+re-exports all of the public interfaces for each module.  Just use
+@example
+  (use-modules (emacsy emacsy))
+@end example
+or
+@example
+  #:use-module (emacsy emacsy)
+@end example
+
+
+@node Event
+@section Event
+
+One of the idioms we want to capture from Emacs is this.
+
+@verbatim
+  (define-key global-map "M-f" 'some-command)
+@end verbatim
+
+They [[keymap]] and [[command]] module will deal with most of the
+above, except for the [[kbd]] procedure.  That's something events will
+be concerned with.  One may define a converter for a [[kbd-entry]] to
+an event of the proper type.  Note that a [[kbd-string]] is broken
+into multiple [[kbd-entries]] on whitespace boundaries, e.g., ``C-x
+C-f'' is a [[kbd-string]] that when parsed becomes two [[kbd-entries]]
+``C-x'' and ``C-f''.
+
+
+@c snarfed from emacsy/event.scm:63
+@deftp {Class} <event>
+Basic event class.
+@end deftp
+
+@c snarfed from emacsy/event.scm:68
+@deftp {Class} <modifier-key-event>
+Event to capture key strokes, including the modifier keys.
+@end deftp
+
+@c snarfed from emacsy/event.scm:72
+@deftp {Class} <key-event>
+Event to capture key strokes, including the modifier keys.
+@end deftp
+
+@c snarfed from emacsy/event.scm:77
+@deftp {Class} <mouse-event>
+Event to capture mouse events.
+@end deftp
+
+@c snarfed from emacsy/event.scm:82
+@deftp {Class} <drag-mouse-event>
+Event to capture mouse drag events.
+@end deftp
+
+@c snarfed from emacsy/event.scm:88
+@deftp {Class} <dummy-event>
+@c This should probably be placed in the [[kbd-macro]] module.
+@end deftp
+
+@c snarfed from emacsy/event.scm:91
+@defvar kbd-converter-functions
+Now we have the function [[kbd-entry->key-event]].  [[kbd]] needs to
+know about this and any other converter function.  So let's register it.
+@end defvar
+
+@c snarfed from emacsy/event.scm:102
+@deffn {Scheme Procedure} kbd-entry->key-event kbd-entry
+Let's write the converter for the [[<key-event>]] class that will
+accept the same kind of strings that Emacs does.  If the [[kbd-entry]]
+does not match the event-type, we return false [[#f]].
+@end deffn
+
+@c snarfed from emacsy/event.scm:124
+@deffn {Scheme Procedure} modifier-char->symbol char
+For the modifier keys, we are going to emulate Emacs to a fault.
+@end deffn
+
+@c snarfed from emacsy/event.scm:140
+@deffn {Scheme Procedure} register-kbd-converter function-name function
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:159
+@deffn {Scheme Procedure} kbd->events kbd-string
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:163
+@deffn {Scheme Procedure} canonize-event! (event <key-event>)
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:167
+@deffn {Scheme Procedure} event->kbd (event <key-event>)
+Now we convert the [[<key-event>]] back to a [[kbd-entry]].
+@end deffn
+
+@c snarfed from emacsy/event.scm:171
+@deffn {Scheme Procedure} event->kbd (event <modifier-key-event>)
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:175
+@deffn {Scheme Procedure} modifier-symbol->char sym
+Instead of using [[define-generic]] I've written a convenience macro
+[[define-generic-public]] that exports the symbol to the current
+module.  This mimics the functionality of [[define-public]].  In
+general, any *-public macro will export the symbol or syntax to the
+@end deffn
+
+@c snarfed from emacsy/event.scm:191
+@deffn {Scheme Procedure} write (obj <key-event>) port
+Display the @var{<key-event>} in a nice way.
+@end deffn
+
+@c snarfed from emacsy/event.scm:211
+@deffn {Scheme Procedure} kbd-entry->mouse-event kbd-entry
+The @var{kbd-entry} for mouse events is similar to key events.  The
+regular expression is
+@verb{@^(([ACHMsS]-)*)((up-|down-|drag-)?mouse-([123]))\$@}.
+@end deffn
+
+@c snarfed from emacsy/event.scm:239
+@deffn {Scheme Procedure} up-mouse-event? e
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:243
+@deffn {Scheme Procedure} down-mouse-event? e
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:247
+@deffn {Scheme Procedure} drag-mouse-event? e
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:251
+@deffn {Scheme Procedure} click-mouse-event? e
+
+@end deffn
+
+@c snarfed from emacsy/event.scm:255
+@deffn {Scheme Procedure} motion-mouse-event? e
+
+@end deffn
+
+@node Keymap
+@section Keymap
+
+The keymap stores the mapping between key strokes---or events---and
+commands.  Emacs uses lists for its representation of keymaps. Emacsy
+instead uses a class that stores entries in a hash table.  Another
+difference for Emacsy is that it does not convert @verb{|S-C-a|} to a
+different representation like @verb{|[33554433]|}; it leaves it as a
+string that is expected to be turned into a canonical representation
+``C-A''.
+
+Here is an example of the keymap representation in Emacs.
+
+@verbatim
+> (let ((k (make-sparse-keymap)))
+    (define-key k "a"         'self-insert-command)
+    (define-key k "<mouse-1>" 'mouse-drag-region)
+    (define-key k "C-x C-f"   'find-file-at-point)
+    k)
+
+(keymap
+ (24 keymap
+     (6 . find-file-at-point))
+ (mouse-1 . mouse-drag-region)
+ (97 . self-insert-command))
+@end verbatim
+
+When I initially implemented Emacsy, I replicated Emacs' keymap
+representation, but I realized it wasn't necessary.  And it seems
+preferrable to make the representation more transparent to casual
+inspection.  Also, Emacsy isn't directly responsible for the
+conversion of keyboard events into [[key-event]]s---that's a lower
+level detail that the embedding application must handle.  Here is the
+same keymap as above but in Emacsy.
+
+@verbatim
+> (let ((k (make-keymap)))
+    (define-key k "a"       'self-insert-command)
+    (define-key k "mouse-1" 'mouse-drag-region)
+    (define-key k "C-x C-f" 'find-file-at-point)
+    k)
+
+#<keymap
+  a self-insert-command
+  C-x #<keymap
+        C-f find-file-at-point>
+  mouse-1 mouse-drag-region>
+@end verbatim
+
+There are a few differences in how the keymap is produced, and the
+representation looks slightly different too.  For one thing it's not a
+list.
+
+@c \todo[inline]{Justify decisions that deviate from Emacs' design.}
+
+Our keymap class has a hashtable of entries and possibly a parent
+keymap.
+
+
+@c snarfed from emacsy/keymap.scm:89
+@deftp {Class} <keymap>
+
+@end deftp
+
+@c snarfed from emacsy/keymap.scm:93
+@deffn {Scheme Procedure} lookup-key keymap keys  #:optional (follow-parent? #t)
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:103
+@deffn {Scheme Procedure} lookup-key? keymap keyspec  #:optional (keymap-ok? #f)
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:117
+@deffn {Scheme Procedure} define-key keymap key-list-or-string symbol-or-procedure-or-keymap
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:125
+@deffn {Scheme Procedure} keymap? obj
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:129
+@deffn {Scheme Procedure} make-keymap  #:optional (parent #f)
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:133
+@deffn {Scheme Procedure} write (obj <keymap>) port
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:137
+@deffn {Scheme Procedure} write-keymap obj port  #:optional (keymap-print-prefix 0)
+
+@end deffn
+
+@c snarfed from emacsy/keymap.scm:141
+@deffn {Scheme Procedure} lookup-key-entry? result
+
+@end deffn
+
+@node Command
+@section Command
+
+@quotation
+If words of command are not clear and distinct, if orders are not thoroughly understood, then the general is to blame.
+@author Sun Tzu
+@end quotation
+
+The command module is responsible for a couple things.  In Emacs one
+defines commands by using the special form [[(interactive)]] within
+the body of the procedure.  Consider this simple command.
+
+@verbatim
+(defun hello-command ()
+  (interactive)
+  (message "Hello, Emacs!"))
+@end verbatim
+
+Emacsy uses a more Scheme-like means of defining commands as shown
+below.
+
+@verbatim
+(define-interactive (hello-command)
+  (message "Hello, Emacsy!"))
+@end verbatim
+
+One deviation from Emacs I want to see within Emacsy is to have the
+commands be more context sensitive.  To illustrate the problem when I
+hit @verb{|M-x TAB TAB|} it autocompletes all the available commands
+into a buffer.  In my case that buffer contains 4,840 commands.  This
+doesn't seem to hurt command usability, but it does hurt the command
+discoverability.
+
+I want Emacsy to have command sets that are analogous to keymaps.
+There will be a global command set [[global-cmdset]] similar to the
+global keymap [[global-map]].  And in the same way that major and
+minor modes may add keymaps to a particular buffer, so too may they
+add command maps.
+
+@c \todo[inline]{Figure out where to look up any given
+@c  function/variable using this kind of code (apropos-internal
+@c  "\^emacsy.*").  Refer to ice-9 readline package for an example of
+@c  its usage.}
+
+The class holds the entries, a string completer for tab completion,
+and potentially a parent command map.
+
+@c \todo[inline]{Wouldn't this better be thought of as a command set
+@c  rather than map.  Also, having it as a map means there could be two
+@c  different implementations of the command; the one referred to by the
+@c  procedure, and the one referred to in the map.  They could be become
+@c  unsynchronized.}
+
+
+@c snarfed from emacsy/command.scm:89
+@deffn {Scheme Procedure} module-command-interface mod
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:93
+@deffn {Scheme Procedure} module-export-command! m names
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:97
+
+
+@c snarfed from emacsy/command.scm:101
+
+
+@c snarfed from emacsy/command.scm:107
+
+
+@c snarfed from emacsy/command.scm:111
+
+
+@c snarfed from emacsy/command.scm:125
+@defvar in-what-command
+
+@end defvar
+
+@c snarfed from emacsy/command.scm:128
+@defvar this-command
+
+@end defvar
+
+@c snarfed from emacsy/command.scm:131
+@defvar last-command
+
+@end defvar
+
+@c snarfed from emacsy/command.scm:134
+@defvar kill-rogue-coroutine?
+
+@end defvar
+
+@c snarfed from emacsy/command.scm:137
+@defvar seconds-to-wait-for-yield
+
+@end defvar
+
+@c snarfed from emacsy/command.scm:140
+@defvar this-interactive-command
+
+@end defvar
+
+@c snarfed from emacsy/command.scm:143
+@deffn {Scheme Procedure} command-contains? (cmap <command-set>) command-symbol
+We have accessors for adding, removing, and testing what's in the
+set. Note that the parent set is never mutated.
+@end deffn
+
+@c snarfed from emacsy/command.scm:148
+@deffn {Scheme Procedure} command-add! (cmap <command-set>) command-symbol
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:152
+@deffn {Scheme Procedure} command-remove! (cmap <command-set>) command-symbol
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:156
+@deffn {Scheme Procedure} register-interactive name proc
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:160
+@deffn {Scheme Procedure} command->proc command
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:164
+@deffn {Scheme Procedure} command-name command
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:168
+@deffn {Scheme Procedure} command? object
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:187
+@deffn {Scheme Procedure} set-command-properties! proc  #:optional (name #f)
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:190
+@deffn {Scheme Procedure} what-command-am-i?
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:194
+@deffn {Scheme Procedure} command-execute command . args
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:198
+@deffn {Scheme Procedure} call-interactively command . args
+
+@end deffn
+
+@c snarfed from emacsy/command.scm:202
+@deffn {Scheme Procedure} called-interactively?  #:optional (kind (quote any))
+
+@end deffn
+
+@node Block
+@section Block
+
+
+@c snarfed from emacsy/block.scm:32
+
+
+@c snarfed from emacsy/block.scm:36
+@deftp {Class} <blocking-continuation>
+We're going to capture these blocking continuations into a class.
+@end deftp
+
+@c snarfed from emacsy/block.scm:46
+@defvar blocking-continuations
+[[call-blockable]] will handle any aborts to the [['block]] prompt.
+If the thunk aborts, it adds an instance of the class
+[[<blocking-continuation>]] to a list of such instances.
+@end defvar
+
+@c snarfed from emacsy/block.scm:55
+@deffn {Scheme Procedure} block-yield
+
+@end deffn
+
+@c snarfed from emacsy/block.scm:59
+@deffn {Scheme Procedure} call-blockable thunk
+
+@end deffn
+
+@c snarfed from emacsy/block.scm:65
+@deffn {Scheme Procedure} block-tick
+To possibly resume these continuations, we're going to call
+[[block-tick]].  Additionally, continuations come in two flavors:
+serial and non-serial.  The constraints on resuming are different.  A
+non-serial block can be resumed whenever the
+[[continue-when?]]
+thunk return true.  A
+serial block, however, will only be resumed after every other serial
+block that has a greater number, meaning more recent, has been
+resumed.
+@end deffn
+
+@c snarfed from emacsy/block.scm:80
+@deffn {Scheme Procedure} blocking?
+
+@end deffn
+
+@c snarfed from emacsy/block.scm:84
+@deffn {Scheme Procedure} maybe-continue (obj <blocking-continuation>)
+
+@end deffn
+
+@c snarfed from emacsy/block.scm:88
+@deffn {Scheme Procedure} block-until condition-thunk  #:optional (serial? #f)
+In addition to simply yielding we can block until a particular
+condition is met.
+@end deffn
+
+@c snarfed from emacsy/block.scm:93
+@deffn {Scheme Procedure} block-while condition-thunk  #:optional (serial? #f)
+And if we have [[block-until]], it's easy to write
+[[block-while]].
+@end deffn
+
+@c snarfed from emacsy/block.scm:98
+@deffn {Scheme Procedure} block-kill (obj <blocking-continuation>)
+Sometimes we may just want to kill a blocking continuation.  One could
+just forget the reference and let it be garbage collected.  Here,
+we're going to throw an exception such that whatever the continuation
+was doing can potentially be cleaned up.
+@end deffn
+
+@node KLECL
+@section KLECL
+
+@quotation
+A box without hinges, key, or lid, yet golden treasure inside is hid.
+@author The Hobbit -- J. R. R. Tolkien
+@end quotation
+
+We finally have all the pieces to properly build the KLECL.  First, we
+have to accept input.
+
+
+@c snarfed from emacsy/klecl.scm:53
+@defvar event-queue
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:56
+@defvar read-event-hook
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:59
+@defvar emacsy-interactive?
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:62
+With the command loop I've also adopted a prefix of [[primitive-]]
+which signifies that it does not do any error handling.  The command
+loop sets up a fair amount of state.
+
+@c snarfed from emacsy/klecl.scm:67
+@defvar this-command-event
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:70
+@defvar last-command-event
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:73
+@defvar pre-command-hook
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:76
+@defvar post-command-hook
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:79
+@defvar emacsy-ran-undefined-command?
+
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:82
+@defvar command-loop-count
+Each command loop is given a different number.
+@end defvar
+
+@c snarfed from emacsy/klecl.scm:85
+@deffn {Scheme Procedure} emacsy-event event
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:89
+@deffn {Scheme Procedure} emacsy-key-event char  #:optional (modifier-keys (quote ))
+This is a convenience procedure to enqueue a key event.
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:93
+@deffn {Scheme Procedure} emacsy-mouse-event position button state  #:optional (modifier-keys (quote ))
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:97
+@deffn {Scheme Procedure} emacsy-discard-input!
+And mainly for testing purposes we also want to discard all input.  Or
+there are cases where we want to unread an event and push it to the
+front of the queue rather than the rear.
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:103
+@deffn {Scheme Procedure} emacsy-event-unread event
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:109
+[[read-event]] is the lowest-level procedure for grabbing events.  It
+will block if there are no events to read.
+
+@c snarfed from emacsy/klecl.scm:130
+@deffn {Scheme Procedure} read-event  #:optional (prompt #f)
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:165
+@deffn {Scheme Procedure} read-key  #:optional (prompt #f)
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:179
+read-key-sequence #:optional prompt #:key keymaps
+
+@c snarfed from emacsy/klecl.scm:215
+@deffn {Scheme Procedure} quit-key? aKey keymaps
+We also check all the maps for a quit key, typically defined as @verb{|C-g|}.
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:221
+@deffn {Scheme Procedure} default-klecl-maps
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:225
+@deffn {Scheme Procedure} message . args
+I find it convenient to begin emitting messages in case of error.
+However, I would like for there to be a clean separation between
+Emacsy and its KLECL such that someone may write a clean vim-y using
+it if they so chose.  So this message will merely go to the stdout\;
+however, it will be redefined later.
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:254
+primitive-command-tick #:optional prompt #:key keymaps undefined-command
+XXX Rename this to klec, for Key-Lookup-Execute-Command (KLEC)---just
+missing the loop component?
+
+@c snarfed from emacsy/klecl.scm:293
+@deffn {Scheme Procedure} command-tick  #:key (keymaps (default-klecl-maps))
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:297
+@deffn {Scheme Procedure} primitive-command-loop  #:optional (continue-pred (const #t))
+Now let's write the command loop without any error handling.  This
+seems a little messy with the continue predicate procedure being
+passed along.  I'm not sure yet, how best to organize it.
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:331
+@deffn {Interactive Procedure} keyboard-quit
+@kindex keyboard-quit
+
+@end deffn
+
+@c snarfed from emacsy/klecl.scm:340
+We have finished the KLECL.  Note that although we have used
+Emacs-like function names, we have not implemented the Emacs-like UI
+yet. We have not defined any default key bindings.  I want to
+encourage people to explore different user interfaces based on the
+KLECL, and one can start from this part of the code.  If one wanted to
+create a modal UI, one could use the [[(emacsy klecl)]] module and not
+have to worry about any ``pollution'' of Emacs-isms.
+
+@node Kbd-Macro
+@section Kbd-Macro
+
+@quotation
+@dots{}
+@author @dots{}
+@end quotation
+
+We will now add a keyboard macro facility familiar to Emacs users.  We
+hook into the [[read-event]] procedure using a hook.
+
+
+@c snarfed from emacsy/kbd-macro.scm:45
+@defvar defining-kbd-macro?
+
+@end defvar
+
+@c snarfed from emacsy/kbd-macro.scm:48
+@defvar last-kbd-macro
+
+@end defvar
+
+@c snarfed from emacsy/kbd-macro.scm:51
+@defvar executing-kbd-macro?
+
+@end defvar
+
+@c snarfed from emacsy/kbd-macro.scm:54
+@defvar kbd-macro-termination-hook
+
+@end defvar
+
+@c snarfed from emacsy/kbd-macro.scm:57
+@defvar executing-temporal-kbd-macro-hook
+
+@end defvar
+
+@c snarfed from emacsy/kbd-macro.scm:60
+@deffn {Scheme Procedure} kbd-read-event-hook event
+XXX This also may record the key event that stops the keyboard
+macro, which it shouldn't.
+@end deffn
+
+@c snarfed from emacsy/kbd-macro.scm:65
+@deffn {Interactive Procedure} kmacro-start-macro
+@kindex kmacro-start-macro
+
+@end deffn
+
+@c snarfed from emacsy/kbd-macro.scm:69
+@deffn {Interactive Procedure} kmacro-end-macro
+@kindex kmacro-end-macro
+
+@end deffn
+
+@c snarfed from emacsy/kbd-macro.scm:73
+@deffn {Interactive Procedure} kmacro-end-and-call-macro
+@kindex kmacro-end-and-call-macro
+
+@end deffn
+
+@c snarfed from emacsy/kbd-macro.scm:77
+FIXME
+
+@c snarfed from emacsy/kbd-macro.scm:102
+@deffn {Interactive Procedure} execute-temporal-kbd-macro  #:optional (kbd-macro last-kbd-macro)
+@kindex execute-temporal-kbd-macro  #:optional (kbd-macro last-kbd-macro)
+In addition to regular keyboard macros, Emacsy can execute keyboard
+macros such that they reproduce the keys at the same pace as they were
+recorded.
+@end deffn
+
+@node Buffer
+@section Buffer
+
+@quotation
+And when you gaze long into an abyss the abyss also gazes into you.
+@author Beyond Good and Evil, Friedrich Nietzsche
+@end quotation
+
+A buffer in Emacs represents text, including its mode, local
+variables, etc.  A Emacsy buffer is not necessarily text.  It can be
+extended to hold whatever the host application is interested in.
+Emacs' concepts of buffer, window, and mode are directly analogous to
+the model, view, and controller respectively---the MVC pattern.
+
+
+@c snarfed from emacsy/buffer.scm:57
+@defmac with-buffer @dots{}
+A convenience macro to work with a given buffer.
+@end defmac
+
+@c snarfed from emacsy/buffer.scm:70
+@deftp {Class} <buffer>
+
+@end deftp
+
+@c snarfed from emacsy/buffer.scm:77
+@deftp {Class} <text-buffer>
+
+@end deftp
+
+@c snarfed from emacsy/buffer.scm:82
+@defvar before-buffer-change-hook
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:85
+@defvar after-buffer-change-hook
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:91
+@defvar buffer-stack
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:94
+@defvar last-buffer
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:97
+@defvar aux-buffer
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:100
+@deffn {Scheme Procedure} buffer-name
+Buffer's have a name, and there is always a current buffer or it's
+false.  Note that methods do not work as easily with optional
+arguments.  It seems best to define each method with a different
+number of arguments as shown below.
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:107
+@deffn {Scheme Procedure} buffer-name (buffer <buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:111
+@deffn {Scheme Procedure} set-buffer-name! name
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:115
+@deffn {Scheme Procedure} set-buffer-name! name (buffer <buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:119
+@deffn {Scheme Procedure} buffer-modified?
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:123
+@deffn {Scheme Procedure} buffer-modified-tick
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:127
+@deffn {Scheme Procedure} write (obj <buffer>) port
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:134
+@deffn {Scheme Procedure} current-local-map
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:138
+@deffn {Scheme Procedure} use-local-map keymap
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:142
+@deffn {Scheme Procedure} buffer-list
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:146
+@deffn {Scheme Procedure} current-buffer
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:150
+@deffn {Scheme Procedure} add-buffer! buffer
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:154
+@deffn {Scheme Procedure} remove-buffer! buffer
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:158
+@deffn {Interactive Procedure} next-buffer  #:optional (incr 1)
+@kindex next-buffer  #:optional (incr 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:162
+@deffn {Interactive Procedure} prev-buffer  #:optional (incr 1)
+@kindex prev-buffer  #:optional (incr 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:166
+@deffn {Scheme Procedure} set-buffer! buffer
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:170
+@deffn {Interactive Procedure} kill-buffer  #:optional (buffer (current-buffer))
+@kindex kill-buffer  #:optional (buffer (current-buffer))
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:174
+@deffn {Interactive Procedure} other-buffer  #:optional (count 1)
+@kindex other-buffer  #:optional (count 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:196
+@defvar switch-to-buffer
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:199
+@deffn {Scheme Procedure} local-var-ref symbol
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:206
+@deffn {Scheme Procedure} local-var-set! symbol value
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:210
+@defvar local-var
+
+@end defvar
+
+@c snarfed from emacsy/buffer.scm:214
+@deffn {Scheme Procedure} buffer-string (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:218
+@deffn {Scheme Procedure} point
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:222
+@deffn {Scheme Procedure} point (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:226
+@deffn {Scheme Procedure} point-min
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:230
+@deffn {Scheme Procedure} point-min (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:234
+@deffn {Scheme Procedure} point-max
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:238
+@deffn {Scheme Procedure} point-max (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:242
+@deffn {Scheme Procedure} goto-char point
+Move the point around.  It's very tempting to change the name from
+[[goto-char]] to [[goto-point!]] because [[goto-char]] is misleading.
+You don't actually go to a character, you go to a place between
+characters, a point.
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:249
+@deffn {Scheme Procedure} goto-char point (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:258
+@deffn {Scheme Procedure} char-before
+XXX define-method needs to allow for the definition of optional arguments.
+This is getting ridiculous.
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:263
+@deffn {Scheme Procedure} char-before point
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:279
+@deffn {Scheme Procedure} char-before point (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:283
+@deffn {Scheme Procedure} char-after
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:287
+@deffn {Scheme Procedure} char-after point
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:291
+@deffn {Scheme Procedure} char-after point (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:295
+@deffn {Scheme Procedure} gb-re-search-forward gb regex  #:optional (bound #f) (no-error? #f) (repeat 1)
+There is
+@url{"http://gnuvola.org/software/guile/doc/Gap-Buffer.html", documentation}
+which suggests that [[(ice-9 gap-buffer)]] module has some nice regex
+search features.  However, I can't find the implementation anywhere,
+so I implemented them pretty sloppily here.  They should work find for
+a minibuffer, but probably shouldn't be used for anything bigger.
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:304
+@deffn {Scheme Procedure} gb-re-search-backward gb regex  #:optional (bound #f) (no-error? #f) (repeat 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:308
+@deffn {Interactive Procedure} kill-line  #:optional (n 1)
+@kindex kill-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:312
+@deffn {Interactive Procedure} delete-backward-char  #:optional (n 1)
+@kindex delete-backward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:316
+@deffn {Interactive Procedure} forward-delete-char  #:optional (n 1)
+@kindex forward-delete-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:320
+@deffn {Interactive Procedure} forward-char  #:optional (n 1)
+@kindex forward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:327
+@deffn {Interactive Procedure} forward-word  #:optional (n 1)
+@kindex forward-word  #:optional (n 1)
+XXX where is gb-re-search-forward defined?  It has documentation.
+but no implementation?
+http://gnuvola.org/software/guile/doc/Gap-Buffer.html
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:333
+@deffn {Interactive Procedure} backward-word  #:optional (n 1)
+@kindex backward-word  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:337
+@deffn {Interactive Procedure} move-beginning-of-line  #:optional (n 1)
+@kindex move-beginning-of-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:341
+@deffn {Interactive Procedure} move-end-of-line  #:optional (n 1)
+@kindex move-end-of-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:345
+@deffn {Interactive Procedure} backward-char  #:optional (n 1)
+@kindex backward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:349
+@deffn {Scheme Procedure} insert  #:rest args
+
+@end deffn
+
+@c snarfed from emacsy/buffer.scm:353
+@deffn {Interactive Procedure} self-insert-command  #:optional (n 1)
+@kindex self-insert-command  #:optional (n 1)
+
+@end deffn
+
+@node Mru-stack
+@subsection Mru-stack
+
+The buffers are kept in a most recently used stack that has the
+following operators: add!, remove!, contains?, recall!, and list.
+
+
+@c snarfed from emacsy/mru-stack.scm:46
+@deftp {Class} <mru-stack>
+
+@end deftp
+
+@c snarfed from emacsy/mru-stack.scm:54
+@deffn {Scheme Procedure} mru-add! (s <mru-stack>) x
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:58
+@deffn {Scheme Procedure} mru-remove! (s <mru-stack>) x
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:62
+@deffn {Scheme Procedure} mru-recall! (s <mru-stack>) x
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:66
+@deffn {Scheme Procedure} mru-set! (s <mru-stack>) x
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:70
+@deffn {Scheme Procedure} mru-ref (s <mru-stack>)
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:74
+@deffn {Scheme Procedure} mru-list (s <mru-stack>)
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:78
+@deffn {Scheme Procedure} mru-empty? (s <mru-stack>)
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:82
+@deffn {Scheme Procedure} mru-contains? (s <mru-stack>) x
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:86
+@deffn {Scheme Procedure} mru-next! (s <mru-stack>) count
+The order of the elements may not change yet the index may be moved
+around.
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:91
+@deffn {Scheme Procedure} mru-prev! (s <mru-stack>) count
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:95
+@deffn {Scheme Procedure} mru-prev! (s <mru-stack>)
+
+@end deffn
+
+@c snarfed from emacsy/mru-stack.scm:99
+@deffn {Scheme Procedure} mru-next! (s <mru-stack>)
+
+@end deffn
+
+@node Minibuffer
+@section Minibuffer
+The minibuffer provides a rich interactive textual input system.  It
+offers @verb{|TAB|} completion and history.  The implementation of it
+inherits from the [[<text-buffer>]].
+
+
+@c snarfed from emacsy/minibuffer.scm:56
+@deftp {Class} <minibuffer>
+
+@end deftp
+
+@c snarfed from emacsy/minibuffer.scm:60
+@defvar minibuffer-local-map
+We define a keymap with all the typical self-insert-commands that
+would be expected in an editable buffer
+@c .\todo{This should probably be defined in the buffer module since it is general.}
+@end defvar
+
+@c snarfed from emacsy/minibuffer.scm:69
+@defvar minibuffer
+
+@end defvar
+
+@c snarfed from emacsy/minibuffer.scm:72
+@defvar emacsy-display-minibuffer?
+
+@end defvar
+
+@c snarfed from emacsy/minibuffer.scm:76
+@defvar ticks-per-second
+
+@end defvar
+
+@c snarfed from emacsy/minibuffer.scm:86
+@defvar minibuffer-history
+
+@end defvar
+
+@c snarfed from emacsy/minibuffer.scm:95
+When we show the minibuffer, we'll show the prompt, the contents (user
+editable), and the minibuffer-message if applicable.
+
+@c snarfed from emacsy/minibuffer.scm:99
+@deffn {Scheme Procedure} buffer-string (buffer <minibuffer>)
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:102
+@deffn {Scheme Procedure} minibuffer-contents  #:optional (buffer minibuffer)
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:106
+@deffn {Scheme Procedure} delete-minibuffer-contents  #:optional (buffer minibuffer)
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:142
+@deffn {Scheme Procedure} minibuffer-message string . args
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:146
+@subsection read-from-minibuffer
+
+@c snarfed from emacsy/minibuffer.scm:149
+history can be #f, a symbol, or a <cursor-list>.
+
+@c snarfed from emacsy/minibuffer.scm:247
+@deffn {Scheme Procedure} try-completion string collection  #:optional (predicate (const #t))
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:251
+@deffn {Scheme Procedure} all-completions string collection  #:optional (predicate (const #t))
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:255
+@deffn {Scheme Procedure} collection->completer collection  #:optional (predicate (const #t))
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:265
+@deffn {Scheme Procedure} completing-read prompt collection  #:key predicate (const #t) (require-match? #f) (initial-input #f) (history (what-command-am-i?)) (to-string #f)
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:295
+@deffn {Scheme Procedure} apropos-module rgx module
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:299
+@defvar command-completion-function
+
+@end defvar
+
+@c snarfed from emacsy/minibuffer.scm:317
+We want to be able to look up filenames.
+
+@c snarfed from emacsy/minibuffer.scm:320
+@deffn {Scheme Procedure} files-in-dir dirname
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:376
+@deffn {Scheme Procedure} read-file-name prompt  #:key dir default-file-name initial predicate history
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:391
+@subsection Minibuffer History
+
+@c snarfed from emacsy/minibuffer.scm:394
+@deffn {Scheme Procedure} make-history  #:optional (list (quote )) (index #f)
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:400
+@deffn {Scheme Procedure} history-insert! history value
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:404
+@deffn {Scheme Procedure} history-ref history
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:408
+@deffn {Scheme Procedure} history-set! history value
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:412
+@deffn {Interactive Procedure} exit-minibuffer
+@kindex exit-minibuffer
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:416
+@deffn {Interactive Procedure} minibuffer-complete
+@kindex minibuffer-complete
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:420
+@deffn {Interactive Procedure} next-match
+@kindex next-match
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:424
+@deffn {Interactive Procedure} previous-match
+@kindex previous-match
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:428
+@deffn {Interactive Procedure} minibuffer-complete-word
+@kindex minibuffer-complete-word
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:432
+@deffn {Interactive Procedure} minibuffer-completion-help
+@kindex minibuffer-completion-help
+
+@end deffn
+
+@c snarfed from emacsy/minibuffer.scm:436
+Some commands for manipulating the minibuffer history.
+
+@c snarfed from emacsy/minibuffer.scm:439
+@deffn {Interactive Procedure} previous-history-element  #:optional (n 1)
+@kindex previous-history-element  #:optional (n 1)
+
+@end deffn
+
+@node Core
+@section Core
+
+Now we're going to put in place some core functionality that makes
+Emacsy an Emacs-like library.
+
+
+@c snarfed from emacsy/core.scm:73
+@defvar global-map
+We need a global keymap.
+@end defvar
+
+@c snarfed from emacsy/core.scm:76
+@defvar special-event-map
+
+@end defvar
+
+@c snarfed from emacsy/core.scm:79
+@defvar emacsy-quit-application?
+
+@end defvar
+
+@c snarfed from emacsy/core.scm:88
+@defvar messages
+
+@end defvar
+
+@c snarfed from emacsy/core.scm:97
+@defvar emacsy-send-mouse-movement-events?
+Sometimes we may want to track the motion events generated by a mouse.
+We don't do this all the time because it seems unnecessarily taxing.
+@end defvar
+
+@c snarfed from emacsy/core.scm:104
+@deffn {Scheme Procedure} current-active-maps
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:109
+@deffn {Scheme Procedure} universal-argument-ref
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:113
+@deffn {Scheme Procedure} universal-argument-pop!
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:117
+@deffn {Scheme Procedure} universal-argument-push! arg
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:121
+@deffn {Interactive Procedure} switch-to-buffer  #:optional buffer
+@kindex switch-to-buffer  #:optional buffer
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:173
+@deffn {Scheme Procedure} emacsy-echo-area
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:177
+@deffn {Scheme Procedure} current-message
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:181
+@deffn {Scheme Procedure} emacsy-message . args
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:188
+@deffn {Scheme Procedure} clear-echo-area
+When the minibuffer is entered, we want to clear the echo-area.
+Because the echo-area is defined in core, it seems best to deal with
+it in core rather than placing echo-area handling code in minibuffer.
+@end deffn
+
+@c snarfed from emacsy/core.scm:194
+@deffn {Scheme Procedure} emacsy-message-or-echo-area
+These are most of the C API calls.
+@end deffn
+
+@c snarfed from emacsy/core.scm:198
+@deffn {Scheme Procedure} emacsy-mode-line
+
+method
+@end deffn
+
+@c snarfed from emacsy/core.scm:203
+@deffn {Scheme Procedure} emacsy-mode-line (buffer <buffer>)
+
+method
+XXX this should be moved into the (emacsy buffer) module.
+@end deffn
+
+@c snarfed from emacsy/core.scm:209
+@deffn {Scheme Procedure} emacsy-minibuffer-point
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:213
+@deffn {Scheme Procedure} emacsy-run-hook hook . args
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:219
+@deffn {Scheme Procedure} emacsy-terminate
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:223
+@deffn {Scheme Procedure} emacsy-tick
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:277
+@deffn {Scheme Procedure} emacsy-initialize interactive?
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:281
+@deffn {Interactive Procedure} eval-expression  #:optional epression
+@kindex eval-expression  #:optional epression
+There is one command that I consider fundamental for an Emacs-like
+program.  Whenever I'm presented with a program that claims to be
+Emacs-like, I try this out @verb{|M-: (+ 1 2)|}. If it doesn't work then
+it may have Emacs-like key bindings, but it's not Emacs-like.  That
+command is [[eval-expression]].  Let's write it.
+@end deffn
+
+@c snarfed from emacsy/core.scm:293
+@deffn {Interactive Procedure} execute-extended-command  #:optional (n 1)
+@kindex execute-extended-command  #:optional (n 1)
+The second fundamental command is [[execute-extended-command]] invoked
+with @verb{|M-x|}.
+@end deffn
+
+@c snarfed from emacsy/core.scm:298
+@deffn {Interactive Procedure} quit-application
+@kindex quit-application
+
+@end deffn
+
+@c snarfed from emacsy/core.scm:302
+@deffn {Interactive Procedure} universal-argument
+@kindex universal-argument
+This [[universal-argument]] command is written using a different style
+than is typical for interative Emacs commands.  Most Emacs commands
+are written with their state, keymaps, and ancillary procedures as
+public variables.  This style has a benefit of allowing one to
+manipulate or extend some pieces; however, there are some benefits to
+having everything encapsulated in this command procedure.  For
+instance, if the minibuffer were written in this style, one could
+invoke recursive minibuffers.
+@end deffn
+
+@c snarfed from emacsy/core.scm:313
+@deffn {Interactive Procedure} load-file  #:optional file-name
+@kindex load-file  #:optional file-name
+We want to be able to load a scheme file.
+@c todo {We should have aread-filename procedure.}
+@end deffn
+
+@node Advice
+@section Advice
+
+@quotation
+Wise men don't need advice.  Fools won't take it.
+@author Benjamin Franklin
+@end quotation
+
+@c @quotation
+@c Nobody can give you wiser advice than yourself.
+@c @author Marcus Tullius Cicero
+@c @end quotation
+
+@quotation
+No enemy is worse than bad advice.
+@author Sophocles
+@end quotation
+
+Emacs has a facility to define ``advice'' these are pieces of code
+that run before, after, or around an already defined function.  This
+@url{"http://electricimage.net/cupboard/2013/05/04/on-defadvice/",article}
+provides a good example.
+
+
+@c snarfed from emacsy/advice.scm:50
+@deftp {Record} <record-of-advice>
+How will this work?  Before we try to make the macro, let's focus on
+building up the functions.  We want to have a function that we can
+substitute for the original function which will have a number of
+before, after, and around pieces of advice that can be attached to it.
+@end deftp
+
+@c snarfed from emacsy/advice.scm:57
+@deftp {Record} <piece-of-advice>
+
+@end deftp
+
+@node Window
+@section Window
+
+Emacsy aims to offer the minimal amount of intrusion to acquire big
+gains in program functionality.  Windows is an optional module for
+Emacsy.  If you want to offer windows that behave like Emacs windows,
+you can, but you aren't required to.
+
+
+@c snarfed from emacsy/window.scm:51
+@deftp {Class} <window>
+The window class contains a renderable window that is associated with
+a buffer.
+@end deftp
+
+@c snarfed from emacsy/window.scm:56
+@deftp {Class} <internal-window>
+The internal window class contains other windows.
+@end deftp
+
+@c snarfed from emacsy/window.scm:60
+@defvar root-window
+
+@end defvar
+
+@c snarfed from emacsy/window.scm:63
+@defvar window-configuration-change-hook
+
+@end defvar
+
+@c snarfed from emacsy/window.scm:66
+@defvar current-window
+
+@end defvar
+
+@c snarfed from emacsy/window.scm:69
+@deffn {Scheme Procedure} initialize (obj <internal-window>) initargs
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:73
+@deffn {Scheme Procedure} window? o
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:77
+@deffn {Scheme Procedure} window-live? o
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:81
+@deffn {Scheme Procedure} frame-root-window
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:85
+@deffn {Scheme Procedure} edges->bcoords edges
+Emacs uses the edges of windows @verb{|(left top right bottom)|}, but
+I'm more comfortable using bounded coordinate systems
+@verb{|(left bottom width height)|}.  So let's write some converters.
+@end deffn
+
+@c snarfed from emacsy/window.scm:91
+@deffn {Scheme Procedure} bcoords->edges coords
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:150
+@deffn {Scheme Procedure} window-clone (window <window>)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:154
+@deffn {Scheme Procedure} selected-window
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:164
+@deffn {Scheme Procedure} update-window (window <internal-window>)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:168
+@deffn {Scheme Procedure} window-tree (w <internal-window>)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:172
+@deffn {Scheme Procedure} window-tree (w <window>)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:182
+@deffn {Scheme Procedure} window-list  #:optional (w root-window)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:186
+@deffn {Interactive Procedure} split-window  #:optional (window (selected-window)) (size 0.5) (side (quote below))
+@kindex split-window  #:optional (window (selected-window)) (size 0.5) (side (quote below))
+Be careful with @verb{|deep-clone|}. If you deep clone one window that
+has references to other windows, you will clone entire object graph.
+@end deffn
+
+@c snarfed from emacsy/window.scm:219
+@deffn {Interactive Procedure} split-window-below  #:optional (size 0.5)
+@kindex split-window-below  #:optional (size 0.5)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:223
+@deffn {Interactive Procedure} split-window-right  #:optional (size 0.5)
+@kindex split-window-right  #:optional (size 0.5)
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:227
+@deffn {Interactive Procedure} delete-window  #:optional (window (selected-window))
+@kindex delete-window  #:optional (window (selected-window))
+
+@end deffn
+
+@c snarfed from emacsy/window.scm:237
+@deffn {Interactive Procedure} other-window  #:optional (count 1)
+@kindex other-window  #:optional (count 1)
+
+@end deffn
+
+@node Help
+@section Help
+
+
+@c snarfed from emacsy/help.scm:35
+@deffn {Interactive Procedure} describe-variable  #:optional symbol
+@kindex describe-variable  #:optional symbol
+
+@end deffn
+
+@c snarfed from emacsy/help.scm:48
+@deffn {Interactive Procedure} describe-command  #:optional symbol
+@kindex describe-command  #:optional symbol
+
+@end deffn
+
+@node Self-doc
+@section Self-doc
+
+Emacs offers a fantastic comprehensive help system.  Emacsy intends to
+replicate most of this functionality.  One distinction that would be
+nice to make is to partition Scheme values into procedures, variables,
+and parameters.  In Scheme, all these kinds of values are the handled
+the same way.  In Emacs, each are accessible by the help system
+distinctly.  For instance, [[C-h f]] looks up functions, [[C-h v]]
+looks up variables.  In addition to defining what kind of value a
+variable holds, this also allows one to include documentation for
+values which is not included in Guile Scheme by default. (XXX fact
+check.)
+
+
+@c snarfed from emacsy/self-doc.scm:69
+@deffn {Scheme Procedure} variable-documentation variable-or-symbol
+XXX Rename from variable-documentation to just documentation.
+@end deffn
+
+@c snarfed from emacsy/self-doc.scm:73
+@deffn {Scheme Procedure} emacsy-collect-kind module kind  #:optional (depth 0)
+We also want to be able to collect up all the variables in some given
+module.
+@end deffn
+
+@c snarfed from emacsy/self-doc.scm:78
+
+
+@c snarfed from emacsy/self-doc.scm:82
+
+
+@c snarfed from emacsy/self-doc.scm:86
+Parameters behave similarly to variables; however, whenever they are
+defined, their values are set.

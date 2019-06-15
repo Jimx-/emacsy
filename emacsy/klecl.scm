@@ -1,9 +1,9 @@
-;;; <file:klecl.scm>=
-;;; \subsection{Legal Stuff}
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
 ;;;
-;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -16,15 +16,6 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; We have finished the KLECL.  Note that although we have used
-;;; Emacs-like function names, we have not implemented the Emacs-like UI
-;;; yet. We have not defined any default key bindings.  I want to
-;;; encourage people to explore different user interfaces based on the
-;;; KLECL, and one can start from this part of the code.  If one wanted to
-;;; create a modal UI, one could use the [[(emacsy klecl)]] module and not
-;;; have to worry about any ``pollution'' of Emacs-isms.
-
 
 (define-module (emacsy klecl)
   #:use-module (ice-9 optargs)
@@ -42,92 +33,97 @@
   #:use-module (emacsy block)
   #:use-module (emacsy coroutine)
   #:use-module (emacsy agenda)
-  #:export (command-loop)
-  )
+  #:export (command-loop))
 
+;;; Commentary:
 
-;;; <klecl:state>=
+;; @node KLECL
+;; @section KLECL
+;;
+;; @quotation
+;; A box without hinges, key, or lid, yet golden treasure inside is hid.
+;; @author The Hobbit -- J. R. R. Tolkien
+;; @end quotation
+
+;; We finally have all the pieces to properly build the KLECL.  First, we
+;; have to accept input.
+
+;;; Code:
+
+;;.
 (define-public event-queue (make-q))
-;;; <klecl:state>=
+
+;;.
 (define-public read-event-hook (make-hook 1))
+
+;;.
 (define-public emacsy-interactive? #f)
-;;; With the command loop I've also adopted a prefix of [[primitive-]]
-;;; which signifies that it does not do any error handling.  The command
-;;; loop sets up a fair amount of state.
-;;;
-;;;
-;;; <klecl:state>=
+
+;; With the command loop I've also adopted a prefix of [[primitive-]]
+;; which signifies that it does not do any error handling.  The command
+;; loop sets up a fair amount of state.
+;;.
+
+;;.
 (define-public this-command-event #f)
+
+;;.
 (define-public last-command-event #f)
 
+;;.
 (define-public pre-command-hook (make-hook))
+
+;;.
 (define-public post-command-hook (make-hook))
-;;; <klecl:state>=
+
+;;.
 (define-public emacsy-ran-undefined-command? #f)
-;;; Each command loop is given a different number.
-;;;
-;;;
-;;; <klecl:state>=
+
+;; Each command loop is given a different number.
 (define command-loop-count 0)
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
-;;; \section{KLECL Module}
-;;;
-;;; \epigraph{A box without hinges, key, or lid, yet golden treasure inside is hid.}{The Hobbit \\ J. R. R. Tolkien}
-;;;
-;;; We finally have all the pieces to properly build the KLECL.  First, we
-;;; have to accept input.
-;;;
-;;; \subsection{emacsy-event}
-;;;
-;;; The embedding application will handle the actual IO, but it passes
-;;; events to Emacsy for processing which are stored in a queue.
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;;.
 (define-public (emacsy-event event)
   (enq! event-queue event))
-;;; This is a convenience procedure to enqueue a key event.
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; This is a convenience procedure to enqueue a key event.
 (define*-public (emacsy-key-event char #:optional (modifier-keys '()))
   (emacsy-event (make <key-event>
                   #:modifier-keys modifier-keys
                   #:command-char char)))
-;;; <klecl:procedure>=
-(define*-public (emacsy-mouse-event position button state
-                                    #:optional (modifier-keys '()))
+
+;;.
+(define*-public (emacsy-mouse-event position button state #:optional (modifier-keys '()))
   (emacsy-event
    (make <mouse-event>
      #:position position #:button button
      #:state state #:modifier-keys modifier-keys)))
-;;; And mainly for testing purposes we also want to discard all input.  Or
-;;; there are cases where we want to unread an event and push it to the
-;;; front of the queue rather than the rear.
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; And mainly for testing purposes we also want to discard all input.  Or
+;; there are cases where we want to unread an event and push it to the
+;; front of the queue rather than the rear.
 (define-public (emacsy-discard-input!)
   (while (not (q-empty? event-queue))
     (deq! event-queue)))
 
+;;.
 (define-public (emacsy-event-unread event)
   (q-push! event-queue event))
-;;; \subsection{read-event}
-;;;
-;;; [[read-event]] is the lowest-level procedure for grabbing events.  It
-;;; will block if there are no events to read.
-;;;
-;;;
-;;; <klecl:procedure>=
-;; (define*-public (read-event #:optional (prompt #f))
-;;   (if prompt
-;;       (message prompt))
-;;   ;;;;(if (q-empty? event-queue)
-;;   (block-while (lambda () (q-empty? event-queue)) #t)
-;;   (let ((event (deq! event-queue)))
-;;     (run-hook read-event-hook event)
-;;     event))
+
+;; @subsection read-event
+;;
+;; [[read-event]] is the lowest-level procedure for grabbing events.  It
+;; will block if there are no events to read.
+;;.
+
+;;; (define*-public (read-event #:optional (prompt #f))
+;;;   (if prompt
+;;;       (message prompt))
+;;;   ;;;;(if (q-empty? event-queue)
+;;;   (block-while (lambda () (q-empty? event-queue)) #t)
+;;;   (let ((event (deq! event-queue)))
+;;;     (run-hook read-event-hook event)
+;;;     event))
 
 (define (raw-read-event prompt)
   (if prompt
@@ -137,6 +133,7 @@
     (emacsy-log-debug "RAW-READ-EVENT ~a~%" event)
     event))
 
+;;.
 (define*-public (read-event #:optional (prompt #f))
   (if emacsy-interactive?
       (if (q-empty? event-queue)
@@ -174,16 +171,18 @@
      (wait)))
 
 (agenda-schedule fulfill-read-requests)
-;;; \subsection{read-key}
-;;;
-;;; Read key is slightly more high level than [[read-event]].  It may do a
-;;; little processing of coalesing of events.  For instance, down and up
-;;; mouse events may be changed into click or drag events.\todo{There's probably a better way of handling disparate classes of events---use polymorphism!}
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; @subsection read-key
+;;
+;; Read key is slightly more high level than [[read-event]].  It may do a
+;; little processing of coalesing of events.  For instance, down and up
+;; mouse events may be changed into click or drag events.
+
+;;; @c\todo{There's probably a better way of handling disparate classes of events---use polymorphism!}
+
 (define last-down-mouse-event #f)
 
+;;.
 (define*-public (read-key #:optional (prompt #f))
   (define* (new-mouse-state new-state event #:optional (event2 #f))
     (let ((e (make (if event2 <drag-mouse-event> <mouse-event>)
@@ -216,17 +215,20 @@
                   (set! last-down-mouse-event #f)
                   new-event)
                 event)))))
-;;; \subsection{read-key-sequence}
-;;;
-;;; [[read-key-sequence]] is at a higher level than [[read-key]].  It
-;;; considers the currently active keymaps.  If a sequence is defined in
-;;; the keymap, it returns that event sequence.  If it doesn't match a
-;;; sequence yet, it continues to read more keys.  If it cannot match any
-;;; sequence, it returns that event sequence.\todo{Consider using values
-;;;   to return multiple values.}
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; @subsection read-key-sequence
+;;
+;; [[read-key-sequence]] is at a higher level than [[read-key]].  It
+;; considers the currently active keymaps.  If a sequence is defined in
+;; the keymap, it returns that event sequence.  If it doesn't match a
+;; sequence yet, it continues to read more keys.  If it cannot match any
+;; sequence, it returns that event sequence.
+
+;;; @c\todo {Consider using values to return multiple values.}
+
+;; read-key-sequence #:optional prompt #:key keymaps
+;;.
+
 (define*-public (read-key-sequence
                  #:optional
                  (prompt #f)
@@ -259,32 +261,29 @@
          (reverse events)
          ;; No.  Let's get some more.
          (loop (cons (read-discrete-key) events))))))
-;;; We also check all the maps for a quit key, typically defined as \verb|C-g|.
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; We also check all the maps for a quit key, typically defined as @verb{|C-g|}.
 (define-public (quit-key? aKey keymaps)
   (define (quit-key?* key keymap)
    (let ((result (lookup-key keymap (list key))))
      (and (not (keymap? result)) (lookup-key-entry? result)
           (eq? 'keyboard-quit result))))
   (any (lambda (keymap) (quit-key?* aKey keymap)) keymaps))
+
 ;;; \todo{Rename default-klecl-maps to current-active-maps.}
-;;;
-;;; <klecl:procedure>=
+
+;;.
 (define-public (default-klecl-maps)
   (list))
-;;; I find it convenient to begin emitting messages in case of error.
-;;; However, I would like for there to be a clean separation between
-;;; Emacsy and its KLECL such that someone may write a clean vim-y using
-;;; it if they so chose.  So this message will merely go to the stdout\;
-;;; however, it will be redefined later.
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; I find it convenient to begin emitting messages in case of error.
+;; However, I would like for there to be a clean separation between
+;; Emacsy and its KLECL such that someone may write a clean vim-y using
+;; it if they so chose.  So this message will merely go to the stdout\;
+;; however, it will be redefined later.
 (define-public (message . args)
   (apply format #t args))
-;;; <klecl:procedure>=
+
 (define call-with-sigalrm
   (if (not (provided? 'posix))
       (lambda (thunk) (thunk))
@@ -305,11 +304,12 @@
                   (sigaction SIGALRM (car handler) (cdr handler))
                   ;; restore original C handler.
                   (sigaction SIGALRM #f))))))))
-;;; XXX Rename this to klec, for Key-Lookup-Execute-Command (KLEC)---just
-;;; missing the loop component?
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; primitive-command-tick #:optional prompt #:key keymaps undefined-command
+;; XXX Rename this to klec, for Key-Lookup-Execute-Command (KLEC)---just
+;; missing the loop component?
+;;.
+
 (define*-public (primitive-command-tick #:optional
                                         (prompt #f)
                                         #:key
@@ -337,13 +337,14 @@
               ;; I doubt we want this command to be executed by the user, so
               ;; we're going to leave it as a procedure.
               (undefined-command key-sequence events))))))))
-;;; <klecl:procedure>=
+
 (define* (undefined-command key-sequence events)
   (message "~a is undefined."
            (string-join key-sequence " "))
   (set! emacsy-ran-undefined-command? #t)
   (values #f 'no-such-command))
-;;; <klecl:procedure>=
+
+;;.
 (define*-public (command-tick #:key (keymaps (default-klecl-maps)))
   "We do one iteration of command-tick and handle errors."
 
@@ -372,12 +373,10 @@
         (else
          (emacsy-log-error
                  "command-tick: Uncaught throw to '~a: ~a\n" key args))))))
-;;; Now let's write the command loop without any error handling.  This
-;;; seems a little messy with the continue predicate procedure being
-;;; passed along.  I'm not sure yet, how best to organize it.
-;;;
-;;;
-;;; <klecl:procedure>=
+
+;; Now let's write the command loop without any error handling.  This
+;; seems a little messy with the continue predicate procedure being
+;; passed along.  I'm not sure yet, how best to organize it.
 (define*-public (primitive-command-loop #:optional (continue-pred (const #t)))
   "We iterate with command-tick but we do not handle any errors."
   (with-fluids ((continue-command-loop? #t))
@@ -389,10 +388,8 @@
                     primitive-command-tick
                   continue-pred))
           (decr! command-loop-count)))))
+
 ;;; Finally, here's our command loop with error handling.
-;;;
-;;;
-;;; <klecl:procedure>=
 (define* (command-loop #:optional (continue-pred (const #t)))
   "We iterate with command-tick and handle errors."
   (catch #t
@@ -419,7 +416,22 @@
         (else
          (emacsy-log-error
                  "command-loop: Uncaught throw to '~a: ~a\n" key args))))))
-;;; <klecl:command>=
+
+;;.
 (define-interactive (keyboard-quit)
   (message "Quit!")
   (throw 'quit-command))
+
+;; @subsection emacsy-event
+;;
+;; The embedding application will handle the actual IO, but it passes
+;; events to Emacsy for processing which are stored in a queue.
+
+;; We have finished the KLECL.  Note that although we have used
+;; Emacs-like function names, we have not implemented the Emacs-like UI
+;; yet. We have not defined any default key bindings.  I want to
+;; encourage people to explore different user interfaces based on the
+;; KLECL, and one can start from this part of the code.  If one wanted to
+;; create a modal UI, one could use the [[(emacsy klecl)]] module and not
+;; have to worry about any ``pollution'' of Emacs-isms.
+;;.

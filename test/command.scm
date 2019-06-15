@@ -1,11 +1,14 @@
 ;;; Layout for tests.                                                       
 ;;;                                                                         
 ;;; <file:command-test.scm>=                                                
-;;; \subsection{Legal Stuff}                                                
+;;; @subsection Legal Stuff                                                
 ;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;                                                          
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;;
+;;; This file is part of Emacsy.
+;;;                                                            
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or

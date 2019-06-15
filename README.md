@@ -1,7 +1,7 @@
 Emacsy
 ======
 
-Emacsy is an embeddable Emacs-like library for [GNU Guile
+Emacsy is an embeddable Emacs-like library using [GNU Guile
 Scheme](http://www.gnu.org/software/guile/).  It was a [kickstarter
 project](http://www.kickstarter.com/projects/568774734/emacsy-an-embeddable-emacs/?ref=kicktraq).
 It is now a [Google Summer of Code 2013
@@ -25,7 +25,7 @@ Dependencies
 * [guile-lib](http://www.nongnu.org/guile-lib/)
 
 * Only necessary if building from github
-  * [Noweb](http://www.cs.tufts.edu/~nr/noweb/) 
+  * [Noweb](http://www.cs.tufts.edu/~nr/noweb/)
 
   * pdflatex
 
@@ -59,7 +59,7 @@ Building from github (harder)
     $ ./configure
     $ make
 
-Running 
+Running
 -------
 
 Run the [minimal example
@@ -75,10 +75,10 @@ browser](https://github.com/shanecelis/emacsy-webkit-gtk) example.
 
 <a href="https://github.com/shanecelis/emacsy-webkit-gtk#screenshot"><img src=https://raw.github.com/shanecelis/emacsy-webkit-gtk/master/support/image/emacsy-webkit-gtk-screenshot-1-small.png></a>
 
-Reading 
+Reading
 -------
 
-This is a literate program, so you can read it.  
+This is a literate program, so you can read it.
 
     $ make show-doc
 
@@ -99,4 +99,4 @@ License
 -------
 
 Emacsy is available under the GNU GPLv3+. See the bundled LICENSE file
-for details.  
+for details.

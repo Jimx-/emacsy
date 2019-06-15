@@ -1,15 +1,9 @@
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
-;;; \section{Help}
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
 ;;;
-;;;
-;;;
-;;;
-;;; <file:help.scm>=
-;;; \subsection{Legal Stuff}
-;;;
-;;; <+ Copyright>=
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +16,14 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; @node Help
+;; @section Help
+
+;;; Code:
+
 (define-module (emacsy help)
   #:use-module (emacsy self-doc)
   #:use-module (emacsy keymap)
@@ -30,9 +32,9 @@
   #:use-module (emacsy minibuffer)
   #:use-module (emacsy core))
 
+;;.
+(define-interactive (describe-variable #:optional symbol) #t)
 
-
-;;; <help:command>=
 (define-interactive
   (describe-variable
    #:optional
@@ -42,6 +44,9 @@
               #:to-string symbol->string)))
   ;;(message "Describing variable ~a: ~a" symbol (variable-documentation symbol))
   (message "~a" (variable-documentation symbol)))
+
+;;.
+(define-interactive (describe-command #:optional symbol) #t)
 
 (define-interactive
   (describe-command

@@ -1,6 +1,9 @@
-;;; <+ Copyright>=
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -29,7 +32,7 @@
 ;;; <util:state>=
 (define-public debug-on-error? #f)
 ;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
-;;; \section{Utility Module}
+;;; @section Utility Module
 ;;;
 ;;; The [[util]] module is a grab bag of all sorts of miscellaneous
 ;;; functionality.  Rather than defining it here in one place.  I thought
@@ -237,7 +240,7 @@ second argument."
               (if (= (vector-ref a i) (vector-ref b i))
                (loop (1+ i))
                #f))))))
-;;; \subsection{What is a command?}
+;;; @subsection What is a command?
 ;;;
 ;;;
 ;;; <util:procedure>=

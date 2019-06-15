@@ -1,11 +1,14 @@
 ;;; Layout for tests.                                                       
 ;;;                                                                         
 ;;; <file:minibuffer-test.scm>=                                             
-;;; \subsection{Legal Stuff}                                                
+;;; @subsection Legal Stuff                                                
 ;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;                                                          
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;;
+;;; This file is part of Emacsy.
+;;;                                                            
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -137,7 +140,7 @@
 
   (check (read-from-minibuffer "What?6 " #:history 'h2) => "")
 )
-;;; \subsection{Tab Completion}                                             
+;;; @subsection Tab Completion                                             
 ;;;                                                                         
 ;;; We want to offer                                                        
 ;;; \href{http://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Completion.html#Basic-Completion}{string

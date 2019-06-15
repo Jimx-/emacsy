@@ -1,4 +1,4 @@
-;;; Emacsy --- An embeddable Emacs-like library for Guile.
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile.
 ;;; Copyright (C) 2019 Jan Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of Emacsy.
@@ -92,7 +92,7 @@
   (home-page "https://github.com/shanecelis/emacsy/")
   (synopsis "Embeddable GNU Emacs-like library using Guile")
   (description
-   "Emacsy is an embeddable GNU Emacs-like library that uses GNU Guile
+   "Emacsy is an embeddable Emacs-like library that uses GNU Guile
 as extension language.  Emacsy can give a C program an Emacsy feel with
 keymaps, minibuffer, recordable macros, history, tab completion, major
 and minor modes, etc., and can also be used as a pure Guile library.  It

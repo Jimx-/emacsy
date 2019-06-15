@@ -55,6 +55,9 @@ fi
 
 AC_HEADER_STDC
 
+AC_CHECK_PROG([HAVE_PDFLATEX], [pdflatex], [yes], [no])
+AM_CONDITIONAL([HAVE_PDFLATEX], [test x$HAVE_PDFLATEX = xyes])
+
 PKG_CHECK_MODULES([FREEGLUT], [freeglut >= 3.0], [HAVE_FREEGLUT=yes])
 PKG_CHECK_MODULES([GL], [gl >= 18.0.0], [HAVE_GL=yes])
 PKG_CHECK_MODULES([GLU], [glu >= 9.0.0], [HAVE_GLU=yes])

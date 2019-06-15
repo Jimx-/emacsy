@@ -1,6 +1,9 @@
-;;; <+ Copyright>=
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +18,7 @@
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
 ;;; <windows:Module>=
 
-;;; \section{Windows (Optional)}
+;;; @section Windows (Optional)
 ;;;
 ;;; Emacsy aims to offer the minimal amount of intrusion to acquire big
 ;;; gains in program functionality.  Windows is an optional module for
@@ -37,7 +40,7 @@
               split-window )
   #:export-syntax (  )
 )
-;;; \section{Classes}
+;;; @section Classes
 ;;;
 ;;; The window class contains a renderable window that is associated with
 ;;; a buffer.
@@ -73,13 +76,13 @@
 ;;; windows.  This way the frame size can change and the pixel edges can
 ;;; be recomputed.
 ;;;
-;;; \begin{figure}
+;;; @figure
 ;;;   \centering
 ;;;   \includegraphics[scale=0.75]{window-diagram.pdf}
 ;;;   \caption[Window Diagram]{\label{window-diagram}Window $A$ can be
 ;;;     fully described by two vectors: its origin $\bv o_a = (ox, oy)$
 ;;;     and its end $\bv e_a = (w_a, h_a)$.}
-;;; \end{figure}
+;;; @end figure
 ;;;
 ;;;
 ;;; Imagine the frame has a width $W$ and a height H.  My root window has
@@ -115,7 +118,7 @@
     (set! (window-child obj) child-window)
   )
 )
-;;; \section{Procedures}
+;;; @section Procedures
 ;;;
 ;;;
 ;;; <windows:Procedures>=
@@ -143,7 +146,7 @@
   (match coords
   ((x y w h)
     (list x (+ y h) (+ x w) y))))
-;;; \section{Units}
+;;; @section Units
 ;;;
 ;;; There are two different units: pixel (\unit{px}) and proportion
 ;;; (unitless but denoted \unit{pr} for explicitness).  The size of a
@@ -161,9 +164,9 @@
 ;;; minibuffer window.  A little bit of specialization to maintain a
 ;;; particular pixel height will require some callbacks or hooks.
 ;;;
-;;; \section{Converting Between Window Reference Frames}
+;;; @section Converting Between Window Reference Frames
 ;;;
-;;; \begin{figure}
+;;; @figure
 ;;;   \centering
 ;;;   \includegraphics[scale=0.75]{child-window-diagram.pdf}
 ;;;   \caption[Child Window Diagram]{\label{child-window-diagram}This diagram shows
@@ -174,79 +177,79 @@
 ;;;     $(x,y)_A$ denotes the coordinates with respect to the $A$
 ;;;     reference frame; $(x,y)_B$ denotes the coordinates with respect to
 ;;;     the $B$ reference frame. }
-;;; \end{figure}
+;;; @end figure
 ;;;
-;;; Figure~\ref{child-window-diagram} shows a diagram of two windows: one
+;;; Figure~@pxref{child-window-diagram} shows a diagram of two windows: one
 ;;; parent and one child.  The valid range of each variable is given
 ;;; below.
 ;;;
-;;; \begin{align}
+;;; @align
 ;;;   \bv o_b &= (ox, oy) \\
 ;;;   ox &\in [0, 1]  \\
 ;;;   oy &\in [0, 1] \\
 ;;;   w_b &\in [0, 1 - ox]  \\
 ;;;   h_b &\in [0, 1 - oy]
-;;; \end{align}
+;;; @end align
 ;;;
 ;;; Let's assume that we know the coordinates of the point with respect to
 ;;; RF $B$ which we'll denote as $(x,y)_B$.  How do we determine the
 ;;; coordinate wrt RF $A$, $(x',y')_A$?  First, let's define some matrix
 ;;; operators: translate $\M T(tx, ty)$ and scale $\M S(sw, sh)$.
 ;;;
-;;; \begin{align}
-;;;   \M T(tx,ty) &= \begin{bmatrix}
+;;; @align
+;;;   \M T(tx,ty) &= @bmatrix
 ;;;     1 & 0 & tx \\
 ;;;     0 & 1 & ty \\
 ;;;     0 & 0 & 1
-;;;   \end{bmatrix} \\
-;;;   \M S(sw,sh) &= \begin{bmatrix}
+;;;   @end bmatrix \\
+;;;   \M S(sw,sh) &= @bmatrix
 ;;;     sw & 0 & 0 \\
 ;;;     0 & sh & 0\\
 ;;;     0 & 0 & 1
-;;;   \end{bmatrix}
-;;; \end{align}
+;;;   @end
+;;; @end align
 ;;;
 ;;; Now we can determine $(x', y')_A$.
 ;;;
-;;; \begin{align}
+;;; @align
 ;;;   %(x',y')_A \px &= \M T(\bv o_b) \, (x,y)_B \, \px  \\
 ;;;   %(x',y')_A \px &= \M S(\bv e_b) \, (x,y)_A \, \pr  \\
 ;;;   (x',y')_A &= \M T(\bv o_b) \, \M S(\bv e_b) \, (x,y)_B  \\
 ;;;   \where \bv e_b &= (w_b, h_b)
-;;; \end{align}
+;;; @end align
 ;;;
 ;;; Note that the multiplication between a $3 \times 3$ matrix and a two
 ;;; dimensional vector actually is shorthand for this $$\M M ~ (x,y)
-;;; \equiv \M M~\begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\text{.}$$ This
+;;; \equiv \M M~@bmatrix x \\ y \\ 1 @end bmatrix\text{.}$$ This
 ;;; is a homogenous coordinate system that allows us to capture affine
 ;;; transformations like translation.
 ;;;
 ;;; Let's denote the transformation to RF $A$ from RF $B$ as ${}_A\M M_B$.
 ;;;
-;;; \begin{align}
+;;; @align
 ;;;   (x', y')_A &= {}_A\M M_B \, (x, y)_B \\
 ;;;   \where{}_A\M M_B &= \M T(\bv o_b) \, \M S(\bv e_b)
-;;; \end{align}
+;;; @end align
 ;;;
 ;;; \noindent And its inverse defines the opposite operation going to RF $B$
 ;;; from RF $A$.
 ;;;
-;;; \begin{align}
+;;; @align
 ;;;   _A\M M_B^{-1} &= (\M T(\bv o_b) \, \M S(\bv e_b))^{-1} \\
 ;;;   _A\M M_B^{-1} &= \M S(\bv e_b)^{-1} \, \M T(\bv o_b)^{-1}  \\
 ;;;   _A\M M_B^{-1} &=  {}_B\M M_A
-;;; \end{align}
+;;; @end align
 ;;;
-;;; \subsection{Identities}
+;;; @subsection Identities
 ;;;
 ;;; Here are a few identities.
 ;;;
-;;; \begin{align}
+;;; @align
 ;;;   [\bv o_b]_B &= (0,0) \\
 ;;;   [\bv e_b]_B &= (1,1) \\
 ;;;   [\bv o_b]_A &= {}_A\M M_B \, (0, 0) \\
 ;;;   [\bv e_b]_A &= {}_A\M M_B \, (1, 1)
-;;; \end{align}
+;;; @end align
 ;;;
 ;;; Again but in code this time.
 ;;;
@@ -303,7 +306,7 @@
             (from-parent (matrix. (scale-2d (/ 1 right-size) 1.) (translate-2d (- left-size) 0.))))
        (set! (to-parent-transform right) to-parent)
        (set! (from-parent-transform right) from-parent))))))
-;;; \subsection{Window Project}
+;;; @subsection Window Project
 ;;;
 ;;; Let's project a point in the current window to the point in its
 ;;; ultimate parent window.
@@ -327,7 +330,7 @@
 (define-method (window-project (window <pixel-window>) position)
   (let ((psize (pixel-size window)))
     (matrix. (scale-2d (car psize) (cadr psize)) position)))
-;;; \subsection{Window Unproject}
+;;; @subsection Window Unproject
 ;;;
 ;;; Let's unproject from a point in the ultimate parent window to a point
 ;;; in the given window.  Note that if the point is not within the bounds
@@ -361,7 +364,7 @@
      (vector-ref origin 1)
      (vector-ref end 0)
      (vector-ref end 1))))
-;;; \subsection{Window List}
+;;; @subsection Window List
 ;;;
 ;;;
 ;;; <windows:Procedures>=
@@ -385,7 +388,7 @@
 
 (define* (window-list #:optional (w root-window))
   (flatten (window-tree w)))
-;;; \subsection{Split Window}
+;;; @subsection Split Window
 ;;;
 ;;; Be careful with \verb|deep-clone|. If you deep clone one window that
 ;;; has references to other windows, you will clone entire object graph.
@@ -409,13 +412,13 @@
     (set! (window-parent new-child) internal-window)
     (update-window internal-window)
   internal-window))
-;;; \section{Window Commands}
+;;; @section Window Commands
 ;;;
 ;;;
 ;;; <windows:Commands>=
 (define-interactive (split-window-below #:optional (size .5))
   (split-window (selected-window) size 'below))
-;;; \section{Window Key Bindings}
+;;; @section Window Key Bindings
 ;;;
 ;;; It will come as no surprise that these key bindings will mimic the
 ;;; behavior of Emacs.

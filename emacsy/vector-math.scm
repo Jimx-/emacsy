@@ -1,6 +1,9 @@
-;;; <+ Copyright>=
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -27,14 +30,14 @@
 (define (matrix. a b)
   a)
 
-;;; @ \begin{enumerate}
-;;; \item vector-component-usage
+;;; @ @enumerate
+;;; @item vector-component-usage
 
 ;;;  The component of $\bv a$ in the $\bv b$ direction.
-;;; \begin{align*}
+;;; @align*
 ;;;   \comp_\bv b \bv a &= \bv a \cdot \bhv b \\
 ;;;   &= \frac{\bv a \cdot \bv b}{||\bv b||}
-;;; \end{align*}
+;;; @end align*
 
 ;;; <<Vector Definitions>>=
 (define (vector-component a b)
@@ -44,15 +47,15 @@
  (/ (vector-dot a b) (vector-norm b)))
 ;; @ Tried to define vector-component-usage to "Scalar projection"
 
-;; \item Vector projection
+;; @item Vector projection
 
 ;;   The vector projection of $\bv a$ on $\bv b$.
-;;   \begin{align*}
+;;   @align*
 ;;     \proj_\bv b \bv a &= a_1 \bhv b \\
 ;;     a_1 &= \comp_\bv b \bv a
-;;   \end{align*}
+;;   @end align*
 
 ;; <<Vector Definitions>>=
 (define (vector-projection a b)
  (vector* (vector-component a b) (vector-normalize b)))
-;; @ \end{enumerate}
+;; @ @end enumerate

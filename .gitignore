@@ -33,3 +33,10 @@ TAGS
 /emacsy-webkit-gtk
 /emacsy-webkit-gtk-w-buffers
 /emacsy-webkit-gtk-w-windows
+/build-aux/mdate-sh
+/build-aux/texinfo.tex
+/doc/emacsy.info
+stamp-vti
+/doc/version.texi
+/doc/emacsy.pdf
+/doc/emacsy.t2p

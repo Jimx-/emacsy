@@ -107,10 +107,6 @@ TEST_EXTENSIONS = .scm
 SCM_LOG_COMPILER = $(top_builddir)/pre-inst-env $(GUILE)
 
 bin_PROGRAMS =
-etc_emacsydir = $(sysconfdir)/emacsy
-
-etc_emacsy_DATA = \
- example/hello-emacsy.scm
 
 EMACSY_CFLAGS = -I $(srcdir)/emacsy
 EMACSY_LDADD = libemacsy.la
@@ -121,11 +117,14 @@ emacsy_webkit_gtk_SOURCES = example/emacsy-webkit-gtk.c
 emacsy_webkit_gtk_w_buffers_SOURCES = example/emacsy-webkit-gtk-w-buffers.c
 emacsy_webkit_gtk_w_windows_SOURCES = example/emacsy-webkit-gtk-w-windows.c
 
-etc_emacsy_DATA +=				\
+etc_emacsydir = $(sysconfdir)/emacsy
+etc_emacsy_DATA =				\
  example/hello-emacsy.scm			\
  example/emacsy-webkit-gtk.scm			\
  example/emacsy-webkit-gtk-w-buffers.scm	\
  example/emacsy-webkit-gtk-w-windows.scm
+
+EXTRA_DIST += $(etc_emacsy_DATA)
 
 if HELLO_EMACSY
 
@@ -162,6 +161,77 @@ emacsy_webkit_gtk_w_windows_LDADD   = $(EMACSY_LDADD) $(GUILE_LIBS) $(WEBKIT_LIB
 BUILT_SOURCES += example/emacsy-webkit-gtk-w-windows.c.x
 
 endif
+
+# Documentation
+###############
+
+TEXI2PDF_FLAGS = -I doc
+info_TEXINFOS = doc/emacsy.texi
+
+emacsy_TEXINFOS =				\
+ doc/api.texi					\
+ doc/fdl-1.3.texi
+
+emacsy_IMAGES =					\
+ doc/images/emacsy-logo.png			\
+ doc/images/minimal-emacsy-example.png		\
+ doc/images/screenshot.png			\
+ doc/images/screenshot-small.png		\
+ doc/images/the-garden-1.png			\
+ doc/images/the-garden-2.png			\
+ doc/images/the-garden-3.png			\
+ doc/images/the-garden-4.png			\
+ doc/images/the-garden-5.png			\
+ doc/images/the-garden-6.png			\
+ doc/images/the-garden-7.png			\
+ doc/images/the-garden-8.png			\
+ doc/images/the-garden.png
+
+infoimagedir = $(infodir)/images
+dist_infoimage_DATA =				\
+  $(emacsy_IMAGES)
+
+EXTRA_DIST +=					\
+  $(emacsy_TEXINFOS)				\
+  $(emacsy_IMAGES)
+
+if HAVE_PDFLATEX
+dist_doc_DATA = doc/emacsy.pdf
+endif
+
+DOC_SNARF = $(top_builddir)/pre-inst-env $(GUILD) doc-snarf
+doc-snarf:
+	@for i in				\
+                example/hello-emacsy.c		\
+                emacsy/emacsy.c			\
+	; do					\
+	  $(GUILD) display-commentary $$i	\
+             | tail +2				\
+             | sed 's,^ ,,';			\
+	  $(DOC_SNARF) -l c -t $$i;		\
+	done
+	@for i in				\
+                emacsy/emacsy.scm		\
+                emacsy/event.scm		\
+                emacsy/keymap.scm		\
+                emacsy/command.scm		\
+                emacsy/block.scm		\
+                emacsy/klecl.scm		\
+                emacsy/kbd-macro.scm		\
+                emacsy/buffer.scm		\
+                emacsy/mru-stack.scm		\
+                emacsy/minibuffer.scm		\
+                emacsy/core.scm			\
+                emacsy/advice.scm		\
+                emacsy/window.scm		\
+                emacsy/help.scm			\
+                emacsy/self-doc.scm		\
+	; do					\
+	  $(GUILD) display-commentary $$i	\
+             | tail +2				\
+             | sed 's,^ ,,';			\
+	  $(DOC_SNARF) -l scheme -t $$i;	\
+	done
 
 sign-dist: dist
 	gpg -a --output $(distdir).tar.gz.sig --detach-sig $(distdir).tar.gz

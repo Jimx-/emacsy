@@ -1,11 +1,14 @@
 ;;; Layout for tests.                                                       
 ;;;                                                                         
 ;;; <file:block-test.scm>=                                                  
-;;; \subsection{Legal Stuff}                                                
+;;; @subsection Legal Stuff                                                
 ;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;                                                          
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;;
+;;; This file is part of Emacsy.
+;;;                                                            
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +33,7 @@
 (use-modules (ice-9 pretty-print))
 (define test-errors '())
 ;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-                     
-;;; \section{Block Module}                                                  
+;;; @section Block Module                                                  
 ;;;                                                                         
 ;;; \epigraph{Wearied I fell asleep: But now lead on; In me is no delay; with thee to go, Is to stay here}{Paradise Lost \\John Milton}
 ;;;                                                                         
@@ -55,7 +58,7 @@
 ;;; is an example of a delimited continuation from the Guile Manual.  This  
 ;;; continuation [[cont]]                                                   
 ;;;                                                                         
-;;; \begin{verbatim}                                                        
+;;; @verbatim                                                        
 ;;; (define cont                                                            
 ;;;   (call-with-prompt                                                     
 ;;;    ;; tag                                                               
@@ -65,15 +68,15 @@
 ;;;      (+ 34 (abort-to-prompt 'foo)))                                     
 ;;;    ;; handler                                                           
 ;;;    (lambda (k) k)))                                                     
-;;; \end{verbatim}                                                          
+;;; @end  verbatim                                                          
 ;;;                                                                         
 ;;; \noindent could be rewritten as                                         
 ;;;                                                                         
-;;; \begin{verbatim}                                                        
+;;; @verbatim                                                        
 ;;; (define cont                                                            
 ;;;   (lambda (x)                                                           
 ;;;     (+ 34 x)))                                                          
-;;; \end{verbatim}.                                                         
+;;; @end  verbatim.                                                         
 ;;;                                                                         
 ;;; \noindent I had to read and re-read this example to let it sink in.     
 ;;; What does it buy us?  It allows us to abort a computation at any time   

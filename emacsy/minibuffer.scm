@@ -1,6 +1,9 @@
-;;; <+ Copyright>=
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -40,28 +43,24 @@
   #:use-module (emacsy coroutine)
   #:use-module (emacsy cursor-list))
 
+;;; Commentary:
 
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
-;;;
-;;; \section{Minibuffer}
-;;;
-;;; \epigraph{...}{...}
-;;;
-;;; The minibuffer provides a rich interactive textual input system.  It
-;;; offers \verb|TAB| completion and history.  The implementation of it
-;;; inherits from the [[<text-buffer>]].
-;;;
-;;;
-;;; <minibuffer:class>=
+;; @node Minibuffer
+;; @section Minibuffer
+;; The minibuffer provides a rich interactive textual input system.  It
+;; offers @verb{|TAB|} completion and history.  The implementation of it
+;; inherits from the [[<text-buffer>]].
+
+;;; Code:
+
+;;.
 (define-class-public <minibuffer> (<text-buffer>)
   (prompt #:accessor minibuffer-prompt #:init-form "")
   (message #:accessor minibuffer-message-string #:init-form ""))
-;;; We define a keymap with all the typical self-insert-commands that
-;;; would be expected in an editable buffer.\todo{This should probably be
-;;;   defined in the buffer module since it is general.}
-;;;
-;;;
-;;; <minibuffer:state>=
+
+;; We define a keymap with all the typical self-insert-commands that
+;; would be expected in an editable buffer
+;; @c .\todo{This should probably be defined in the buffer module since it is general.}
 (define-public minibuffer-local-map
   (let ((keymap (make-keymap)))
     (char-set-for-each
@@ -74,60 +73,59 @@
       (char-set-intersection char-set:ascii char-set:printing)
       #\vtab #\page #\space #\nul))
     keymap))
-;;; We instantiate the [[<minibuffer>]] class into the global variable
-;;; [[minibuffer]].
-;;;
-;;;
-;;; <minibuffer:state>=
+
+;; We instantiate the [[<minibuffer>]] class into the global variable
+;; [[minibuffer]].
+
+;;.
 (define-public minibuffer
   (make <minibuffer> #:keymap minibuffer-local-map #:name "*minibuffer-1*"))
-;;; <minibuffer:state>=
+;;.
 (define-public emacsy-display-minibuffer? #f) ;; or the echo area
-;;; <minibuffer:state>=
+;;.
 (define-public minibuffer-message-timeout 5)
+;;.
 (define-public ticks-per-second #f)
 (define minibuffer-message-modified-tick 0)
-;;; <minibuffer:state>=
 (define minibuffer-reading? #f)
-;;; <minibuffer:state>=
 (define *nth-match* 0)
-
-;;; <minibuffer:state>=
 (define minibuffer-completion-table (make-fluid '()))
 (define minibuffer-completion-predicate (make-fluid (const #t)))
 (define minibuffer-completion-confirm #f)
 (define minibuffer-completion-exit-commands '())
-;;; <minibuffer:state>=
+
+;;.
 (define-public minibuffer-history #f)
 (define history-symbol-map (make-hash-table))
-;;; The minibuffer has a prompt, but we want it to behave generally like
-;;; any other text buffer.  So let's implement the procedures:
-;;; [[buffer-string]], [[point]], [[point-min]], [[point-max]], and
-;;; [[goto-char]].
-;;;
-;;; When we show the minibuffer, we'll show the prompt, the contents (user
-;;; editable), and the minibuffer-message if applicable.
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; The minibuffer has a prompt, but we want it to behave generally like
+;; any other text buffer.  So let's implement the procedures:
+;; [[buffer-string]], [[point]], [[point-min]], [[point-max]], and
+;; [[goto-char]].
+;;
+;; When we show the minibuffer, we'll show the prompt, the contents (user
+;; editable), and the minibuffer-message if applicable.
+;;.
+
+;;.
 (define-method (buffer-string (buffer <minibuffer>))
   (string-concatenate (list
                        (minibuffer-prompt buffer)
                        (minibuffer-contents buffer)
                        (minibuffer-message-string buffer))))
-;;; <minibuffer:procedure>=
+;;.
 (define*-public (minibuffer-contents #:optional (buffer minibuffer))
   (gb->string (gap-buffer buffer)))
 
+;;.
 (define*-public (delete-minibuffer-contents #:optional (buffer minibuffer))
   (gb-erase! (gap-buffer buffer)))
-;;; For the point methods, we're going to make [[(goto-char 1)]] the
-;;; beginning of the prompt, but [[(point-min)]] where the user editable
-;;; content starts.  Basically, it should be as though it were a regular
-;;; buffer that has been narrowed.
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; For the point methods, we're going to make [[(goto-char 1)]] the
+;; beginning of the prompt, but [[(point-min)]] where the user editable
+;; content starts.  Basically, it should be as though it were a regular
+;; buffer that has been narrowed.
+
 (define-method (point-min (buffer <minibuffer>))
   (+ (next-method) (string-length (minibuffer-prompt buffer))))
 
@@ -136,20 +134,18 @@
 
 (define-method (point-max (buffer <minibuffer>))
   (+ (next-method) (string-length (minibuffer-prompt buffer))))
-;;; For [[goto-char]] we just undo that thing.\todo{If the prompt changes,
-;;;   the point should be adjusted manualy.}
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; For [[goto-char]] we just undo that thing.\todo{If the prompt changes,
+;;   the point should be adjusted manualy.}
+
 (define-method (goto-char point (buffer <minibuffer>))
   (gb-goto-char (gap-buffer buffer)
                 (- point (string-length (minibuffer-prompt buffer)))))
-;;; One can add a message to the minibuffer that can act as an interactive
-;;; help or show possible completions.  The message will only last until
-;;; the next command is executed.
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; One can add a message to the minibuffer that can act as an interactive
+;; help or show possible completions.  The message will only last until
+;; the next command is executed.
+
 (define* (seconds->ticks seconds #:optional (default-ticks #f))
   "Converts seconds to number of ticks, if such a conversion is
 available. Otherwise returns default-ticks."
@@ -157,6 +153,7 @@ available. Otherwise returns default-ticks."
       (* seconds ticks-per-second)
       default-ticks))
 
+;;.
 (define-public (minibuffer-message string . args)
   (set! (minibuffer-message-string minibuffer)
         (apply format #f string args))
@@ -166,10 +163,15 @@ available. Otherwise returns default-ticks."
                        (when (= my-tick minibuffer-message-modified-tick)
                          (set! (minibuffer-message-string minibuffer) ""))))
                        (seconds->ticks minibuffer-message-timeout 1)))
-;;; \subsection{read-from-minibuffer}
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; @subsection read-from-minibuffer
+;;.
+
+;; history can be #f, a symbol, or a <cursor-list>.
+;;.
+(define*-public (read-from-minibuffer prompt #:optional (initial-contents #f) #:key (read #f) (keymap minibuffer-local-map) (history (what-command-am-i?)))
+  #t)
+
 (define*-public (read-from-minibuffer prompt #:optional
                                       (initial-contents #f)
                                       #:key
@@ -236,7 +238,7 @@ available. Otherwise returns default-ticks."
        (set! (local-keymap minibuffer) original-keymap)
        (set! minibuffer-history original-history))
      '(quit-command keyboard-quit))))
-;;; <minibuffer:procedure>=
+
 (define (readline-completer->stream completer string)
   (define iter
     (stream-lambda (f)
@@ -255,16 +257,16 @@ available. Otherwise returns default-ticks."
                   result
                   stream-null)))))
         stream-null)))
-;;; <minibuffer:procedure>=
+
 (define (required-arguments proc)
   (assoc-ref (program-arguments-alist proc) 'required))
+
 (define (readline-completer? proc)
   (let ((req (length (required-arguments proc))))
     (= req 2)))
 
-;;; <minibuffer:procedure>=
-(define*-public
-  (try-completion string collection #:optional (predicate (const #t)))
+;;.
+(define*-public (try-completion string collection #:optional (predicate (const #t)))
 
   (if (procedure? collection)
       (if (readline-completer? collection)
@@ -277,9 +279,9 @@ available. Otherwise returns default-ticks."
         (receive (completions expansion exact? unique?)
             (complete completer string)
           expansion))))
-;;; <minibuffer:procedure>=
-(define*-public
-  (all-completions string collection #:optional (predicate (const #t)))
+
+;;.
+(define*-public (all-completions string collection #:optional (predicate (const #t)))
   (if (procedure? collection)
       (if (readline-completer? collection)
           (all-completions
@@ -292,22 +294,25 @@ available. Otherwise returns default-ticks."
      (receive (completions expansion exact? unique?)
          (complete completer string)
        completions))))
-;;; <minibuffer:procedure>=
-(define*-public
-  (collection->completer collection #:optional (predicate (const #t)))
+
+;;.
+(define*-public (collection->completer collection #:optional (predicate (const #t)))
   (if (is-a? collection <string-completer>)
       collection
 
       (let ((completer (make <string-completer>)))
         (add-strings! completer (filter predicate collection))
         completer)))
-;;; <minibuffer:procedure>=
+
 (define (rotate-list lst nth)
   (let* ((nth (modulo nth (length lst)))
          (tail (list-tail lst nth))
          (head (list-head lst nth)))
     (append tail head)))
-;;; <minibuffer:procedure>=
+
+;;.
+(define*-public (completing-read prompt collection #:key predicate (const #t) (require-match? #f) (initial-input #f) (history (what-command-am-i?)) (to-string #f)) #t)
+
 (define*-public
   (completing-read prompt collection
                    #:key
@@ -317,7 +322,7 @@ available. Otherwise returns default-ticks."
                    (history (what-command-am-i?))
                    (to-string #f))
 
-;; XXX implement require-match?
+;;; XXX implement require-match?
   (define (completing-read* collection*)
     (with-fluids ((minibuffer-completion-table collection*)
                   (minibuffer-completion-predicate predicate))
@@ -330,14 +335,12 @@ available. Otherwise returns default-ticks."
       (from-string* (completing-read* (map to-string* collection)))))
    (else
     (completing-read* collection))))
-;;; \subsection{Filename Lookup}
-;;;
-;;; \subsubsection{New}
-;;;
-;;; We can do filename lookups by using the readline tab completion facilities.
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; @subsection File name Lookup
+;;
+;; We can do filename lookups by using the readline tab completion facilities.
+
+;;.
 (define-public (apropos-module rgx module)
   "Return a list of accessible variable names for a given module."
   (apropos-fold (lambda (module name var data)
@@ -345,6 +348,9 @@ available. Otherwise returns default-ticks."
                 '()
                 rgx
                 (apropos-fold-accessible module)))
+
+;;.
+(define-public (command-completion-function text cont?) #t)
 
 (define-public command-completion-function
   (let ((completions '()))
@@ -360,12 +366,11 @@ available. Otherwise returns default-ticks."
           (let ((retval (car completions)))
             (begin (set! completions (cdr completions))
                    retval))))))
-;;; \subsubsection{Old}
-;;;
-;;; We want to be able to look up filenames.
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; We want to be able to look up filenames.
+;;.
+
+;;.
 (define (files-in-dir dirname)
   (let ((dir (opendir dirname))
         (filenames '()))
@@ -428,6 +433,9 @@ available. Otherwise returns default-ticks."
 
 (define no-dot-files (negate dot-directory?))
 
+;;.
+(define*-public (read-file-name prompt #:key dir default-file-name initial predicate history) #t)
+
 (define*-public
   (read-file-name prompt #:key
                   (dir #f)
@@ -439,15 +447,17 @@ available. Otherwise returns default-ticks."
                    filename-completion-function
                    #:predicate predicate
                    #:history history))
-;;; \subsection{Minibuffer History}
-;;;
-;;;
-;;; <minibuffer:procedure>=
+
+;; @subsection Minibuffer History
+;;.
+
+;;.
 (define*-public (make-history #:optional (list '()) (index #f))
   (make-cursor-list list (or index (length list))))
 
 (set! minibuffer-history (make-history))
 
+;;.
 (define-public (history-insert! history value)
   (cursor-right-insert! history value)
   ;;(fluid-set! minibuffer-history
@@ -456,6 +466,7 @@ available. Otherwise returns default-ticks."
   ;;                       value))
   )
 
+;;.
 (define-public (history-ref history)
   (if (cursor-right? history)
    (cursor-right-ref history)
@@ -463,6 +474,7 @@ available. Otherwise returns default-ticks."
   ;;(list-ref (fluid-ref minibuffer-history) index)
   )
 
+;;.
 (define-public (history-set! history value)
       (cursor-right-set! history value)
       ;;(if (cursor-right? history)
@@ -472,11 +484,13 @@ available. Otherwise returns default-ticks."
   ;;  (list-set! lst index value)
   ;;  (fluid-set! minibuffer-history lst))
   value)
-;;; <minibuffer:command>=
+
+;;.
 (define-interactive (exit-minibuffer)
   (set! minibuffer-reading? #f)
   (switch-to-buffer last-buffer))
-;;; <minibuffer:command>=
+
+;;.
 (define-interactive (minibuffer-complete)
   (with-buffer
    minibuffer
@@ -506,28 +520,32 @@ available. Otherwise returns default-ticks."
          (list "{"
                (string-join (rotate-list completions *nth-match*) " | ")
                "}"))))))))
-;;; <minibuffer:command>=
+
+;;.
 (define-interactive (next-match)
   (incr! *nth-match*)
   (minibuffer-complete))
 
+;;.
 (define-interactive (previous-match)
   (decr! *nth-match*)
   (minibuffer-complete))
 
-;;; <minibuffer:command>=
+;;.
 (define-interactive (minibuffer-complete-word)
   ;; This should only complete a word.
   (minibuffer-complete))
 
+;;.
 (define-interactive (minibuffer-completion-help)
   ;; This should only complete a word.
   (message "minibuffer-complete-help NYI")
   #f)
-;;; Some commands for manipulating the minibuffer history.
-;;;
-;;;
-;;; <minibuffer:command>=
+
+;; Some commands for manipulating the minibuffer history.
+;;.
+
+;;.
 (define-interactive (previous-history-element #:optional (n 1))
   (define (previous-history-element* n)
     (cond

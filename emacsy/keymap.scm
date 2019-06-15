@@ -1,6 +1,9 @@
-;;; <+ Copyright>=
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=
+;;;
+;;; This file is part of Emacsy.
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -13,6 +16,69 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; @node Keymap
+;; @section Keymap
+
+;; The keymap stores the mapping between key strokes---or events---and
+;; commands.  Emacs uses lists for its representation of keymaps. Emacsy
+;; instead uses a class that stores entries in a hash table.  Another
+;; difference for Emacsy is that it does not convert @verb{|S-C-a|} to a
+;; different representation like @verb{|[33554433]|}; it leaves it as a
+;; string that is expected to be turned into a canonical representation
+;; ``C-A''.
+;;
+;; Here is an example of the keymap representation in Emacs.
+;;
+;; @verbatim
+;; > (let ((k (make-sparse-keymap)))
+;;     (define-key k "a"         'self-insert-command)
+;;     (define-key k "<mouse-1>" 'mouse-drag-region)
+;;     (define-key k "C-x C-f"   'find-file-at-point)
+;;     k)
+;;
+;; (keymap
+;;  (24 keymap
+;;      (6 . find-file-at-point))
+;;  (mouse-1 . mouse-drag-region)
+;;  (97 . self-insert-command))
+;; @end verbatim
+;;
+;; When I initially implemented Emacsy, I replicated Emacs' keymap
+;; representation, but I realized it wasn't necessary.  And it seems
+;; preferrable to make the representation more transparent to casual
+;; inspection.  Also, Emacsy isn't directly responsible for the
+;; conversion of keyboard events into [[key-event]]s---that's a lower
+;; level detail that the embedding application must handle.  Here is the
+;; same keymap as above but in Emacsy.
+;;
+;; @verbatim
+;; > (let ((k (make-keymap)))
+;;     (define-key k "a"       'self-insert-command)
+;;     (define-key k "mouse-1" 'mouse-drag-region)
+;;     (define-key k "C-x C-f" 'find-file-at-point)
+;;     k)
+;;
+;; #<keymap
+;;   a self-insert-command
+;;   C-x #<keymap
+;;         C-f find-file-at-point>
+;;   mouse-1 mouse-drag-region>
+;; @end verbatim
+;;
+;; There are a few differences in how the keymap is produced, and the
+;; representation looks slightly different too.  For one thing it's not a
+;; list.
+;;
+;; @c \todo[inline]{Justify decisions that deviate from Emacs' design.}
+;;
+;; Our keymap class has a hashtable of entries and possibly a parent
+;; keymap.
+
+;;; Code:
+
 (define-module (emacsy keymap)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 optargs)
@@ -20,71 +86,12 @@
   #:use-module (emacsy util)
   #:use-module (emacsy event))
 
-;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
-;;; \section{Keymap Module}
-;;;
-;;; The keymap stores the mapping between key strokes---or events---and
-;;; commands.  Emacs uses lists for its representation of keymaps. Emacsy
-;;; instead uses a class that stores entries in a hash table.  Another
-;;; difference for Emacsy is that it does not convert \verb|S-C-a| to a
-;;; different representation like \verb|[33554433]|; it leaves it as a
-;;; string that is expected to be turned into a canonical representation
-;;; ``C-A''.
-;;;
-;;; Here is an example of the keymap representation in Emacs.
-;;;
-;;; \begin{verbatim}
-;;; > (let ((k (make-sparse-keymap)))
-;;;     (define-key k "a"         'self-insert-command)
-;;;     (define-key k "<mouse-1>" 'mouse-drag-region)
-;;;     (define-key k "C-x C-f"   'find-file-at-point)
-;;;     k)
-;;;
-;;; (keymap
-;;;  (24 keymap
-;;;      (6 . find-file-at-point))
-;;;  (mouse-1 . mouse-drag-region)
-;;;  (97 . self-insert-command))
-;;; \end{verbatim}
-;;;
-;;; When I initially implemented Emacsy, I replicated Emacs' keymap
-;;; representation, but I realized it wasn't necessary.  And it seems
-;;; preferrable to make the representation more transparent to casual
-;;; inspection.  Also, Emacsy isn't directly responsible for the
-;;; conversion of keyboard events into [[key-event]]s---that's a lower
-;;; level detail that the embedding application must handle.  Here is the
-;;; same keymap as above but in Emacsy.
-;;;
-;;; \begin{verbatim}
-;;; > (let ((k (make-keymap)))
-;;;     (define-key k "a"       'self-insert-command)
-;;;     (define-key k "mouse-1" 'mouse-drag-region)
-;;;     (define-key k "C-x C-f" 'find-file-at-point)
-;;;     k)
-;;;
-;;; #<keymap
-;;;   a self-insert-command
-;;;   C-x #<keymap
-;;;         C-f find-file-at-point>
-;;;   mouse-1 mouse-drag-region>
-;;; \end{verbatim}
-;;;
-;;; There are a few differences in how the keymap is produced, and the
-;;; representation looks slightly different too.  For one thing it's not a
-;;; list.
-;;;
-;;; \todo[inline]{Justify decisions that deviate from Emacs' design.}
-;;;
-;;; Our keymap class has a hashtable of entries and possibly a parent
-;;; keymap.
-;;;
-;;;
-;;; <keymap:class>=
+;;.
 (define-class-public <keymap> ()
   (entries #:getter entries #:init-thunk (lambda () (make-hash-table)))
   (parent #:accessor parent #:init-keyword #:parent #:init-value #f))
 
-;;; <keymap:procedure>=
+;;.
 (define*-public (lookup-key keymap keys #:optional (follow-parent? #t))
   (define* (lookup-key* keymap keys #:optional (follow-parent? #t))
     (if (null? keys)
@@ -110,15 +117,14 @@
   (lookup-key* keymap (if (string? keys)
                           (kbd keys)
                           keys) follow-parent?))
+
 ;;; We propagate the error using a number using the following procedure.
-;;;
-;;;
-;;; <keymap:procedure>=
 (define (1+if-number x)
   (if (number? x)
       (1+ x)
       x))
-;;; <keymap:procedure>=
+
+;;.
 (define*-public (lookup-key? keymap keyspec #:optional (keymap-ok? #f))
    (let* ((keys (if (string? keyspec)
                     (kbd keyspec)
@@ -130,7 +136,7 @@
          (and (not (keymap? result))
               (not (boolean? result))
               (not (number? result))))))
-;;; <keymap:procedure>=
+
 (define (make-trampoline module name)
   "Creates a trampoline out of a symbol in a given module, e.g. (lambda () (name))"
   (let ((var (module-variable module name)))
@@ -140,7 +146,8 @@
       (set-procedure-property! proc 'name
                                (string->symbol (format #f "~a-trampoline" name)))
       proc)))
-;;; <keymap:procedure>=
+
+;;.
 (define-public (define-key keymap key-list-or-string symbol-or-procedure-or-keymap)
   (let* ((keys (if (string? key-list-or-string)
                    (kbd key-list-or-string)
@@ -167,21 +174,24 @@
           ;; keymap.
           (define-key keymap (rcdr keys)
             (define-key (make-keymap) (list (rcar keys)) procedure-or-keymap)))))))
+
 ;;; Let's define a keymap predicate, which is defined in Emacs as
 ;;; [[keymapp]] ('p' for predicate).  I am adopting Scheme's question mark
 ;;; for predicates which seems more natural.
-;;;
-;;;
-;;; <keymap:procedure>=
+
+;;.
 (define-public (keymap? obj)
   (is-a? obj <keymap>))
-;;; <keymap:procedure>=
+
+;;.
 (define*-public (make-keymap #:optional (parent #f))
   (make <keymap> #:parent parent))
-;;; <keymap:procedure>=
+
+;;.
 (define-method (write (obj <keymap>) port)
   (write-keymap obj port))
 
+;;.
 (define* (write-keymap obj port #:optional (keymap-print-prefix 0))
   (display  "#<keymap " port)
   (hash-for-each (lambda (key value)
@@ -198,6 +208,7 @@
   (if (parent obj)
       (write-keymap (parent obj) port (+ 2 keymap-print-prefix)))
   (display ">" port))
-;;; <keymap:procedure>=
+
+;;.
 (define-public (lookup-key-entry? result)
   (and (not (boolean? result)) (not (number? result))))

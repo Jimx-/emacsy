@@ -1,11 +1,14 @@
 ;;; Layout for tests.                                                       
 ;;;                                                                         
 ;;; <file:keymap-test.scm>=                                                 
-;;; \subsection{Legal Stuff}                                                
+;;; @subsection Legal Stuff                                                
 ;;;                                                                         
-;;; <+ Copyright>=                                                          
+;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
+;;;                                                          
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
-;;; <+ License>=                                                            
+;;;
+;;; This file is part of Emacsy.
+;;;                                                            
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +38,7 @@
 ;;; The core functionality of the keymap is being able to define and look   
 ;;; up key bindings.                                                        
 ;;;                                                                         
-;;; \subsection{Lookup Key}                                                 
+;;; @subsection Lookup Key                                                 
 ;;;                                                                         
 ;;; The procedure [[lookup-key]] return a keymap or symbol for a given      
 ;;; list of keys.  Consider this test keymap                                
@@ -73,7 +76,7 @@
 (check (lookup-key? k "C-x") => #f)
 (check (lookup-key? k "C-x C-f") => #t)
 (check (lookup-key? k "a") => #t)
-;;; \subsection{Define Key}                                                 
+;;; @subsection Define Key                                                 
 ;;;                                                                         
 ;;; The procedure [[define-key]] may return a number indicating an error,   
 ;;; or a keymap indicating it worked.                                       
