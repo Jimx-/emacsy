@@ -1,6 +1,7 @@
 ;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
 ;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
+;;; Copyright (C) 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of Emacsy.
 ;;;
@@ -16,43 +17,6 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
-(define-module (emacsy core)
-  #:use-module (ice-9 format)
-  #:use-module (ice-9 q)
-  #:use-module (ice-9 optargs)
-  #:use-module (ice-9 readline)
-  #:use-module (oop goops)
-  #:use-module (rnrs io ports)
-  #:use-module (debugging assert)
-  #:use-module (system repl error-handling)
-  #:use-module (srfi srfi-1)  ;; take
-  #:use-module (srfi srfi-11) ;; let-values
-  #:use-module (srfi srfi-26) ;; cut cute
-
-  #:use-module (emacsy util)
-  #:use-module (emacsy self-doc)
-  #:use-module (emacsy keymap)
-  #:use-module (emacsy event)
-  #:use-module (emacsy mode)
-  #:use-module (emacsy buffer)
-  #:use-module (emacsy command)
-  #:use-module (emacsy block)
-  #:use-module (emacsy klecl)
-  #:use-module (emacsy kbd-macro)
-  #:use-module (emacsy minibuffer)
-  #:use-module (emacsy coroutine)
-  #:use-module (emacsy agenda)
-  #:replace (switch-to-buffer)
-  #:export (read-from-mouse))
-
-;;; <core:macro>=
-(define-syntax-public track-mouse
-  (syntax-rules ()
-    ((track-mouse e ...)
-     (in-out-guard  ;; This is different from dynamic-wind.
-       (lambda () (set! emacsy-send-mouse-movement-events? #t))
-       (lambda () e ...)
-       (lambda () (set! emacsy-send-mouse-movement-events? #f))))))
 
 ;;; Commentary:
 
@@ -64,10 +28,44 @@
 
 ;;; Code:
 
+(define-module (emacsy core)
+  #:use-module (ice-9 format)
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 optargs)
+  #:use-module (ice-9 q)
+  #:use-module (ice-9 readline)
+  #:use-module (oop goops)
+  #:use-module (rnrs io ports)
+  #:use-module (debugging assert)
+  #:use-module (system repl error-handling)
+  #:use-module (srfi srfi-11) ;; let-values
 
-;; hallo fobar
-;; @section Core
-;;-Author: janneke
+  #:use-module (emacsy util)
+  #:use-module (emacsy self-doc)
+  #:use-module (emacsy keymap)
+  #:use-module (emacsy event)
+  #:use-module (emacsy mode)
+  #:use-module (emacsy buffer)
+  #:use-module (emacsy text)
+  #:use-module (emacsy command)
+  #:use-module (emacsy block)
+  #:use-module (emacsy klecl)
+  #:use-module (emacsy kbd-macro)
+  #:use-module (emacsy minibuffer)
+  #:use-module (emacsy coroutine)
+  #:use-module (emacsy agenda)
+  #:replace (switch-to-buffer
+             kill-buffer)
+  #:export (read-from-mouse))
+
+;;; <core:macro>=
+(define-syntax-public track-mouse
+  (syntax-rules ()
+    ((track-mouse e ...)
+     (in-out-guard  ;; This is different from dynamic-wind.
+       (lambda () (set! emacsy-send-mouse-movement-events? #t))
+       (lambda () e ...)
+       (lambda () (set! emacsy-send-mouse-movement-events? #f))))))
 
 
 ;; We need a global keymap.
@@ -206,7 +204,7 @@
 ;; These are most of the C API calls.
 (define-public (emacsy-message-or-echo-area)
   (if emacsy-display-minibuffer?
-      (buffer-string minibuffer)
+      (buffer-string)
       echo-area))
 
 ;;.
@@ -223,7 +221,7 @@
 ;;.
 (define-public (emacsy-minibuffer-point)
   (if emacsy-display-minibuffer?
-      (point minibuffer)
+      (point)
       -1))
 
 ;;.
@@ -463,3 +461,67 @@
            (lambda () (clear-echo-area)))
 ;;; <core:process>=
 (add-hook! no-blocking-continuations-hook restart-command-loop)
+
+(define-public fundamental-map
+  (let ((keymap (make-keymap global-map)))
+    (char-set-for-each
+     (lambda (c)
+       (let ((event (make <key-event>
+                      #:command-char c)))
+         (define-key keymap (list (event->kbd event))
+           'self-insert-command)))
+     (list->char-set
+      '(#\space)
+      (char-set-delete
+       (char-set-intersection char-set:ascii char-set:printing)
+       #\vtab #\page #\nul)))
+    (for-each
+     (match-lambda ((key command) (define-key keymap key command)))
+     `(("C-SPC" set-mark-command)
+       ("C-x h" mark-whole-buffer)
+       ("C-k" kill-line)
+       ("C-w" kill-region)
+       ("C-y" yank)
+       ("M-y" yank-pop)
+       ("C-x C-x" exchange-point-and-mark)
+       ("C-f" forward-char)
+       ("M-f" forward-word)
+       ("C-b" backward-char)
+       ("M-b" backward-word)
+       ("M-DEL" backward-kill-word)
+       ("M-d" kill-word)
+       ("C-d" delete-forward-char)
+       ("C-a" move-beginning-of-line)
+       ("C-e" move-end-of-line)
+       ("M-<" beginning-of-buffer)
+       ("M->" end-of-buffer)
+       ("C-n" next-line)
+       ("C-p" previous-line)
+       ("DEL" delete-backward-char)
+       ("RET" ,(lambda _ (insert #\newline)))
+       ("C-k" kill-line)))
+    keymap))
+
+(define-public fundamental-mode (make <mode> #:mode-name "fundamental" #:mode-map fundamental-map))
+
+(define*-public (make-text-buffer #:optional (name "*scratch*"))
+  (let ((buffer (make <text-buffer> #:name name #:buffer-modes `(,fundamental-mode))))
+    (add-buffer! buffer)
+    buffer))
+
+;; The *scratch* buffer.
+;;.
+(define-public scratch (make-text-buffer "*scratch*"))
+(buffer:insert-string scratch
+                      ";; This buffer is for text that is not saved, and for Scheme evaluation.
+;; To create a file, visit it with C-x C-f and enter text in its buffer.
+")
+
+
+;; Override kill-buffer; make sure the buffer list does not become empty.
+;;.
+(define-interactive (kill-buffer #:optional (buffer (current-buffer)))
+  "Safe variant of kill-buffer."
+  (remove-buffer! buffer)
+  (when (null? (buffer-list))
+    (set! scratch (make-text-buffer))))

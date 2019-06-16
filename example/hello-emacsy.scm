@@ -46,7 +46,7 @@
 ;; @var{counter}. This is fine, but what else can we do with it?  We could
 ;; make a macro that increments 5 times by hitting
 ;; @verb{|C-x ( = = = = = C-x )|}, then hit @verb{|C-e|} to run that macro.
-(set! debug-on-error? #t)
+;; (set! debug-on-error? #t)
 
 ;; Let's implement another command that will ask the user for a number to
 ;; set the counter to.

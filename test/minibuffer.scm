@@ -1,14 +1,14 @@
-;;; Layout for tests.                                                       
-;;;                                                                         
-;;; <file:minibuffer-test.scm>=                                             
-;;; @subsection Legal Stuff                                                
-;;;                                                                         
+;;; Layout for tests.
+;;;
+;;; <file:minibuffer-test.scm>=
+;;; @subsection Legal Stuff
+;;;
 ;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
-;;;                                                          
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
 ;;;
 ;;; This file is part of Emacsy.
-;;;                                                            
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -30,52 +30,53 @@
 (use-private-modules (emacsy minibuffer))
 
 (set! emacsy-interactive? #t)
+(set! aux-buffer minibuffer)
 
-;;; <+ Test Preamble>=                                                      
+;;; <+ Test Preamble>=
 (use-modules (check))
 (use-modules (ice-9 pretty-print))
 (define test-errors '())
-;;; <minibuffer:test>=                                                      
-(check (buffer-string minibuffer) => "")
-(check (point-min minibuffer) => 1)
+;;; <minibuffer:test>=
+(check (buffer-string) => "")
+(check (point) => 1)
 (set! (minibuffer-prompt minibuffer) "What? ")
-(check (buffer-string minibuffer) => "What? ")
-(check (point-min minibuffer) => 7)
+(check (buffer-string) => "What? ")
+(check (point-min) => 7)
 (with-buffer minibuffer
              (insert "Nothing."))
-(check (buffer-string minibuffer) => "What? Nothing.")
-;;; <minibuffer:test>=                                                      
+(check (buffer-string) => "What? Nothing.")
+;;; <minibuffer:test>=
 (set! default-klecl-maps (lambda () (list minibuffer-local-map)))
 (set-buffer! minibuffer)
 (delete-minibuffer-contents minibuffer)
-(check (buffer-string minibuffer) => "What? ")
+(check (buffer-string) => "What? ")
 (insert "A")
 (agenda-schedule (colambda ()
                   (minibuffer-message " [Huh?]")))
 ;;(with-blockable (minibuffer-message " [Huh?]"))
 (update-agenda)
-(check (buffer-string minibuffer) => "What? A [Huh?]")
+(check (buffer-string) => "What? A [Huh?]")
 (update-agenda)
-(check (buffer-string minibuffer) => "What? A")
+(check (buffer-string) => "What? A")
 (emacsy-key-event #\c)
 (agenda-schedule (colambda () (command-tick)))
 (update-agenda)
-(check (buffer-string minibuffer) => "What? Ac")
+(check (buffer-string) => "What? Ac")
 ;(emacsy-key-event #\a)
 ;(block-tick)
-;(check (buffer-string minibuffer) => "What? Aa")
-;;; Test regular input to minibuffer.                                       
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;(check (buffer-string) => "What? Aa")
+;;; Test regular input to minibuffer.
+;;;
+;;;
+;;; <minibuffer:test>=
 (emacsy-discard-input!)
 (emacsy-key-event #\a)
 (emacsy-key-event #\cr)
 (check (read-from-minibuffer "What? ") => "a")
-;;; Test quitting the minibuffer.                                           
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;;; Test quitting the minibuffer.
+;;;
+;;;
+;;; <minibuffer:test>=
 (emacsy-discard-input!)
 (emacsy-key-event #\a)
 (emacsy-key-event #\g '(control))
@@ -86,10 +87,10 @@
 ;; Displaying the "Quit!" message causes a pause.
 ;(check-throw (update-agenda) => 'quit-command)
 ;(set! emacsy-interactive? #t)
-;;; Test retaining history in the minibuffer.                               
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;;; Test retaining history in the minibuffer.
+;;;
+;;;
+;;; <minibuffer:test>=
 (emacsy-discard-input!)
 (emacsy-key-event #\h)
 (emacsy-key-event #\i)
@@ -105,10 +106,10 @@
   (check (read-from-minibuffer "What?4 " #:history h) => "bye")
   (check (cursor-list->list h) => '("hi" "bye"))
   )
-;;; Test accessing history in the minibuffer.                               
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;;; Test accessing history in the minibuffer.
+;;;
+;;;
+;;; <minibuffer:test>=
 (emacsy-discard-input!)
 (emacsy-key-event #\p '(meta))
 (emacsy-key-event #\cr)
@@ -122,10 +123,10 @@
   (check (read-from-minibuffer "What?5 " #:history h) => "1")
   (check (cursor-list->list h) => '("hi" "1" ""))
 )
-;;; Test accessing history in the minibuffer using a symbol.                
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;;; Test accessing history in the minibuffer using a symbol.
+;;;
+;;;
+;;; <minibuffer:test>=
 (emacsy-discard-input!)
 (emacsy-key-event #\1)
 (emacsy-key-event #\cr)
@@ -140,35 +141,35 @@
 
   (check (read-from-minibuffer "What?6 " #:history 'h2) => "")
 )
-;;; @subsection Tab Completion                                             
-;;;                                                                         
-;;; We want to offer                                                        
+;;; @subsection Tab Completion
+;;;
+;;; We want to offer
 ;;; \href{http://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Completion.html#Basic-Completion}{string
-;;;   completion} similar to Emacs.                                         
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;;;   completion} similar to Emacs.
+;;;
+;;;
+;;; <minibuffer:test>=
 (check (try-completion "f" (list "foo" "foobar" "barfoo")) => "foo")
 (check (try-completion "b" (list "foo" "foobar" "barfoo")) => "barfoo")
 
 ;; Try against readline completer
 (check (try-completion "f" (make-completion-function (list "foo" "foobar" "barfoo"))) => "foo")
 (check (try-completion "b" (make-completion-function (list "foo" "foobar" "barfoo"))) => "barfoo")
-;;; It can also work with a procedure.                                      
-;;;                                                                         
-;;;                                                                         
-;;; <minibuffer:test>=                                                      
+;;; It can also work with a procedure.
+;;;
+;;;
+;;; <minibuffer:test>=
 (check (try-completion "f" (lambda (string predicate all?) (if (string=? string "f") "blah" "huh"))) => "blah")
 (check (try-completion "w" (lambda (string predicate all?) (if (string=? string "f") "blah" "huh"))) => "huh")
-;;; <minibuffer:test>=                                                      
-(check (sort (stream->list (readline-completer->stream command-completion-function "")) string<?) => (sort '("switch-to-buffer" "eval-expression" "execute-extended-command" "load-file" "quit-application" "universal-argument") string<?))
-;;; <minibuffer:test>=                                                      
+;;; <minibuffer:test>=
+(check (sort (stream->list (readline-completer->stream command-completion-function "")) string<?) => (sort '("switch-to-buffer" "eval-expression" "execute-extended-command" "kill-buffer" "load-file" "quit-application" "universal-argument") string<?))
+;;; <minibuffer:test>=
 (check (all-completions "f" (list "foo" "foobar" "barfoo")) => (list "foo" "foobar"))
 (check (all-completions "b" (list "foo" "foobar" "barfoo")) => (list "barfoo"))
 
 (check (all-completions "f" (make-completion-function (list "foo" "foobar" "barfoo"))) => (list "foo" "foobar"))
 (check (all-completions "b" (make-completion-function (list "foo" "foobar" "barfoo"))) => (list "barfoo"))
-;;; <minibuffer:test>=                                                      
+;;; <minibuffer:test>=
 (chdir (format #f "~a/~a" (getenv "ABS_TOP_SRCDIR") "test/minibuffer-test-dir"))
 (check (dirname "") => ".")
 (check (my-dirname "") => ".")
@@ -213,7 +214,7 @@
 
 (chdir (format #f "~a/~a" (getenv "ABS_TOP_SRCDIR") "test/minibuffer-test-dir/empty-dir"))
 (check (file-name-completer "../ex" (const #t) #f) => "../exam/")
-;;; <minibuffer:test>=                                                      
+;;; <minibuffer:test>=
 (let ((h (make-history '("3" "2" "1"))))
   (cursor-left! h)
     (check ( history-ref h) => "1")
@@ -224,7 +225,7 @@
     (cursor-right! h)
     (cursor-right! h)
     (check (cursor-list->list h) => '("3" "2" "a")))
-;;; <+ Test Postscript>=                                                    
+;;; <+ Test Postscript>=
 ;(run-tests)
 (check-report)
 '(if (> (length test-errors) 0)

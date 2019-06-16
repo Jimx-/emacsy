@@ -1,6 +1,7 @@
 ;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
 ;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
+;;; Copyright (C) 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of Emacsy.
 ;;;
@@ -19,22 +20,14 @@
 
 (define-module (emacsy buffer)
   #:use-module (ice-9 optargs)
-  #:use-module (ice-9 q)
-  #:use-module (ice-9 gap-buffer)
-  #:use-module (ice-9 receive)
-  #:use-module (ice-9 regex)
-  #:use-module (srfi srfi-26)
-  #:use-module (string completion)
   #:use-module (oop goops)
   #:use-module (emacsy util)
   #:use-module (emacsy mru-stack)
   #:use-module (emacsy self-doc)
-  #:use-module (emacsy event)
   #:use-module (emacsy keymap)
   #:use-module (emacsy command)
   #:use-module (emacsy klecl)
-  #:use-module (emacsy mode)
-  #:use-module (rnrs base))
+  #:use-module (emacsy mode))
 
 ;;; Commentary:
 
@@ -61,11 +54,30 @@
 (define-syntax-public with-buffer
   (syntax-rules ()
     ((with-buffer buffer e ...)
-     (let ((old-buffer (current-buffer)))
+     (let ((old-buffer (current-buffer))
+           (result *unspecified*))
        (in-out-guard
-         (lambda () (set-buffer! buffer))
-         (lambda () e ...)
-         (lambda () (set-buffer! old-buffer)))))))
+        (lambda () (set-buffer! buffer))
+        (lambda () e ...)
+        (lambda () (set-buffer! old-buffer)))))))
+
+;; @defmac save-excursion @dots{}
+;; A convenience macro to do some work
+;; @end defmac
+;;.
+(define-syntax-public save-excursion
+  (syntax-rules ()
+    ((save-excursion body ...)
+     (let ((old-buffer (current-buffer))
+           (old-point (point))
+           (old-mark (mark)))
+       (in-out-guard
+        (lambda _ #t)
+        (lambda _ body ...)
+        (lambda _
+          (set-buffer! old-buffer)
+          (set-mark old-mark)
+          (goto-char old-point)))))))
 
 ;;.
 (define-class-public <buffer> ()
@@ -76,15 +88,8 @@
   (buffer-modified-tick #:accessor buffer-modified-tick #:init-value 0)
   (buffer-enter-hook #:accessor buffer-enter-hook #:init-form (make-hook 0))
   (buffer-exit-hook #:accessor buffer-exit-hook #:init-form (make-hook 0))
-  (buffer-modes #:accessor buffer-modes #:init-form '()))
+  (buffer-modes #:accessor buffer-modes #:init-form '() #:init-keyword #:buffer-modes))
 (export local-keymap local-variables buffer-enter-hook buffer-exit-hook before-buffer-change-hook after-buffer-change-hook after-change-hook before-change-hook buffer-modified-tick buffer-modes)
-
-;; Our minibuffer and messages buffer require a text buffer.
-
-;;.
-(define-class-public <text-buffer> (<buffer>)
-  (gap-buffer #:accessor gap-buffer #:init-form (make-gap-buffer "")))
-(export gap-buffer)
 
 ;;.
 (define-variable before-buffer-change-hook (make-hook 1) "This hook is called prior to the buffer being changed with one argument, the buffer.")
@@ -181,6 +186,7 @@
       (set! aux-buffer #f)
       (set! aux-buffer buffer)))
 
+;; This is scary, we will override it when we have <text-buffer>.
 ;;.
 (define-interactive (kill-buffer #:optional (buffer (current-buffer)))
   (remove-buffer! buffer))
@@ -230,208 +236,3 @@
 ;;.
 (define-public local-var
                (make-procedure-with-setter local-var-ref local-var-set!))
-
-;;.
-(define-method-public (buffer-string (buffer <text-buffer>))
-  (gb->string (gap-buffer buffer)))
-
-;;.
-(define-method-public (point)
-  (point (current-buffer)))
-
-;;.
-(define-method-public (point (buffer <text-buffer>))
-  (gb-point (gap-buffer buffer)))
-
-;;.
-(define-method-public (point-min)
-  (point-min (current-buffer)))
-
-;;.
-(define-method-public (point-min (buffer <text-buffer>))
-  (gb-point-min (gap-buffer buffer)))
-
-;;.
-(define-method-public (point-max)
-  (point-max (current-buffer)))
-
-;;.
-(define-method-public (point-max (buffer <text-buffer>))
-  (gb-point-max (gap-buffer buffer)))
-
-;; Move the point around.  It's very tempting to change the name from
-;; [[goto-char]] to [[goto-point!]] because [[goto-char]] is misleading.
-;; You don't actually go to a character, you go to a place between
-;; characters, a point.
-(define-method-public (goto-char point)
-  (goto-char point (current-buffer)))
-
-;;.
-(define-method-public (goto-char point (buffer <text-buffer>))
-  (gb-goto-char (gap-buffer buffer) point))
-
-;(define goto-point! goto-char)
-;;; Let's add the procedures [[char-before]] and [[char-after]] to inspect
-;;; the characters before and after a point.
-;;;
-;;; <buffer:procedure>=
-;; XXX define-method needs to allow for the definition of optional arguments.
-;; This is getting ridiculous.
-(define-method-public (char-before)
-  (char-before (point) (current-buffer)))
-
-;;.
-(define-method-public (char-before point)
-  (char-before point (current-buffer)))
-
-(define (gb-char-before gb point)
-  ;; Avert thy eyes.
-  (if (<= point (gb-point-min gb))
-      #f
-      (string-ref (gb->string gb) (- point 2))))
-
-(define (gb-char-after gb point)
-  ;; Avert thy eyes.
-  (if (>= point (gb-point-max gb))
-      #f
-      (string-ref (gb->string gb) (- point 1))))
-
-;;.
-(define-method-public (char-before point (buffer <text-buffer>))
-  (gb-char-before (gap-buffer buffer) point))
-
-;;.
-(define-method-public (char-after)
-  (char-after (point) (current-buffer)))
-
-;;.
-(define-method-public (char-after point)
-  (char-after point (current-buffer)))
-
-;;.
-(define-method-public (char-after point (buffer <text-buffer>))
-  (gb-char-after (gap-buffer buffer) point))
-
-;; There is
-;; @url{"http://gnuvola.org/software/guile/doc/Gap-Buffer.html", documentation}
-;; which suggests that [[(ice-9 gap-buffer)]] module has some nice regex
-;; search features.  However, I can't find the implementation anywhere,
-;; so I implemented them pretty sloppily here.  They should work find for
-;; a minibuffer, but probably shouldn't be used for anything bigger.
-(define*-public (gb-re-search-forward gb regex #:optional (bound #f) (no-error? #f) (repeat 1))
-  ;; This could be done better in the gap-buffer.scm itself.
-  (if (= repeat 0)
-      (gb-point gb)
-      (let* ((string (gb->string gb))
-             (pt (gb-point gb))
-             (match (regexp-exec regex string (- pt 1))))
-        ;;(format #t "match ~a ~%" match)
-        (if match
-            (begin
-              (gb-goto-char gb (+ 1 (match:end match 0)))
-              (gb-re-search-forward gb regex bound no-error? (1- repeat)))
-            (if no-error?
-                #f
-                (scm-error 'no-match 'gb-re-search-forward
-
-                           "No match found for regex '~a' in ~s after point ~a" (list regex string pt) #f))))))
-
-;;.
-(define*-public (gb-re-search-backward gb regex #:optional (bound #f) (no-error? #f) (repeat 1))
-  ;; This could be done better in the gap-buffer.scm itself.
-  (if (= repeat 0)
-      (gb-point gb)
-      (let loop ((start-search 0)
-                 (last-match-start #f))
-       (let* ((string (gb->string gb))
-              (pt (gb-point gb))
-              (match (regexp-exec regex string start-search)))
-         (define (my-error)
-           (if no-error?
-               #f
-               (scm-error
-                'no-match 'gb-re-search-forward
-                "No match found for regex '~a' in ~s before point ~a"
-                (list regex string pt) #f)))
-         (define (finish)
-           (if last-match-start
-               (begin
-                 (gb-goto-char gb (1+ last-match-start))
-                 (gb-re-search-backward gb regex bound no-error? (1- repeat)))
-               (my-error)))
-         ;;(format #t "match ~a ~%" match)
-         (if match
-             (if (< (match:start match 0) (1- pt))
-                 ;; continue searching
-                 (loop (match:end match 0) (match:start match 0))
-                 (finish))
-             (finish))))))
-
-;;.
-(define-interactive (kill-line #:optional (n 1))
-  (gb-delete-char! (gap-buffer (current-buffer)) (- (point-max) (point))))
-
-;;.
-(define-interactive (delete-backward-char #:optional (n 1))
-  (gb-delete-char! (gap-buffer (current-buffer)) (- n)))
-
-;;.
-(define-interactive (forward-delete-char #:optional (n 1))
-  (gb-delete-char! (gap-buffer (current-buffer)) n))
-
-;;.
-(define-interactive (forward-char #:optional (n 1))
-  (goto-char (+ (point) n)))
-
-(define forward-word-regex (make-regexp "\\s*\\w+\\b"))
-(define backward-word-regex (make-regexp "\\b\\w+\\s*"))
-
-;; XXX where is gb-re-search-forward defined?  It has documentation.
-;; but no implementation?
-;; http://gnuvola.org/software/guile/doc/Gap-Buffer.html
-(define-interactive (forward-word #:optional (n 1))
-  (gb-re-search-forward (gap-buffer (current-buffer)) forward-word-regex #f #t n))
-
-;;.
-(define-interactive (backward-word #:optional (n 1))
-  (gb-re-search-backward (gap-buffer (current-buffer)) backward-word-regex #f #t n))
-
-;;.
-(define-interactive (move-beginning-of-line #:optional (n 1))
-  ;(gb-beginning-of-line (gap-buffer (current-buffer)) n)
-  (goto-char (point-min)))
-
-;;.
-(define-interactive (move-end-of-line #:optional (n 1))
-  ;(gb-beginning-of-line (gap-buffer (current-buffer)) n)
-  (goto-char (point-max)))
-
-;;.
-(define-interactive (backward-char #:optional (n 1))
-  (forward-char (- n)))
-
-;;.
-(define*-public (insert #:rest args)
-  (and (current-buffer)
-   (if (null? args)
-       0
-       (let ((arg (car args)))
-         (run-hook before-buffer-change-hook (current-buffer))
-         (cond
-          ((string? arg)
-           (gb-insert-string! (gap-buffer (current-buffer)) arg))
-          ((char? arg)
-           (gb-insert-char! (gap-buffer (current-buffer)) arg))
-          (else #f))
-         (set! (buffer-modified? (current-buffer)) #t)
-         (incr! (buffer-modified-tick (current-buffer)))
-         (run-hook after-buffer-change-hook (current-buffer))))))
-
-;;.
-(define-interactive (self-insert-command #:optional (n 1))
-  (if (< n 1)
-      ;; We're done.
-      #f
-      (let* ((event this-command-event))
-        ;; Do I have to do anything for shifted characters?
-        (insert (command-char event)))))

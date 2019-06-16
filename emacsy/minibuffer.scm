@@ -35,6 +35,7 @@
   #:use-module (emacsy keymap)
   #:use-module (emacsy event)
   #:use-module (emacsy buffer)
+  #:use-module (emacsy text)
   #:use-module (emacsy command)
   #:use-module (emacsy block)
   #:use-module (emacsy klecl)
@@ -49,7 +50,7 @@
 ;; @section Minibuffer
 ;; The minibuffer provides a rich interactive textual input system.  It
 ;; offers @verb{|TAB|} completion and history.  The implementation of it
-;; inherits from the [[<text-buffer>]].
+;; inherits from the @var{<text-buffer>}.
 
 ;;; Code:
 
@@ -108,7 +109,7 @@
 ;;.
 
 ;;.
-(define-method (buffer-string (buffer <minibuffer>))
+(define-method (buffer:buffer-string (buffer <minibuffer>))
   (string-concatenate (list
                        (minibuffer-prompt buffer)
                        (minibuffer-contents buffer)
@@ -126,19 +127,19 @@
 ;; content starts.  Basically, it should be as though it were a regular
 ;; buffer that has been narrowed.
 
-(define-method (point-min (buffer <minibuffer>))
+(define-method (buffer:point-min (buffer <minibuffer>))
   (+ (next-method) (string-length (minibuffer-prompt buffer))))
 
-(define-method (point (buffer <minibuffer>))
+(define-method (buffer:point (buffer <minibuffer>))
   (+ (next-method) (string-length (minibuffer-prompt buffer))))
 
-(define-method (point-max (buffer <minibuffer>))
+(define-method (buffer:point-max (buffer <minibuffer>))
   (+ (next-method) (string-length (minibuffer-prompt buffer))))
 
 ;; For [[goto-char]] we just undo that thing.\todo{If the prompt changes,
 ;;   the point should be adjusted manualy.}
 
-(define-method (goto-char point (buffer <minibuffer>))
+(define-method (buffer:goto-char (buffer <minibuffer>) point)
   (gb-goto-char (gap-buffer buffer)
                 (- point (string-length (minibuffer-prompt buffer)))))
 
@@ -611,7 +612,7 @@ available. Otherwise returns default-ticks."
 (define-key minibuffer-local-map "C-a" 'move-beginning-of-line)
 (define-key minibuffer-local-map "C-e" 'move-end-of-line)
 (define-key minibuffer-local-map "C-k" 'kill-line)
-(define-key minibuffer-local-map "C-d" 'forward-delete-char)
+(define-key minibuffer-local-map "C-d" 'delete-forward-char)
 (define-key minibuffer-local-map "RET" 'exit-minibuffer)
 (define-key minibuffer-local-map "M-n" 'next-history-element)
 (define-key minibuffer-local-map "M-p" 'previous-history-element)

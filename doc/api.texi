@@ -835,47 +835,47 @@ Emacs' concepts of buffer, window, and mode are directly analogous to
 the model, view, and controller respectively---the MVC pattern.
 
 
-@c snarfed from emacsy/buffer.scm:57
+@c snarfed from emacsy/buffer.scm:50
 @defmac with-buffer @dots{}
 A convenience macro to work with a given buffer.
 @end defmac
 
-@c snarfed from emacsy/buffer.scm:70
+@c snarfed from emacsy/buffer.scm:64
+@defmac save-excursion @dots{}
+A convenience macro to do some work
+@end defmac
+
+@c snarfed from emacsy/buffer.scm:82
 @deftp {Class} <buffer>
 
 @end deftp
 
-@c snarfed from emacsy/buffer.scm:77
-@deftp {Class} <text-buffer>
-
-@end deftp
-
-@c snarfed from emacsy/buffer.scm:82
+@c snarfed from emacsy/buffer.scm:87
 @defvar before-buffer-change-hook
 
 @end defvar
 
-@c snarfed from emacsy/buffer.scm:85
+@c snarfed from emacsy/buffer.scm:90
 @defvar after-buffer-change-hook
 
 @end defvar
 
-@c snarfed from emacsy/buffer.scm:91
+@c snarfed from emacsy/buffer.scm:96
 @defvar buffer-stack
 
 @end defvar
 
-@c snarfed from emacsy/buffer.scm:94
+@c snarfed from emacsy/buffer.scm:99
 @defvar last-buffer
 
 @end defvar
 
-@c snarfed from emacsy/buffer.scm:97
+@c snarfed from emacsy/buffer.scm:102
 @defvar aux-buffer
 
 @end defvar
 
-@c snarfed from emacsy/buffer.scm:100
+@c snarfed from emacsy/buffer.scm:105
 @deffn {Scheme Procedure} buffer-name
 Buffer's have a name, and there is always a current buffer or it's
 false.  Note that methods do not work as easily with optional
@@ -883,275 +883,111 @@ arguments.  It seems best to define each method with a different
 number of arguments as shown below.
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:107
+@c snarfed from emacsy/buffer.scm:112
 @deffn {Scheme Procedure} buffer-name (buffer <buffer>)
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:111
+@c snarfed from emacsy/buffer.scm:116
 @deffn {Scheme Procedure} set-buffer-name! name
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:115
+@c snarfed from emacsy/buffer.scm:120
 @deffn {Scheme Procedure} set-buffer-name! name (buffer <buffer>)
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:119
+@c snarfed from emacsy/buffer.scm:124
 @deffn {Scheme Procedure} buffer-modified?
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:123
+@c snarfed from emacsy/buffer.scm:128
 @deffn {Scheme Procedure} buffer-modified-tick
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:127
+@c snarfed from emacsy/buffer.scm:132
 @deffn {Scheme Procedure} write (obj <buffer>) port
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:134
+@c snarfed from emacsy/buffer.scm:139
 @deffn {Scheme Procedure} current-local-map
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:138
+@c snarfed from emacsy/buffer.scm:143
 @deffn {Scheme Procedure} use-local-map keymap
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:142
+@c snarfed from emacsy/buffer.scm:147
 @deffn {Scheme Procedure} buffer-list
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:146
+@c snarfed from emacsy/buffer.scm:151
 @deffn {Scheme Procedure} current-buffer
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:150
+@c snarfed from emacsy/buffer.scm:155
 @deffn {Scheme Procedure} add-buffer! buffer
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:154
+@c snarfed from emacsy/buffer.scm:159
 @deffn {Scheme Procedure} remove-buffer! buffer
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:158
+@c snarfed from emacsy/buffer.scm:163
 @deffn {Interactive Procedure} next-buffer  #:optional (incr 1)
 @kindex next-buffer  #:optional (incr 1)
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:162
+@c snarfed from emacsy/buffer.scm:167
 @deffn {Interactive Procedure} prev-buffer  #:optional (incr 1)
 @kindex prev-buffer  #:optional (incr 1)
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:166
+@c snarfed from emacsy/buffer.scm:171
 @deffn {Scheme Procedure} set-buffer! buffer
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:170
-@deffn {Interactive Procedure} kill-buffer  #:optional (buffer (current-buffer))
-@kindex kill-buffer  #:optional (buffer (current-buffer))
+@c snarfed from emacsy/buffer.scm:175
+This is scary, we will override it when we have <text-buffer>.
 
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:174
+@c snarfed from emacsy/buffer.scm:180
 @deffn {Interactive Procedure} other-buffer  #:optional (count 1)
 @kindex other-buffer  #:optional (count 1)
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:196
+@c snarfed from emacsy/buffer.scm:202
 @defvar switch-to-buffer
 
 @end defvar
 
-@c snarfed from emacsy/buffer.scm:199
+@c snarfed from emacsy/buffer.scm:205
 @deffn {Scheme Procedure} local-var-ref symbol
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:206
+@c snarfed from emacsy/buffer.scm:212
 @deffn {Scheme Procedure} local-var-set! symbol value
 
 @end deffn
 
-@c snarfed from emacsy/buffer.scm:210
+@c snarfed from emacsy/buffer.scm:216
 @defvar local-var
 
 @end defvar
-
-@c snarfed from emacsy/buffer.scm:214
-@deffn {Scheme Procedure} buffer-string (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:218
-@deffn {Scheme Procedure} point
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:222
-@deffn {Scheme Procedure} point (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:226
-@deffn {Scheme Procedure} point-min
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:230
-@deffn {Scheme Procedure} point-min (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:234
-@deffn {Scheme Procedure} point-max
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:238
-@deffn {Scheme Procedure} point-max (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:242
-@deffn {Scheme Procedure} goto-char point
-Move the point around.  It's very tempting to change the name from
-[[goto-char]] to [[goto-point!]] because [[goto-char]] is misleading.
-You don't actually go to a character, you go to a place between
-characters, a point.
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:249
-@deffn {Scheme Procedure} goto-char point (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:258
-@deffn {Scheme Procedure} char-before
-XXX define-method needs to allow for the definition of optional arguments.
-This is getting ridiculous.
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:263
-@deffn {Scheme Procedure} char-before point
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:279
-@deffn {Scheme Procedure} char-before point (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:283
-@deffn {Scheme Procedure} char-after
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:287
-@deffn {Scheme Procedure} char-after point
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:291
-@deffn {Scheme Procedure} char-after point (buffer <text-buffer>)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:295
-@deffn {Scheme Procedure} gb-re-search-forward gb regex  #:optional (bound #f) (no-error? #f) (repeat 1)
-There is
-@url{"http://gnuvola.org/software/guile/doc/Gap-Buffer.html", documentation}
-which suggests that [[(ice-9 gap-buffer)]] module has some nice regex
-search features.  However, I can't find the implementation anywhere,
-so I implemented them pretty sloppily here.  They should work find for
-a minibuffer, but probably shouldn't be used for anything bigger.
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:304
-@deffn {Scheme Procedure} gb-re-search-backward gb regex  #:optional (bound #f) (no-error? #f) (repeat 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:308
-@deffn {Interactive Procedure} kill-line  #:optional (n 1)
-@kindex kill-line  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:312
-@deffn {Interactive Procedure} delete-backward-char  #:optional (n 1)
-@kindex delete-backward-char  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:316
-@deffn {Interactive Procedure} forward-delete-char  #:optional (n 1)
-@kindex forward-delete-char  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:320
-@deffn {Interactive Procedure} forward-char  #:optional (n 1)
-@kindex forward-char  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:327
-@deffn {Interactive Procedure} forward-word  #:optional (n 1)
-@kindex forward-word  #:optional (n 1)
-XXX where is gb-re-search-forward defined?  It has documentation.
-but no implementation?
-http://gnuvola.org/software/guile/doc/Gap-Buffer.html
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:333
-@deffn {Interactive Procedure} backward-word  #:optional (n 1)
-@kindex backward-word  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:337
-@deffn {Interactive Procedure} move-beginning-of-line  #:optional (n 1)
-@kindex move-beginning-of-line  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:341
-@deffn {Interactive Procedure} move-end-of-line  #:optional (n 1)
-@kindex move-end-of-line  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:345
-@deffn {Interactive Procedure} backward-char  #:optional (n 1)
-@kindex backward-char  #:optional (n 1)
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:349
-@deffn {Scheme Procedure} insert  #:rest args
-
-@end deffn
-
-@c snarfed from emacsy/buffer.scm:353
-@deffn {Interactive Procedure} self-insert-command  #:optional (n 1)
-@kindex self-insert-command  #:optional (n 1)
-
-@end deffn
 
 @node Mru-stack
 @subsection Mru-stack
@@ -1226,181 +1062,511 @@ around.
 
 @end deffn
 
+@node Text
+@section Text
+
+Editing and stuff.
+
+
+@c snarfed from emacsy/text.scm:49
+@deffn {Scheme Procedure} buffer-string
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:53
+@deffn {Scheme Procedure} point
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:57
+@deffn {Scheme Procedure} point-min
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:61
+@deffn {Interactive Procedure} beginning-of-buffer  #:optional arg
+@kindex beginning-of-buffer  #:optional arg
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:65
+@deffn {Scheme Procedure} point-max
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:69
+@deffn {Interactive Procedure} end-of-buffer  #:optional arg
+@kindex end-of-buffer  #:optional arg
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:73
+@deffn {Scheme Procedure} mark  #:optional force
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:77
+@deffn {Scheme Procedure} set-mark pos
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:81
+@deffn {Interactive Procedure} set-mark-command  #:optional arg
+@kindex set-mark-command  #:optional arg
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:85
+@deffn {Interactive Procedure} mark-whole-buffer
+@kindex mark-whole-buffer
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:89
+@deffn {Interactive Procedure} exchange-point-and-mark
+@kindex exchange-point-and-mark
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:93
+@deffn {Scheme Procedure} char-after  #:optional (point (point))
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:100
+@deffn {Interactive Procedure} goto-char  #:optional (point (point))
+@kindex goto-char  #:optional (point (point))
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:104
+@deffn {Interactive Procedure} forward-char  #:optional (n 1)
+@kindex forward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:108
+@deffn {Interactive Procedure} backward-char  #:optional (n 1)
+@kindex backward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:112
+@deffn {Interactive Procedure} beginning-of-line  #:optional (n 1)
+@kindex beginning-of-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:116
+@deffn {Interactive Procedure} end-of-line  #:optional (n 1)
+@kindex end-of-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:120
+@deffn {Interactive Procedure} move-beginning-of-line  #:optional (n 1)
+@kindex move-beginning-of-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:124
+@deffn {Interactive Procedure} move-end-of-line  #:optional (n 1)
+@kindex move-end-of-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:128
+@deffn {Interactive Procedure} re-search-forward regex  #:optional (bound #f) (no-error? #f) (repeat 1)
+@kindex re-search-forward regex  #:optional (bound #f) (no-error? #f) (repeat 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:133
+@deffn {Interactive Procedure} re-search-backward regex  #:optional (bound #f) (no-error? #f) (repeat 1)
+@kindex re-search-backward regex  #:optional (bound #f) (no-error? #f) (repeat 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:139
+@deffn {Interactive Procedure} forward-word  #:optional (n 1)
+@kindex forward-word  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:144
+@deffn {Interactive Procedure} backward-word  #:optional (n 1)
+@kindex backward-word  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:149
+@deffn {Interactive Procedure} forward-line  #:optional (n 1)
+@kindex forward-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:153
+@deffn {Scheme Procedure} backward-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:169
+@deffn {Scheme Procedure} insert-char char
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:173
+@deffn {Interactive Procedure} insert  #:rest args
+@kindex insert  #:rest args
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:177
+@deffn {Interactive Procedure} self-insert-command  #:optional (n 1)
+@kindex self-insert-command  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:181
+@defvar kill-ring
+.
+@end defvar
+
+@c snarfed from emacsy/text.scm:204
+@deffn {Interactive Procedure} delete-forward-char  #:optional (n 1)
+@kindex delete-forward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:208
+@deffn {Interactive Procedure} forward-delete-char  #:optional (n 1)
+@kindex forward-delete-char  #:optional (n 1)
+Alias for delete-forward-char
+@end deffn
+
+@c snarfed from emacsy/text.scm:212
+@deffn {Interactive Procedure} delete-backward-char  #:optional (n 1)
+@kindex delete-backward-char  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:216
+@deffn {Interactive Procedure} backward-delete-char  #:optional (n 1)
+@kindex backward-delete-char  #:optional (n 1)
+Alias for delete-backward-char
+@end deffn
+
+@c snarfed from emacsy/text.scm:220
+@deffn {Interactive Procedure} delete-region  #:optional (start (point)) (end (mark))
+@kindex delete-region  #:optional (start (point)) (end (mark))
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:224
+@deffn {Interactive Procedure} kill-region  #:optional (start (point)) (end (mark))
+@kindex kill-region  #:optional (start (point)) (end (mark))
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:228
+@deffn {Scheme Procedure} delete-line n
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:232
+@deffn {Interactive Procedure} kill-line  #:optional (n 1)
+@kindex kill-line  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:236
+@deffn {Scheme Procedure} delete-word n
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:240
+@deffn {Interactive Procedure} kill-word  #:optional (n 1)
+@kindex kill-word  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:244
+@deffn {Interactive Procedure} backward-kill-word  #:optional (n 1)
+@kindex backward-kill-word  #:optional (n 1)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:250
+A child of <buffer>, such as <text-buffer>, <minibuffer> or a custom UI buffer
+may override these, for efficiency or otherwise.
+
+@c snarfed from emacsy/text.scm:286
+@deffn {Scheme Procedure} buffer:line-length (buffer <buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:290
+@deffn {Scheme Procedure} buffer:current-column (buffer <buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:294
+@deffn {Scheme Procedure} buffer:beginning-of-line (buffer <buffer>) n
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:298
+@deffn {Scheme Procedure} buffer:end-of-line (buffer <buffer>) n
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:302
+@subsection Editing for Gap Buffer
+
+@c snarfed from emacsy/text.scm:313
+@var{<text-buffer>} inherits from buffer and implements the simplest
+text editing for the Gap Buffer.
+
+@c snarfed from emacsy/text.scm:321
+@deffn {Scheme Procedure} buffer:buffer-string (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:325
+@deffn {Scheme Procedure} buffer:goto-char (buffer <text-buffer>) pos
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:329
+@deffn {Scheme Procedure} buffer:point (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:333
+@deffn {Scheme Procedure} buffer:point-min (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:337
+@deffn {Scheme Procedure} buffer:point-max (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:341
+@deffn {Scheme Procedure} buffer:set-mark (buffer <text-buffer>) pos
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:345
+@deffn {Scheme Procedure} buffer:mark (buffer <text-buffer>)
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:349
+@deffn {Scheme Procedure} buffer:char-before (buffer <text-buffer>) point
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:353
+@deffn {Scheme Procedure} buffer:char-after (buffer <text-buffer>) pos
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:357
+@deffn {Scheme Procedure} buffer:insert-string (buffer <text-buffer>) string
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:361
+@deffn {Scheme Procedure} buffer:insert-char (buffer <text-buffer>) char
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:365
+@deffn {Scheme Procedure} buffer:delete-char (buffer <text-buffer>) n
+
+@end deffn
+
+@c snarfed from emacsy/text.scm:369
+@deffn {Scheme Procedure} buffer:delete-region (buffer <text-buffer>) start end
+
+@end deffn
+
 @node Minibuffer
 @section Minibuffer
 The minibuffer provides a rich interactive textual input system.  It
 offers @verb{|TAB|} completion and history.  The implementation of it
-inherits from the [[<text-buffer>]].
+inherits from the @var{<text-buffer>}.
 
 
-@c snarfed from emacsy/minibuffer.scm:56
+@c snarfed from emacsy/minibuffer.scm:57
 @deftp {Class} <minibuffer>
 
 @end deftp
 
-@c snarfed from emacsy/minibuffer.scm:60
+@c snarfed from emacsy/minibuffer.scm:61
 @defvar minibuffer-local-map
 We define a keymap with all the typical self-insert-commands that
 would be expected in an editable buffer
 @c .\todo{This should probably be defined in the buffer module since it is general.}
 @end defvar
 
-@c snarfed from emacsy/minibuffer.scm:69
+@c snarfed from emacsy/minibuffer.scm:70
 @defvar minibuffer
 
 @end defvar
 
-@c snarfed from emacsy/minibuffer.scm:72
+@c snarfed from emacsy/minibuffer.scm:73
 @defvar emacsy-display-minibuffer?
 
 @end defvar
 
-@c snarfed from emacsy/minibuffer.scm:76
+@c snarfed from emacsy/minibuffer.scm:77
 @defvar ticks-per-second
 
 @end defvar
 
-@c snarfed from emacsy/minibuffer.scm:86
+@c snarfed from emacsy/minibuffer.scm:87
 @defvar minibuffer-history
 
 @end defvar
 
-@c snarfed from emacsy/minibuffer.scm:95
+@c snarfed from emacsy/minibuffer.scm:96
 When we show the minibuffer, we'll show the prompt, the contents (user
 editable), and the minibuffer-message if applicable.
 
-@c snarfed from emacsy/minibuffer.scm:99
-@deffn {Scheme Procedure} buffer-string (buffer <minibuffer>)
+@c snarfed from emacsy/minibuffer.scm:100
+@deffn {Scheme Procedure} buffer:buffer-string (buffer <minibuffer>)
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:102
+@c snarfed from emacsy/minibuffer.scm:103
 @deffn {Scheme Procedure} minibuffer-contents  #:optional (buffer minibuffer)
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:106
+@c snarfed from emacsy/minibuffer.scm:107
 @deffn {Scheme Procedure} delete-minibuffer-contents  #:optional (buffer minibuffer)
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:142
+@c snarfed from emacsy/minibuffer.scm:143
 @deffn {Scheme Procedure} minibuffer-message string . args
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:146
+@c snarfed from emacsy/minibuffer.scm:147
 @subsection read-from-minibuffer
 
-@c snarfed from emacsy/minibuffer.scm:149
+@c snarfed from emacsy/minibuffer.scm:150
 history can be #f, a symbol, or a <cursor-list>.
 
-@c snarfed from emacsy/minibuffer.scm:247
+@c snarfed from emacsy/minibuffer.scm:248
 @deffn {Scheme Procedure} try-completion string collection  #:optional (predicate (const #t))
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:251
+@c snarfed from emacsy/minibuffer.scm:252
 @deffn {Scheme Procedure} all-completions string collection  #:optional (predicate (const #t))
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:255
+@c snarfed from emacsy/minibuffer.scm:256
 @deffn {Scheme Procedure} collection->completer collection  #:optional (predicate (const #t))
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:265
+@c snarfed from emacsy/minibuffer.scm:266
 @deffn {Scheme Procedure} completing-read prompt collection  #:key predicate (const #t) (require-match? #f) (initial-input #f) (history (what-command-am-i?)) (to-string #f)
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:295
+@c snarfed from emacsy/minibuffer.scm:296
 @deffn {Scheme Procedure} apropos-module rgx module
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:299
+@c snarfed from emacsy/minibuffer.scm:300
 @deffn {Scheme Procedure} command-completion-function text cont?
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:317
+@c snarfed from emacsy/minibuffer.scm:318
 We want to be able to look up filenames.
 
-@c snarfed from emacsy/minibuffer.scm:320
+@c snarfed from emacsy/minibuffer.scm:321
 @deffn {Scheme Procedure} files-in-dir dirname
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:376
+@c snarfed from emacsy/minibuffer.scm:377
 @deffn {Scheme Procedure} read-file-name prompt  #:key dir default-file-name initial predicate history
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:391
+@c snarfed from emacsy/minibuffer.scm:392
 @subsection Minibuffer History
 
-@c snarfed from emacsy/minibuffer.scm:394
+@c snarfed from emacsy/minibuffer.scm:395
 @deffn {Scheme Procedure} make-history  #:optional (list (quote )) (index #f)
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:400
+@c snarfed from emacsy/minibuffer.scm:401
 @deffn {Scheme Procedure} history-insert! history value
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:404
+@c snarfed from emacsy/minibuffer.scm:405
 @deffn {Scheme Procedure} history-ref history
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:408
+@c snarfed from emacsy/minibuffer.scm:409
 @deffn {Scheme Procedure} history-set! history value
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:412
+@c snarfed from emacsy/minibuffer.scm:413
 @deffn {Interactive Procedure} exit-minibuffer
 @kindex exit-minibuffer
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:416
+@c snarfed from emacsy/minibuffer.scm:417
 @deffn {Interactive Procedure} minibuffer-complete
 @kindex minibuffer-complete
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:420
+@c snarfed from emacsy/minibuffer.scm:421
 @deffn {Interactive Procedure} next-match
 @kindex next-match
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:424
+@c snarfed from emacsy/minibuffer.scm:425
 @deffn {Interactive Procedure} previous-match
 @kindex previous-match
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:428
+@c snarfed from emacsy/minibuffer.scm:429
 @deffn {Interactive Procedure} minibuffer-complete-word
 @kindex minibuffer-complete-word
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:432
+@c snarfed from emacsy/minibuffer.scm:433
 @deffn {Interactive Procedure} minibuffer-completion-help
 @kindex minibuffer-completion-help
 
 @end deffn
 
-@c snarfed from emacsy/minibuffer.scm:436
+@c snarfed from emacsy/minibuffer.scm:437
 Some commands for manipulating the minibuffer history.
 
-@c snarfed from emacsy/minibuffer.scm:439
+@c snarfed from emacsy/minibuffer.scm:440
 @deffn {Interactive Procedure} previous-history-element  #:optional (n 1)
 @kindex previous-history-element  #:optional (n 1)
 
@@ -1413,124 +1579,124 @@ Now we're going to put in place some core functionality that makes
 Emacsy an Emacs-like library.
 
 
-@c snarfed from emacsy/core.scm:73
+@c snarfed from emacsy/core.scm:71
 @defvar global-map
 We need a global keymap.
 @end defvar
 
-@c snarfed from emacsy/core.scm:76
+@c snarfed from emacsy/core.scm:74
 @defvar special-event-map
 
 @end defvar
 
-@c snarfed from emacsy/core.scm:79
+@c snarfed from emacsy/core.scm:77
 @defvar emacsy-quit-application?
 
 @end defvar
 
-@c snarfed from emacsy/core.scm:88
+@c snarfed from emacsy/core.scm:86
 @defvar messages
 
 @end defvar
 
-@c snarfed from emacsy/core.scm:97
+@c snarfed from emacsy/core.scm:95
 @defvar emacsy-send-mouse-movement-events?
 Sometimes we may want to track the motion events generated by a mouse.
 We don't do this all the time because it seems unnecessarily taxing.
 @end defvar
 
-@c snarfed from emacsy/core.scm:104
+@c snarfed from emacsy/core.scm:102
 @deffn {Scheme Procedure} current-active-maps
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:109
+@c snarfed from emacsy/core.scm:107
 @deffn {Scheme Procedure} universal-argument-ref
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:113
+@c snarfed from emacsy/core.scm:111
 @deffn {Scheme Procedure} universal-argument-pop!
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:117
+@c snarfed from emacsy/core.scm:115
 @deffn {Scheme Procedure} universal-argument-push! arg
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:121
+@c snarfed from emacsy/core.scm:119
 @deffn {Interactive Procedure} switch-to-buffer  #:optional buffer
 @kindex switch-to-buffer  #:optional buffer
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:173
+@c snarfed from emacsy/core.scm:171
 @deffn {Scheme Procedure} emacsy-echo-area
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:177
+@c snarfed from emacsy/core.scm:175
 @deffn {Scheme Procedure} current-message
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:181
+@c snarfed from emacsy/core.scm:179
 @deffn {Scheme Procedure} emacsy-message . args
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:188
+@c snarfed from emacsy/core.scm:186
 @deffn {Scheme Procedure} clear-echo-area
 When the minibuffer is entered, we want to clear the echo-area.
 Because the echo-area is defined in core, it seems best to deal with
 it in core rather than placing echo-area handling code in minibuffer.
 @end deffn
 
-@c snarfed from emacsy/core.scm:194
+@c snarfed from emacsy/core.scm:192
 @deffn {Scheme Procedure} emacsy-message-or-echo-area
 These are most of the C API calls.
 @end deffn
 
-@c snarfed from emacsy/core.scm:198
+@c snarfed from emacsy/core.scm:196
 @deffn {Scheme Procedure} emacsy-mode-line
 
 method
 @end deffn
 
-@c snarfed from emacsy/core.scm:203
+@c snarfed from emacsy/core.scm:201
 @deffn {Scheme Procedure} emacsy-mode-line (buffer <buffer>)
 
 method
 XXX this should be moved into the (emacsy buffer) module.
 @end deffn
 
-@c snarfed from emacsy/core.scm:209
+@c snarfed from emacsy/core.scm:207
 @deffn {Scheme Procedure} emacsy-minibuffer-point
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:213
+@c snarfed from emacsy/core.scm:211
 @deffn {Scheme Procedure} emacsy-run-hook hook . args
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:219
+@c snarfed from emacsy/core.scm:217
 @deffn {Scheme Procedure} emacsy-terminate
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:223
+@c snarfed from emacsy/core.scm:221
 @deffn {Scheme Procedure} emacsy-tick
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:277
+@c snarfed from emacsy/core.scm:275
 @deffn {Scheme Procedure} emacsy-initialize interactive?
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:281
+@c snarfed from emacsy/core.scm:279
 @deffn {Interactive Procedure} eval-expression  #:optional epression
 @kindex eval-expression  #:optional epression
 There is one command that I consider fundamental for an Emacs-like
@@ -1540,20 +1706,20 @@ it may have Emacs-like key bindings, but it's not Emacs-like.  That
 command is [[eval-expression]].  Let's write it.
 @end deffn
 
-@c snarfed from emacsy/core.scm:293
+@c snarfed from emacsy/core.scm:291
 @deffn {Interactive Procedure} execute-extended-command  #:optional (n 1)
 @kindex execute-extended-command  #:optional (n 1)
 The second fundamental command is [[execute-extended-command]] invoked
 with @verb{|M-x|}.
 @end deffn
 
-@c snarfed from emacsy/core.scm:298
+@c snarfed from emacsy/core.scm:296
 @deffn {Interactive Procedure} quit-application
 @kindex quit-application
 
 @end deffn
 
-@c snarfed from emacsy/core.scm:302
+@c snarfed from emacsy/core.scm:300
 @deffn {Interactive Procedure} universal-argument
 @kindex universal-argument
 This [[universal-argument]] command is written using a different style
@@ -1566,12 +1732,18 @@ instance, if the minibuffer were written in this style, one could
 invoke recursive minibuffers.
 @end deffn
 
-@c snarfed from emacsy/core.scm:313
+@c snarfed from emacsy/core.scm:311
 @deffn {Interactive Procedure} load-file  #:optional file-name
 @kindex load-file  #:optional file-name
 We want to be able to load a scheme file.
 @c todo {We should have aread-filename procedure.}
 @end deffn
+
+@c snarfed from emacsy/core.scm:406
+The *scratch* buffer.
+
+@c snarfed from emacsy/core.scm:415
+Override kill-buffer; make sure the buffer list does not become empty.
 
 @node Advice
 @section Advice

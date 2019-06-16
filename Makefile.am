@@ -42,6 +42,7 @@ dist_emacsy_scm_DATA =				\
  emacsy/mode.scm				\
  emacsy/mru-stack.scm				\
  emacsy/self-doc.scm				\
+ emacsy/text.scm				\
  emacsy/util.scm				\
  emacsy/vector-math.scm				\
  emacsy/window.scm				\
@@ -97,6 +98,7 @@ TESTS =						\
  test/minibuffer.scm				\
  test/mru-stack.scm				\
  test/self-doc.scm				\
+ test/text.scm					\
  test/window.scm				\
  test/windows.scm
 
@@ -243,6 +245,7 @@ doc-snarf-api:
                 emacsy/kbd-macro.scm		\
                 emacsy/buffer.scm		\
                 emacsy/mru-stack.scm		\
+                emacsy/text.scm			\
                 emacsy/minibuffer.scm		\
                 emacsy/core.scm			\
                 emacsy/advice.scm		\

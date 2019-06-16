@@ -143,6 +143,13 @@ keyboard_func (unsigned char glut_key, int x, int y)
     mod_flags |= EMACSY_MODKEY_CONTROL;
   if (glut_mod_flags & GLUT_ACTIVE_ALT)
     mod_flags |= EMACSY_MODKEY_META;
+  if (glut_key == 8)
+    glut_key = 127;
+  else if (glut_key == 127)
+    {
+      glut_key = 4;
+      mod_flags += EMACSY_MODKEY_CONTROL;
+    }
 /*
  * The keys @verb{|C-a|} and @verb{|C-b|} return @code{1} and @code{2}
  * respectively.  We want to map these to their actual character values.

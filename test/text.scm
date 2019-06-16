@@ -20,6 +20,7 @@
 (use-modules (check)
              (emacsy mru-stack)
              (emacsy buffer)
+             (emacsy text)
              (emacsy command)
              (emacsy event)
              (emacsy keymap)
@@ -27,22 +28,48 @@
              (rnrs base))
 
 (use-private-modules (emacsy buffer))
+(use-private-modules (emacsy text))
 
 ;;; <+ Test Preamble>=
 (use-modules (check))
 (use-modules (ice-9 pretty-print))
 (define test-errors '())
-;;; <buffer:test>=
-(define b (make <buffer> #:name "*test-buffer*"))
-(check (buffer-name b) => "*test-buffer*")
-(check (object->string b) => "\"#<buffer '*test-buffer*'>\"")
-(check (current-buffer) => #f)
-;;; <buffer:test>=
-(add-buffer! b)
-(check (buffer-name) => "*test-buffer*")
-(remove-buffer! b)
-(check (current-buffer) => #f)
 
+;;; Let's test this regex search in a gap buffer.
+;;;
+;;; <buffer:test>=
+(define c (make <text-buffer> #:name "*test-regex*"))
+(add-buffer! c)
+(check (current-buffer) => c)
+(check (buffer-modified?) => #f)
+(check (buffer-modified-tick) => 0)
+(insert "hellos these ard words!")
+(check (buffer-modified?) => #t)
+(check (buffer-modified-tick) => 1)
+;;       1    7     13  17
+(check (point) => (point-max))
+(check (point-min) => 1)
+(goto-char (point-min))
+(check (gb-char-after (gap-buffer c) 1) => #\h)
+(check (gb-char-before (gap-buffer c) 1) => #f)
+(check (point) => 1)
+(check (forward-word) => 7)
+(check (point) => 7)
+(check (char-before) => #\s)
+(check (char-after) => #\space)
+
+(check (forward-word 2) => 17)
+(check (char-before) => #\d)
+(check (char-after) => #\space)
+(check (backward-word) => 14)
+(check (char-before) => #\space)
+(check (char-after) => #\a)
+
+;;#(!sdrow dra eseht solleh (17 . 24))
+;;  1      8   12    18
+;; is               ^      ^
+;; goto      ^
+;; was     ^
 ;;; <+ Test Postscript>=
 ;(run-tests)
 (check-report)
