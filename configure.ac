@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([emacsy], [0.2], [guile-user@gnu.org])
+AC_INIT([emacsy], [0.3], [guile-user@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE([-Wall foreign -Wno-portability parallel-tests subdir-objects])
