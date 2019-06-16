@@ -18,9 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 EXTRA_DIST =					\
-  README.md					\
-  NEWS						\
-  guix.scm
+ guix.scm					\
+ todo.org
 
 dist_emacsy_scm_DATA =				\
  emacsy/advice.scm				\

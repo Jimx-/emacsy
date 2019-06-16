@@ -473,24 +473,25 @@ to use it.
 @section Requirements
 
 This section lists requirements when building Emacsy from source.  The
-build procedure for Emacsy is the same as for other GNU software, and is
-not covered here.  Please see the files @file{README} and @file{INSTALL}
-in the Emacsy source tree for additional details.
+build procedure for Emacsy is the same as for GNU software, and is not
+covered here.  Please see the files @file{README} and @file{INSTALL} in
+the Emacsy source tree for additional details.
 
 Emacsy depends on the following packages:
 
 @itemize
-@item @url{http://gnu.org/software/guile/, GNU Guile}, version 2.0.13 or
-later, including 2.2.x;
-@item @url{http://nongnu.org/guile-lib/, Guile-Lib}, version 0.2.0 or
-later.
+@item @url{http://gnu.org/software/guile/, GNU Guile}, version 2.2.4 is known to work.
+@item @url{http://nongnu.org/guile-lib/, Guile-Lib}, version 0.2.1.6 is known to work.
 @item @url{http://www.gnu.org/software/make/, GNU Make}.
-@item @url{http://gcc.gnu.org, GCC's gcc}.
 @end itemize
 
 The following dependencies are optional:
 
 @itemize
+@item @url{http://www.gnu.org/software/autoconf, Autoconf},
+@url{http://www.gnu.org/software/automake, Automake},
+@url{http://www.gnu.org/software/libtool, Libtool}, and
+@url{https://www.freedesktop.org/wiki/Software/pkg-config, pkg-config} to build from git.
 @item
 Installing @url{https://savannah.gnu.org/projects/texinfo, Texinfo},
 will allow you to build the documentation.
@@ -498,8 +499,8 @@ will allow you to build the documentation.
 Installing @url{https://freeglut.sourceforge.net, FreeGLUT},
 will allow you to build the Hello Emacsy example.
 @item
-Installing @url{https://webkitgtk.org, WebKitGtk+},
-will allow you to build the Emacsy Webkit GTK+ examples.
+Installing @url{https://webkitgtk.org, WebKitGTK}, will allow you to
+build the bare bones Emacsy Web browser examples.
 @end itemize
 
 
