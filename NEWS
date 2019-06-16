@@ -10,6 +10,13 @@ Copyright © 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 
 Please send Emacsy reports to guile-user@gnu.org.
 
+* Changes in 0.2 since 0.1.3
+** Core
+*** Emacsy now has a Guix package and is released with GNU Guix.
+*** Emacsy now supports Guile 2.2, Gtk+3, WebKit2Gtk-4.0.
+*** Emacsy is less noisy, again.
+** C API
+*** The C API now uses the EMACSY_ prefix C constants (WAS: EY_).
 * Changes in 0.1.3 since 0.1.2
 ** Core
 *** Emacsy now supports universal argument (C-u ...).

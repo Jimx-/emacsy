@@ -2,8 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-# We'll try to use semantic versioning.  http://semver.org
-AC_INIT([emacsy], [0.1.3], [guile-user@gnu.org])
+AC_INIT([emacsy], [0.2], [guile-user@gnu.org])
 AC_CONFIG_AUX_DIR([support/build-aux])
 # Lies.
 #AM_INIT_GUILE_MODULE
