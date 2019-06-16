@@ -256,6 +256,16 @@ doc-snarf-api:
 	  $(DOC_SNARF) -l scheme -t $$i;	\
 	done
 
+# Distribution
+##############
+
+# Reproducible tarball
+GZIP_ENV = --no-name
+am__tar = $${TAR-tar} --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf - "$$tardir" dist
+
+tag:
+	git tag -s v$(PACKAGE_VERSION) -m "$(PACKAGE_NAME) $(PACKAGE_VERSION)."
+
 sign-dist: dist
 	gpg -a --output $(distdir).tar.gz.sig --detach-sig $(distdir).tar.gz
 
