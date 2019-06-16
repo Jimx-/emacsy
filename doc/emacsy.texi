@@ -56,6 +56,7 @@ Emacs-like library using GNU Guile.
 * Introduction::
 * The Garden::
 * Installation::                Installing Emacsy.
+* Hello Emacsy::
 * Api::
 * Contributing::                Your help needed!
 * Acknowledgments::             Thanks!
@@ -86,9 +87,15 @@ Installation
 * Requirements::                Software needed to build and run Emacsy.
 * Running the Test Suites::     Testing Emacsy.
 
+Hello Emacsy
+
+* Embedder's API::              Unlimited power.
+* The Simplest Application Ever::  Hello Emacsy!
+* Conclusion::                  And now what?
+* Plaintext Please::            Use the Source.
+
 Api
 
-* Hello Emacsy::
 * C Api::
 * Emacsy Facade::
 * Event::
@@ -516,10 +523,95 @@ make check
 @end example
 
 @c *********************************************************************
+@node Hello Emacsy
+@chapter Hello Emacsy
+
+I have received a lot of questions asking, what does
+Emacsy@footnote{Kickstarter page @url{http://kck.st/IY0Bau}} actually
+do?  What restrictions does it impose on the GUI toolkit?  How is it
+possible to not use any Emacs code? I thought it might be best if I
+were to provide a minimal example program, so that people can see
+code that illustrates Emacsy API usage.
+
+@image{images/minimal-emacsy-example,,,,.png}
+
+@menu
+* Embedder's API::              Unlimited power.
+* The Simplest Application Ever::  Hello Emacsy!
+* Conclusion::                  And now what?
+* Plaintext Please::            Use the Source.
+@end menu
+
+@node Embedder's API
+@section Embedder's API: Unlimited power.
+
+Here are a few function prototypes defined in @file{emacsy.h}, @pxref{C
+Api, C Api for the full list}.
+
+@c snarfed from emacsy/emacsy.c:45
+@deftypefn {C Function}  int emacsy_initialize (int init_flags)
+Initialize Emacsy.
+@end deftypefn
+
+@c snarfed from emacsy/emacsy.c:63
+@deftypefn {C Function}  void emacsy_key_event (int char_code, int modifier_key_flags)
+Enqueue a keyboard event.
+@end deftypefn
+
+@c snarfed from emacsy/emacsy.c:109
+@deftypefn {C Function}  int emacsy_tick ()
+Run an iteration of Emacsy's event loop, does not block.
+@end deftypefn
+
+@c snarfed from emacsy/emacsy.c:134
+@deftypefn {C Function}  char *emacsy_mode_line ()
+Return the mode line.
+@end deftypefn
+
+@c snarfed from emacsy/emacsy.c:177
+@deftypefn {C Function}  int emacsy_terminate ()
+Terminate Emacsy; run termination hook.
+@end deftypefn
+
+@node The Simplest Application Ever
+@section The Simplest Application Ever
+
+@include hello-emacsy.texi
+
+@node Conclusion
+@section Conclusion
+
+We implemented a simple interactive application that displays a
+number.  We embedded Emacsy into it: sending events to Emacsy and
+displaying the minibuffer.  We implemented primitive procedures so
+Emacsy could access and manipulate the application's state.  We
+extended the user interface to accept new commands @verb{|+|} and
+@verb{|-|} to change the state.
+
+Now we can @verb{|telnet localhost 37146|} to get a REPL.
+
+@node Plaintext Please
+@section Plaintext Please
+
+@c @node hello-emacsy.c
+@subsection hello-emacsy.c
+@verbatiminclude example/hello-emacsy.c
+
+@c @node hello-emacsy.c.x
+@subsection hello-emacsy.c.x
+@verbatiminclude example/hello-emacsy.c.x
+
+@c @node hello-emacsy.scm
+@subsection hello-emacsy.scm
+@verbatiminclude example/hello-emacsy.scm
+
+@c @node emacsy.h
+@subsection emacsy.h
+@verbatiminclude emacsy/emacsy.h
+
+@c *********************************************************************
 @node Api
 @chapter Api
-
-@c \input{hello-emacsy}
 
 I expounded on the virtues of the Key Lookup Execute Command Loop
 (KLECL) in @pxref{Overlooked Treasure}.  Now we're going to implement a
@@ -527,7 +619,6 @@ KLECL, which requires fleshing out some concepts.  We need events,
 keymaps, and commands.  Let's begin with events.
 
 @menu
-* Hello Emacsy::
 * C Api::
 * Emacsy Facade::
 * Event::

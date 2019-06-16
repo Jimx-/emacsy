@@ -76,8 +76,7 @@ void emacsy_mouse_event (int x, int y,
                          int button,
                          int modifier_key_flags);
 
-/* Run an iteration of Emacsy's event loop
-   (will not block). */
+/* Run an iteration of Emacsy's event loop, does not block. */
 int emacsy_tick ();
 
 /* Return the message or echo area. */

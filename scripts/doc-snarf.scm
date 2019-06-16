@@ -343,7 +343,7 @@ return the standard internal docstring if found.  Return #f if not."
   ;;  (write-line docstrings)
   (cond
    (def-line
-     (let ((type (cond ((equal? lang 'c) 'c-function)
+     (let ((type (cond ((eq? lang 'c) 'c-function)
                        ((string-match "\\(define(-public)? [^(]" def-line) 'variable)
                        ((string-match "\\(define-variable" def-line) 'variable)
                        ((string-match "\\(define-interactive" def-line) 'interactive)
@@ -366,7 +366,7 @@ return the standard internal docstring if found.  Return #f if not."
                                             #f
                                             filename
                                             (+ (- line-no (length docstrings) (length options)) 1))
-        (make-entry 'procedure
+        (make-entry (if (eq? lang 'c) 'c-function 'procedure)
                     (string->symbol (car (reverse docstrings)))
 		    (car (reverse docstrings))
 		    (cdr (reverse docstrings))

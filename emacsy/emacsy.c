@@ -61,7 +61,7 @@ emacsy_initialize (int init_flags)
 }
 
 /* void emacsy_key_event (int char_code, int modifier_key_flags)
-   Enqueue a keyboard event.
+ * Enqueue a keyboard event.
  */
 void
 emacsy_key_event (int char_code, int modifier_key_flags)

@@ -21,38 +21,13 @@
  */
 
 /*
- * @node Hello Emacsy
- * @section Hello Emacsy
- *
- * I have received a lot of questions asking, what does
- * Emacsy@footnote{Kickstarter page @url{http://kck.st/IY0Bau}} actually
- * do?  What restrictions does it impose on the GUI toolkit?  How is it
- * possible to not use any Emacs code? I thought it might be best if I
- * were to provide a minimal example program, so that people can see
- * code that illustrates Emacsy API usage.
- */
-
-/*
- * @image{images/minimal-emacsy-example,,,,.png}
- */
-
-/*
- * @subsection The Simplest Application Ever
- *
  * Let's exercise these functions in a minimal FreeGLUT program we'll call
  * @verb{|hello-emacsy|}.@footnote{Note: Emacsy does not rely on FreeGLUT.
  * One could use Gtk+, Ncurses, Qt, or whatever}.  This simple program
- * will display an integer, the variable [[counter]], that one can
+ * will display an integer, the variable @var{counter}, that one can
  * increment or decrement.
- * @c
- * @c %\appendix
- * @c \begin{subappendices}
  *
- * @c \section{Plaintext Please}
- * @c Here are the plaintext files: \href{http://gnufoo.org/emacsy/emacsy.h}{emacsy.h}
- * @c \href{http://gnufoo.org/emacsy/hello-emacsy.c}{hello-emacsy.c}
- * @c \href{http://gnufoo.org/emacsy/emacsy-stub.c}{emacsy-stub.c}, and
- * @c \href{http://gnufoo.org/emacsy/hello-emacsy.scm}{hello-emacsy.scm}. Or
+ * @image{images/minimal-emacsy-example,,,,.png}
  */
 
 #ifndef SCM_MAGIC_SNARFER
@@ -67,7 +42,11 @@
 #endif
 #include <libguile.h>
 
+void display_func ();
+void keyboard_func (unsigned char glut_key, int x, int y);
 void draw_string (int, int, char*);
+char * try_load_startup (char const* prefix, char const* dir, char const* startup_script);
+void primitives_init ();
 
 /*
  * @defvar int counter = 0;
@@ -78,47 +57,84 @@ void draw_string (int, int, char*);
 int counter = 0;
 int interactive = 1;
 
-/* char * try_load_startup (char const* prefix, char const* dir, char const* startup_script)
- * Locate the @file{hello-emacsy.scm} Guile initialization and load it.
+/*
+ * Initialize everything in @var{main} and enter our runloop.
  */
-char *
-try_load_startup (char const* prefix, char const* dir, char const* startup_script)
+int
+main (int argc, char *argv[])
 {
-  static char file_name[PATH_MAX];
-  if (prefix)
-    strcpy (file_name, prefix);
-  if (dir)
-    strcat (file_name, dir);
-  strcat (file_name, startup_script);
+  int err;
+/* glutInit (&argc, argv);
+ * Initialize GLUT.
+ */
+  glutInit (&argc, argv);
+  glutInitDisplayMode (GLUT_RGB|GLUT_DOUBLE);
+  glutInitWindowSize (500, 500);
+  glutCreateWindow ("Hello, Emacsy!");
+  glutDisplayFunc (display_func);
+  if (interactive)
+    glutKeyboardFunc (keyboard_func);
+/* void scm_init_guile ();
+ * Initialize Guile.
+ */
+  scm_init_guile ();
+/* emacsy_initialize (@dots {});
+ * Initialize Emacsy.
+ */
+  if (argc == 2 && strcmp ("--batch", argv[1]) == 0)
+    interactive = 0;
+  err = emacsy_initialize (interactive
+                           ? EMACSY_INTERACTIVE
+                           : EMACSY_NON_INTERACTIVE);
+  if (err)
+    exit (err);
+/* primitives_init ();
+ * Register primitives.
+ */
+  primitives_init ();
 
-  if (access (file_name, R_OK) != -1)
-    {
-      fprintf (stderr, "Loading '%s'.\n", file_name);
-      scm_c_primitive_load (file_name);
-      return file_name;
-    }
-  else
-    fprintf (stderr, "no such file '%s'.\n", file_name);
+/* char * try_load_startup (@dots{});
+ * Try to load @file{hello-emacsy.scm}
+ */
+  char const *startup_script = "hello-emacsy.scm";
 
+  char prefix[PATH_MAX];
+  strcpy (prefix, argv[0]);
+  if (getenv ("_"))
+    strcpy (prefix, getenv ("_"));
+  dirname (dirname (prefix));
+
+  if (!try_load_startup (0, 0, startup_script)
+      &&!try_load_startup (getenv ("EMACSY_SYSCONFDIR"), "/", startup_script)
+      &&!try_load_startup (prefix, "/", startup_script)
+      &&!try_load_startup (prefix, "/etc/emacsy/", startup_script))
+    fprintf (stderr, "error: failed to find '%s'.\n", startup_script);
+/* void glutMainLoop ();
+ * Enter GLUT main loop, not return.
+ */
+  glutMainLoop ();
   return 0;
 }
 
-/* @c @section Runloop Interaction
+/*
+ * @subsection Runloop Interaction
  *
  * Let's look at how Emacsy interacts with your application's runloop
  * since that's probably the most concerning part of embedding.  First,
  * let's pass some input to Emacsy.
+ */
 
- /* void keyboard_func(unsigned char glut_key, int x, int y)
+/* void keyboard_func (unsigned char glut_key, int x, int y)
  * Send key events to Emacsy.
  */
 void
 keyboard_func (unsigned char glut_key, int x, int y)
 {
-  /* The Key event (not processed yet). */
+/*
+ * int key; // The Key event (not processed yet).
+ */
   int key;
   int mod_flags;
-  /* <Get modifier key flags.>=                                               */
   int glut_mod_flags = glutGetModifiers ();
   mod_flags = 0;
   if (glut_mod_flags & GLUT_ACTIVE_SHIFT)
@@ -127,8 +143,10 @@ keyboard_func (unsigned char glut_key, int x, int y)
     mod_flags |= EMACSY_MODKEY_CONTROL;
   if (glut_mod_flags & GLUT_ACTIVE_ALT)
     mod_flags |= EMACSY_MODKEY_META;
-  // The keys \verb|C-a| and \verb|C-b| returns $1$ and $2$
-  // respectively. We want to map these to their actual character values.
+/*
+ * The keys @verb{|C-a|} and @verb{|C-b|} return @code{1} and @code{2}
+ * respectively.  We want to map these to their actual character values.
+ */
   key = mod_flags & EMACSY_MODKEY_CONTROL
     ? glut_key + ('a' - 1)
     : glut_key;
@@ -137,14 +155,18 @@ keyboard_func (unsigned char glut_key, int x, int y)
 }
 
 /* void display_func ()
- * The function [[display_func]] is run for every frame that's
+ * The function @var{display_func} is run for every frame that's
  * drawn. It's effectively our runloop, even though the actual runloop is
  * in FreeGLUT.
+ *
+ * Our application has just one job: Display the counter variable.
  */
 void
 display_func ()
 {
-  // Setup the display buffer the drawing.
+/* glClear (GL_COLOR_BUFFER_BIT);
+ * Setup the display buffer the drawing.
+ */
   glClear (GL_COLOR_BUFFER_BIT);
 
   glMatrixMode (GL_PROJECTION);
@@ -157,13 +179,13 @@ display_func ()
   glMatrixMode (GL_MODELVIEW);
   glColor3f (1, 1, 1);
 
-  // Our application has just one job.
-  // Display the counter variable
   char counter_string[255];
   sprintf (counter_string, "%d", counter);
   draw_string (250, 250, counter_string);
 
-  // Process events in Emacsy.
+/*
+ * Process events in Emacsy.
+ */
   if (emacsy_tick () & EMACSY_QUIT_APPLICATION_P)
     {
       emacsy_terminate ();
@@ -171,10 +193,14 @@ display_func ()
     }
   glutSetWindowTitle (emacsy_current_buffer ());
 
-  // Display Emacsy message/echo area.
+/*
+ * Display Emacsy message/echo area.
+ */
   draw_string (0, 5, emacsy_message_or_echo_area ());
 
-  // Display Emacsy mode line.
+/*
+ *  Display Emacsy mode line.
+ */
   draw_string (0, 30, emacsy_mode_line ());
 
   glutSwapBuffers ();
@@ -212,10 +238,10 @@ draw_string (int x, int y, char *string)
 /*
  * @deffn {Scheme Procedure} get-counter
  * @deffnx {C Function} SCM scm_get_counter ()
- * Let's define a new primitive Scheme procedure [[get-counter]], so
+ * Let's define a new primitive Scheme procedure @var{get-counter}, so
  * Emacsy can access the application's state.  This will define
- * a [[C]] function [[SCM scm_get_counter (void)]] and a Scheme procedure
- * [[ (get-counter)]].
+ * a @var{C} function @code{SCM scm_get_counter (void)} and a Scheme procedure
+ * @code{(get-counter)}.
  *
  * @end deffn
  */
@@ -261,61 +287,27 @@ primitives_init ()
 #endif
 }
 
-/* int main ()
- * Initialize everything in @var{main} and enter our runloop.
+/* char * try_load_startup (char const* prefix, char const* dir, char const* startup_script)
+ * Locate the @file{hello-emacsy.scm} Guile initialization and load it.
  */
-int
-main (int argc, char *argv[])
+char *
+try_load_startup (char const* prefix, char const* dir, char const* startup_script)
 {
-  int err;
-  /* <Initialize GLUT.>=                                                      */
-  glutInit (&argc, argv);
-  glutInitDisplayMode (GLUT_RGB|GLUT_DOUBLE);
-  glutInitWindowSize (500, 500);
-  glutCreateWindow ("Hello, Emacsy!");
-  glutDisplayFunc (display_func);
-  if (interactive)
-    glutKeyboardFunc (keyboard_func);
-  scm_init_guile ();    /* Initialize Guile. */
-  /* Initialize Emacsy. */
-  if (argc == 2 && strcmp ("--batch", argv[1]) == 0)
-    interactive = 0;
-  err = emacsy_initialize (interactive
-                           ? EMACSY_INTERACTIVE
-                           : EMACSY_NON_INTERACTIVE);
-  if (err)
-    exit (err);
-  primitives_init ();   /* Register primitives. */
-  /* We load this file in [[main]] like so.                                   */
-  /*                                                                          */
-  /*                                                                          */
-  /* <Load config.>=                                                          */
-  char const *startup_script = "hello-emacsy.scm";
+  static char file_name[PATH_MAX];
+  if (prefix)
+    strcpy (file_name, prefix);
+  if (dir)
+    strcat (file_name, dir);
+  strcat (file_name, startup_script);
 
-  char prefix[PATH_MAX];
-  strcpy (prefix, argv[0]);
-  if (getenv ("_"))
-    strcpy (prefix, getenv ("_"));
-  dirname (dirname (prefix));
+  if (access (file_name, R_OK) != -1)
+    {
+      fprintf (stderr, "Loading '%s'.\n", file_name);
+      scm_c_primitive_load (file_name);
+      return file_name;
+    }
+  else
+    fprintf (stderr, "no such file '%s'.\n", file_name);
 
-  if (!try_load_startup (0, 0, startup_script)
-      &&!try_load_startup (getenv ("EMACSY_SYSCONFDIR"), "/", startup_script)
-      &&!try_load_startup (prefix, "/", startup_script)
-      &&!try_load_startup (prefix, "/etc/emacsy/", startup_script))
-    fprintf (stderr, "error: failed to find '%s'.\n", startup_script);
-  glutMainLoop ();      /* We never return. */
   return 0;
 }
-
-/*
- * Now we can @verb{|telnet localhost 37146|} to get a REPL.
- *
- * @subsection Conclusion
- *
- * We implemented a simple interactive application that displays a
- * number.  We embedded Emacsy into it: sending events to Emacsy and
- * displaying the minibuffer.  We implemented primitive procedures so
- * Emacsy could access and manipulate the application's state.  We
- * extended the user interface to accept new commands @verb{|+|} and
- * @verb{|-|} to change the state.
- */
