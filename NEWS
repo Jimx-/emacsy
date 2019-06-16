@@ -1,0 +1,24 @@
+                                                              -*- org -*-
+#+TITLE: Emacsy NEWS – history of user-visible changes
+#+STARTUP: content hidestars
+
+Copyright © 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
+
+  Copying and distribution of this file, with or without modification,
+  are permitted in any medium without royalty provided the copyright
+  notice and this notice are preserved.
+
+Please send Emacsy reports to guile-user@gnu.org.
+
+* Changes in 0.1.3 since 0.1.2
+** Core
+*** Emacsy now supports universal argument (C-u ...).
+*** Emacsy now supports a non-interactive batch mode.
+*** Emacsy now uses Guile-2d's coroutines and agenda.
+*** Emacsy is less noisy.
+*** Emacsy now has a self-doc interface.
+** Scheme API
+*** emacsy-initialize now takes a boolean: emacsy-interactive?.
+** C API
+*** The C API now uses the EMACSY_ prefix C constants (WAS: EY_).
+*** emacsy_initialize now takes flags: EMACSY_INTERACTIVE EMACSY_NON_INTERACTIVE.
