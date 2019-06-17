@@ -29,7 +29,6 @@
 ;;; Code:
 
 (define-module (emacsy core)
-  #:use-module (ice-9 format)
   #:use-module (ice-9 match)
   #:use-module (ice-9 optargs)
   #:use-module (ice-9 q)
@@ -206,17 +205,6 @@
   (if emacsy-display-minibuffer?
       (buffer-string)
       echo-area))
-
-;;.
-;; method
-(define-method-public (emacsy-mode-line)
-  (emacsy-mode-line (current-buffer)))
-
-;;.
-;; method
-;; XXX this should be moved into the (emacsy buffer) module.
-(define-method-public (emacsy-mode-line (buffer <buffer>))
-  (format #f "-:**- ~a    (~{~a~^ ~})" (buffer-name buffer) (map mode-name (buffer-modes buffer))))
 
 ;;.
 (define-public (emacsy-minibuffer-point)

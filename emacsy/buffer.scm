@@ -19,6 +19,7 @@
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (emacsy buffer)
+  #:use-module (ice-9 format)
   #:use-module (ice-9 optargs)
   #:use-module (oop goops)
   #:use-module (emacsy util)
@@ -236,3 +237,11 @@
 ;;.
 (define-public local-var
                (make-procedure-with-setter local-var-ref local-var-set!))
+
+;;.
+;; method
+(define-method-public (emacsy-mode-line)
+  (emacsy-mode-line (current-buffer)))
+
+(define-method (emacsy-mode-line (buffer <buffer>))
+  (format #f "-:~a- ~a    (~{~a~^ ~})" (if (buffer-modified? buffer) "**" "--") (buffer-name buffer) (map mode-name (buffer-modes buffer))))
