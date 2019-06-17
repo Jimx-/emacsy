@@ -32,6 +32,7 @@
   #:use-module (ice-9 match)
   #:use-module (ice-9 optargs)
   #:use-module (ice-9 q)
+  #:use-module (ice-9 rdelim)
   #:use-module (ice-9 readline)
   #:use-module (oop goops)
   #:use-module (rnrs io ports)
@@ -505,7 +506,6 @@
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
 ")
 
-
 ;; Override kill-buffer; make sure the buffer list does not become empty.
 ;;.
 (define-interactive (kill-buffer #:optional (buffer (current-buffer)))
@@ -513,3 +513,33 @@
   (remove-buffer! buffer)
   (when (null? (buffer-list))
     (set! scratch (make-text-buffer))))
+
+(define-interactive (new-buffer #:optional (name "*scratch*"))
+  (let ((buffer (make-text-buffer name))) ;; FIXME: we need a hook for this
+    (switch-to-buffer buffer)
+    buffer))
+
+(use-modules (system base pmatch))
+;;.
+(define-interactive (find-file #:optional (file-name (read-file-name "Find file: ")))
+  (catch #t
+    (lambda _
+      (let* ((buffer (new-buffer (basename file-name))) ;; FIXME: de-duplication <2> |dir etc
+             (file-name (expand-file-name file-name))
+             (exists? (access? file-name R_OK))
+             (text (if exists? (with-input-from-file (expand-file-name file-name) read-string) "")))
+        (set! (buffer-file-name buffer) file-name)
+        (insert text)
+        (goto-char (point-min))
+        (when (and=> (buffer-file-name (current-buffer)) string?)
+          (set! (local-var 'default-directory) (canonize-file-name (dirname (buffer-file-name buffer)))))
+        (set! (buffer-modified-tick buffer) 0)
+        (set! (buffer-modified? buffer) (not exists?))))
+    (lambda (key subr msg args . rest)
+      (let ((error-msg
+             (with-output-to-string
+               (lambda _
+                 (display-error #f (current-output-port) subr msg args rest)))))
+        (message "Failed to load ~a: ~a" file-name error-msg)))))
+
+(define-key global-map "C-x C-f" 'find-file)

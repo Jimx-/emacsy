@@ -34,6 +34,8 @@
  (scheme-mode
   .
   ((geiser-active-implementations . (guile))
+   (eval . (put 'with-buffer 'scheme-indent-function 1))
+   (eval . (put 'save-excursion 'scheme-indent-function 1))
    (eval
     .
     (progn
@@ -43,7 +45,7 @@
        (lambda (dir) (add-to-list 'geiser-guile-load-path dir))
        (mapcar
         #'prefix-dir-locals-dir
-        '("src" "example/emacsy-webkit-gtk/src/")))))))
+        '("." "test")))))))
 
  (texinfo-mode    . ((indent-tabs-mode . nil)
                      (fill-column . 72))))

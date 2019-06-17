@@ -54,6 +54,9 @@
 
 ;;; Code:
 
+(define (%debug . rest)
+  (apply format (current-error-port) rest))
+
 ;;.
 (define-class-public <minibuffer> (<text-buffer>)
   (prompt #:accessor minibuffer-prompt #:init-form "")
@@ -202,9 +205,9 @@ available. Otherwise returns default-ticks."
    (switch-to-buffer minibuffer)
    (delete-minibuffer-contents minibuffer)
    (with-buffer minibuffer
-    (when initial-contents
-      (insert initial-contents))
-    (goto-char (point-min)))
+     (if initial-contents (begin (insert initial-contents)
+                                 (goto-char (point-max)))
+         (goto-char (point-min))))
    (set! (minibuffer-prompt minibuffer) (or prompt ""))
    (in-out
     (set! minibuffer-reading? #t)
@@ -268,7 +271,6 @@ available. Otherwise returns default-ticks."
 
 ;;.
 (define*-public (try-completion string collection #:optional (predicate (const #t)))
-
   (if (procedure? collection)
       (if (readline-completer? collection)
           (try-completion
@@ -339,7 +341,7 @@ available. Otherwise returns default-ticks."
 
 ;; @subsection File name Lookup
 ;;
-;; We can do filename lookups by using the readline tab completion facilities.
+;; We can do file name lookups by using the readline tab completion facilities.
 
 ;;.
 (define-public (apropos-module rgx module)
@@ -368,68 +370,101 @@ available. Otherwise returns default-ticks."
             (begin (set! completions (cdr completions))
                    retval))))))
 
-;; We want to be able to look up filenames.
+;; We want to be able to look up file names.
 ;;.
+
+;;.
+(define-public (expand-file-name file-name)
+  (let ((home (getenv "HOME")))
+    (cond ((string-prefix? "~/" file-name) (string-append home (substring file-name 1)))
+          ((equal? file-name "~") file-name)
+          ((string-prefix? "~" file-name)
+           (let* ((slash (string-index file-name #\/))
+                  (user (if slash (substring file-name 1 slash)
+                            (substring file-name 1))))
+             (string-append (dirname home) "/" user (if slash (substring file-name slash) ""))))
+          ((string-prefix? "~" file-name) file-name)
+          (else file-name))))
+
+(define-public (contract-file-name file-name)
+  (let ((home (getenv "HOME")))
+    (cond ((string=? file-name home) "~/")
+          ((string-prefix? home file-name)
+           (string-append "~" (substring file-name (string-length home))))
+          (else file-name))))
 
 ;;.
 (define (files-in-dir dirname)
-  (let ((dir (opendir dirname))
-        (filenames '()))
-    (let loop ((filename (readdir dir)))
-      (when (not (eof-object? filename))
-        (cons! filename filenames)
+  (let ((dir (opendir (expand-file-name dirname)))
+        (file-names '()))
+    (let loop ((file-name (readdir dir)))
+      (when (not (eof-object? file-name))
+        (cons! file-name file-names)
         (loop (readdir dir))))
     (closedir dir)
-    (sort-filenames filenames)))
+    (sort-file-names file-names)))
 
-(define (make-filename dir name)
-  (format #f "~a~a" (if (slash-suffix? dir)
-                        dir
-                        (format #f "~a/" dir)) name))
+(define (make-file-name dir name)
+  (string-append (cond ((string=? dir "~") "~") ;; not dot?
+                       ((slash-suffix? dir) dir)
+                       (else (string-append dir "/")))
+                 (if (string-prefix? "~" name) (string-append "~" name)
+                     name)))
 
-(define (sort-filenames lst)
+(define (sort-file-names lst)
   (sort lst string<))
 
-(define (files-in-parent-dir filename)
+(define (dirname- name)
+  (let ((home (getenv "HOME")))
+    (cond ((string=? name "~") (dirname home))
+          ((or (string=? name "~/")
+               (and ;;(> (string-length name) 3)
+                    (string-prefix? "~/" name)
+                    (not (string-index (substring name 2) #\/)))) "~/")
+          ((and (string-prefix? "~" name)
+                (not (string-index name #\/))) (dirname home))
+          ((directory? (expand-file-name name)) (canonize-file-name name))
+          (else (dirname name)))))
 
-  (let* ((dir (my-dirname filename))
-         ;(base (basename filename))
-         (filenames (files-in-dir dir)))
-    (sort-filenames
-     (if (or (string-prefix? dir filename)
-             (string-prefix? filename dir)) ;; the directory is a prefix of
+(define (files-in-parent-dir file-name)
+  (let* ((dir (dirname- file-name))
+         (file-names (files-in-dir dir))
+         (file-names (if (and (string-prefix? "~" file-name)
+                             (not (string-index file-name #\/))) (map (cut string-append "~" <>) file-names)
+                        file-names)))
+    (sort-file-names
+     (if (or (string-prefix? dir file-name)
+             (string-prefix? file-name dir)) ;; the directory is a prefix of
          ;; the string--good!
-         (map (compose canonize-filename (cut make-filename dir <>)) filenames)
-         (map canonize-filename filenames)))))
+         (map (compose canonize-file-name (cut make-file-name dir <>)) file-names)
+         (map canonize-file-name file-names)))))
 
-(define (directory? filename)
-  (and (access? filename F_OK)
-       (eq? 'directory (stat:type (stat filename)))))
+(define (directory? file-name)
+  (let ((file-name (expand-file-name file-name)))
+    (and (access? file-name F_OK)
+         (eq? 'directory (stat:type (stat file-name))))))
 
 (define (slash-suffix? name)
   (eq? #\/ (string-ref name (1- (string-length name)))))
 
-(define (canonize-filename name)
-  (if (directory? name)
-      (if (slash-suffix? name)
-          name
-          (format #f "~a/" name))
+;;.
+(define-public (canonize-file-name name)
+  (if (directory? (expand-file-name name))
+      (cond ((slash-suffix? name) name)
+            (else (string-append name "/")))
       name))
 
-(define (my-dirname name)
-  (if (directory? name)
-      (canonize-filename name)
-      (dirname name)))
-
 (define (file-name-completer string predicate all?)
-    (if all?
-        (all-completions string (files-in-parent-dir string) predicate)
-        (try-completion string (files-in-parent-dir string) predicate)))
+  ;; Should we override ~ and / during file-name-completion?
+  (cond ((string-suffix? "//" string) (set! reset-completion "/"))
+        ((string-suffix? "/~" string) (set! reset-completion "~/"))
+        ((string-suffix? "/~/" string) (set! reset-completion "~/"))
+        ((string-suffix? "./." string) (set! reset-completion (string-drop-right string 2)))
+        (else
+         ((if all? all-completions try-completion) string (files-in-parent-dir string) predicate))))
 
 (define (dot-directory? name)
-  (or ;(string=? "." name)
-      ;(string=? ".." name)
-      (string-suffix? "./" name)
+  (or (string-suffix? "./" name)
       (string-suffix? "../" name)))
 
 (define no-dot-files (negate dot-directory?))
@@ -439,15 +474,31 @@ available. Otherwise returns default-ticks."
 
 (define*-public
   (read-file-name prompt #:key
-                  (dir #f)
+                  (dir default-directory)
                   (default-file-name #f)
                   (initial #f)
                   (predicate no-dot-files)
                   (history (what-command-am-i?)))
   (completing-read prompt
-                   filename-completion-function
+                   file-name-completion-function
+                   #:initial-input (contract-file-name dir)
                    #:predicate predicate
                    #:history history))
+
+;;.
+(define-variable default-directory (canonize-file-name (getcwd))
+  "The current directory.")
+;;.
+(define-public file-name-completion-function
+  (let ((completions '()))
+    (lambda (text cont?)
+      (when (not cont?)
+        (set! completions
+              (file-name-completer text no-dot-files #t)))
+      (and (pair? completions)
+           (let ((retval (car completions)))
+             (set! completions (cdr completions))
+             retval)))))
 
 ;; @subsection Minibuffer History
 ;;.
@@ -491,6 +542,7 @@ available. Otherwise returns default-ticks."
   (set! minibuffer-reading? #f)
   (switch-to-buffer last-buffer))
 
+(define reset-completion #f)
 ;;.
 (define-interactive (minibuffer-complete)
   (with-buffer
@@ -504,11 +556,10 @@ available. Otherwise returns default-ticks."
                         contents
                         (fluid-ref minibuffer-completion-table)
                         (fluid-ref minibuffer-completion-predicate))))
-     (format #t "contents = ~a, expansion = ~a, completions = ~a ~%" contents expansion completions)
-     (while (not (= (point) (point-min)))
-       (delete-backward-char))
-                                        ;(goto-char (point-min))
-                                        ;(kill-line)
+     (delete-region (point-min) (point-max))
+     (when reset-completion
+       (set! expansion reset-completion)
+       (set! reset-completion #f))
      (insert expansion)
      (cond
       ((= 0 (length completions))
@@ -519,7 +570,10 @@ available. Otherwise returns default-ticks."
        (minibuffer-message
         (string-concatenate
          (list "{"
-               (string-join (rotate-list completions *nth-match*) " | ")
+               (regexp-substitute/global
+                #f "~"
+                (string-join (rotate-list completions *nth-match*) " | ")
+                'pre "~~" 'post)
                "}"))))))))
 
 ;;.
@@ -606,6 +660,10 @@ available. Otherwise returns default-ticks."
 (define-key minibuffer-local-map "M-f" 'forward-word)
 (define-key minibuffer-local-map "C-b" 'backward-char)
 (define-key minibuffer-local-map "M-b" 'backward-word)
+(define-key minibuffer-local-map "M-DEL" 'backward-kill-word)
+(define-key minibuffer-local-map "M-d" 'kill-word)
+(define-key minibuffer-local-map "M-<" 'beginning-of-buffer)
+(define-key minibuffer-local-map "M->" 'end-of-buffer)
 (define-key minibuffer-local-map "DEL" 'delete-backward-char)
 (define-key minibuffer-local-map "SPC" 'self-insert-command)
 (define-key minibuffer-local-map "-"   'self-insert-command)
