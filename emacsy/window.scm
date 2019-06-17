@@ -275,9 +275,30 @@
          (index (member-ref current-window lst)))
     (set! current-window (list-ref lst (modulo (+ index count) (length lst))))))
 
+(define recenter-last-op #f)
+;; Cycling order for recenter-top-bottom.
+;;.
+(define-variable recenter-positions '(middle top bottom)
+  "Cycling order for recenter-top-bottom.")
+
+;;.
+(define-interactive (recenter-top-bottom #:optional arg)
+  (cond (arg => recenter)
+        (else
+         (set! recenter-last-op
+               (if (eq? this-command last-command)
+                   (car (or (cdr (memq recenter-last-op
+                                       (append recenter-positions recenter-positions)))))
+                   (car recenter-positions)))
+         (buffer:recenter (current-buffer) recenter-last-op))))
+
+(define-method (buffer:recenter (buffer <buffer>))
+  (message "buffer:recenter not implemented" buffer))
+
 (define-key global-map "C-x 0" 'delete-window)
 (define-key global-map "C-x 1" 'delete-other-windows)
 (define-key global-map "C-x 2" 'split-window-below)
 (define-key global-map "C-x 3" 'split-window-right)
 
 (define-key global-map "C-x o" 'other-window)
+(define-key global-map "C-l" 'recenter-top-bottom)
