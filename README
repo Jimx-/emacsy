@@ -31,7 +31,7 @@ and
     ./pre-inst-env emacsy-webkit-gtk
 #+END_EXAMPLE
 
-Guimax is free software, it is distributed under the terms of the GNU
+Emacsy is free software, it is distributed under the terms of the GNU
 General Public Licence version 3 or later.  See the file [[file:COPYING][COPYING]].
 
 * WARNING
