@@ -153,7 +153,7 @@
          ((is-a? buffer <text-buffer>)
           
           (web-view-load-string (wud-web-view userdata)
-                                (buffer-string buffer)))
+                                (buffer-string)))
          (else
           (web-view-load-string (wud-web-view userdata)
                                 "")))
