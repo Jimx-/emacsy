@@ -38,6 +38,7 @@
   #:use-module (rnrs io ports)
   #:use-module (debugging assert)
   #:use-module (system repl error-handling)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-11) ;; let-values
 
   #:use-module (emacsy util)
