@@ -44,6 +44,7 @@
              (gnu packages)
              (gnu packages autotools)
              (gnu packages compression)
+             (gnu packages glib)
              (gnu packages gettext)
              (gnu packages gl)
              (gnu packages gnome)
@@ -78,6 +79,7 @@
   (propagated-inputs
    `(("guile-lib" ,guile-lib)
      ("guile-readline" ,guile-readline)
+     ("glib-networking" ,glib-networking)
      ("freeglut" ,freeglut)
      ("gssettings-desktop-schemas" ,gsettings-desktop-schemas)
      ("webkitgtk" ,webkitgtk)))
