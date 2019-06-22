@@ -59,14 +59,14 @@
 (set! current-window (make <gtk-window> #:window-buffer messages))
 (set! root-window (make <internal-window> #:window-children (list current-window)))
 
-(define-interactive 
-  (load-url #:optional 
-        (url (read-from-minibuffer "URL: "))) 
+(define-interactive
+  (load-url #:optional
+        (url (read-from-minibuffer "URL: ")))
   (webkit-load-url url))
 
 ;; Load-url is all right, but it requires an actual URL.
 ;; Let's fix that with a new command: GOTO.
-(define-interactive 
+(define-interactive
   (goto #:optional
         (urlish (read-from-minibuffer "GOTO: ")))
   ;(set-buffer-name! urlish)
@@ -82,7 +82,7 @@
    (else
     ;; It's just one word.  Let's try adding a .com and http:// if it
     ;; needs it.
-    (load-url (format #f "http://~a~a" urlish 
+    (load-url (format #f "http://~a~a" urlish
                       (if (string-suffix? ".com" urlish) "" ".com"))))))
 
 (define-interactive (go-forward)
@@ -101,13 +101,13 @@
 
 ;; These aren't as good as Emacs' isearch-forward, but they're not
 ;; a bad start.
-(define-interactive 
+(define-interactive
   (search-forward #:optional
                    (text (or find-text (read-from-minibuffer "Search: "))))
   (set! find-text text)
   (webkit-find-next text))
 
-(define-interactive 
+(define-interactive
   (search-backward #:optional
                   (text (or find-text (read-from-minibuffer "Search: "))))
   (set! find-text text)
@@ -141,23 +141,23 @@
 (define-method (redisplay (window <window>))
   (let* ((buffer (window-buffer window))
          (userdata (user-data window)))
-    (when (and buffer 
+    (when (and buffer
                (window-user-data? userdata))
-      ;(format #t "redisplaying window ~a with buffer ~a~%" window buffer)
-      
+      ;;(format #t "redisplaying window ~a with buffer ~a~%" window buffer)
+
       (update-label! (wud-modeline userdata)
                      (emacsy-mode-line buffer)
                      (eq? window (selected-window)))
       (when (needs-redisplay? window)
         (cond
          ((is-a? buffer <text-buffer>)
-          
+
           (web-view-load-string (wud-web-view userdata)
                                 (buffer-string)))
          (else
           (web-view-load-string (wud-web-view userdata)
                                 "")))
-        
+
         (redisplayed! window)))))
 
 (define-method (redisplay (window <internal-window>))
@@ -170,7 +170,7 @@
   (instantiate-window root-window))
 
 (define (gtk-window-configuration-change internal-window)
-  (set-window-content! (instantiate-root-window)))
+  (set-window-content! (warn 'instantiate-root-window (instantiate-root-window))))
 
 (define-interactive (test-window-change)
   (gtk-window-configuration-change #f))
@@ -182,11 +182,8 @@
     (create-web-view-window window buffer (is-a? buffer <text-buffer>))))
 
 (define-method (instantiate-window (window <internal-window>))
-  (create-gtk-window (map instantiate-window (window-children window))
-                     (eq? (orientation window) 'vertical))
-  #;(if (eq? (orientation window) 'vertical)
-      (create-vertical-window (map instantiate-window (window-children window)))
-      (create-horizontal-window (map instantiate-window (window-children window)))))
+  (warn 'gtk-window (create-gtk-window (map instantiate-window (window-children window))
+                                       (eq? (orientation window) 'vertical))))
 
 ;; Now let's bind these to some keys.
 

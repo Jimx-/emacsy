@@ -260,7 +260,7 @@ SCM_DEFINE (scm_get_counter, "get-counter",
             (),
             "Returns value of counter.")
 {
-  return scm_from_int(counter);
+  return scm_from_int (counter);
 }
 
 /*
@@ -277,8 +277,8 @@ SCM_DEFINE (scm_set_counter_x, "set-counter!",
             (SCM value),
             "Sets value of counter.")
 {
-  counter = scm_to_int(value);
-  glutPostRedisplay();
+  counter = scm_to_int (value);
+  glutPostRedisplay ();
   return SCM_UNSPECIFIED;
 }
 

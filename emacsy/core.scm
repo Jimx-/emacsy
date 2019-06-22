@@ -453,7 +453,7 @@
 (add-hook! no-blocking-continuations-hook restart-command-loop)
 
 (define-public fundamental-map
-  (let ((keymap (make-keymap global-map)))
+  (let ((keymap (make-keymap)))
     (char-set-for-each
      (lambda (c)
        (let ((event (make <key-event>
@@ -495,7 +495,7 @@
 (define-public fundamental-mode (make <mode> #:mode-name "fundamental" #:mode-map fundamental-map))
 
 (define*-public (make-text-buffer #:optional (name "*scratch*"))
-  (let ((buffer (make <text-buffer> #:name name #:buffer-modes `(,fundamental-mode))))
+  (let ((buffer (make <text-buffer> #:name name #:buffer-modes `(,fundamental-mode) #:keymap global-map)))
     (add-buffer! buffer)
     buffer))
 
@@ -520,7 +520,6 @@
     (switch-to-buffer buffer)
     buffer))
 
-(use-modules (system base pmatch))
 ;;.
 (define-interactive (find-file #:optional (file-name (read-file-name "Find file: ")))
   (catch #t

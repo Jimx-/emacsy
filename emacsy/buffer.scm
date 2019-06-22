@@ -71,13 +71,14 @@
     ((save-excursion body ...)
      (let ((old-buffer (current-buffer))
            (old-point (point))
-           (old-mark (mark)))
+           ;;(old-mark (mark))
+           )
        (in-out-guard
         (lambda _ #t)
         (lambda _ body ...)
         (lambda _
           (set-buffer! old-buffer)
-          (set-mark old-mark)
+          ;;(set-mark old-mark)
           (goto-char old-point)))))))
 
 ;;.

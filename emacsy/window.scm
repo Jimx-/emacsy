@@ -292,7 +292,7 @@
                    (car recenter-positions)))
          (buffer:recenter (current-buffer) recenter-last-op))))
 
-(define-method (buffer:recenter (buffer <buffer>))
+(define-method (buffer:recenter (buffer <buffer>) position)
   (message "buffer:recenter not implemented" buffer))
 
 (define-key global-map "C-x 0" 'delete-window)
