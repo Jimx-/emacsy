@@ -31,6 +31,8 @@
   #:use-module (emacsy mode)
   #:export (next-buffer
             prev-buffer
+            buffer-previous!
+            buffer-next!
             with-buffer
             save-excursion
             <buffer>
@@ -195,6 +197,12 @@
 ;;.
 (define (remove-buffer! buffer)
   (mru-remove! buffer-stack buffer))
+
+(define* (buffer-previous! #:optional (incr 1))
+  (mru-next! buffer-stack incr))
+
+(define* (buffer-next! #:optional (incr 1))
+  (buffer-previous! (- incr)))
 
 ;;.
 (define-interactive (next-buffer #:optional (incr 1))
