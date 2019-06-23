@@ -28,7 +28,30 @@
   #:use-module (emacsy keymap)
   #:use-module (emacsy command)
   #:use-module (emacsy klecl)
-  #:use-module (emacsy mode))
+  #:use-module (emacsy mode)
+  #:export (next-buffer
+            prev-buffer
+            with-buffer
+            save-excursion
+            <buffer>
+            buffer-stack
+            last-buffer
+            aux-buffer
+            buffer-name
+            buffer-name
+            set-buffer-name!
+            buffer-modified?
+            buffer-modified-tick
+            current-local-map
+            use-local-map
+            buffer-list
+            current-buffer
+            add-buffer!
+            remove-buffer!
+            set-buffer!
+            switch-to-buffer
+            local-var
+            emacsy-mode-line))
 
 ;;; Commentary:
 
@@ -52,7 +75,7 @@
 ;; A convenience macro to work with a given buffer.
 ;; @end defmac
 ;;.
-(define-syntax-public with-buffer
+(define-syntax with-buffer
   (syntax-rules ()
     ((with-buffer buffer e ...)
      (let ((old-buffer (current-buffer))
@@ -66,7 +89,7 @@
 ;; A convenience macro to do some work
 ;; @end defmac
 ;;.
-(define-syntax-public save-excursion
+(define-syntax save-excursion
   (syntax-rules ()
     ((save-excursion body ...)
      (let ((old-buffer (current-buffer))
@@ -82,7 +105,7 @@
           (goto-char old-point)))))))
 
 ;;.
-(define-class-public <buffer> ()
+(define-class <buffer> ()
   (name #:init-keyword #:name)
   (file-name #:accessor buffer-file-name #:init-form #f #:init-keyword #:buffer-file-name)
   (keymap #:accessor local-keymap #:init-keyword #:keymap #:init-form (make-keymap))
@@ -104,39 +127,39 @@
 ;;; one.
 
 ;;.
-(define-public buffer-stack (make <mru-stack>))
+(define buffer-stack (make <mru-stack>))
 
 ;;.
-(define-public last-buffer #f)
+(define last-buffer #f)
 
 ;;.
-(define-public aux-buffer #f)
+(define aux-buffer #f)
 
 ;; Buffer's have a name, and there is always a current buffer or it's
 ;; false.  Note that methods do not work as easily with optional
 ;; arguments.  It seems best to define each method with a different
 ;; number of arguments as shown below.
-(define-method-public (buffer-name)
+(define-method (buffer-name)
   (buffer-name (current-buffer)))
 
 ;;.
-(define-method-public (buffer-name (buffer <buffer>))
+(define-method (buffer-name (buffer <buffer>))
   (slot-ref buffer 'name))
 
 ;;.
-(define-method-public (set-buffer-name! name)
+(define-method (set-buffer-name! name)
   (set-buffer-name! name (current-buffer)))
 
 ;;.
-(define-method-public (set-buffer-name! name (buffer <buffer>))
+(define-method (set-buffer-name! name (buffer <buffer>))
   (slot-set! buffer 'name name))
 
 ;;.
-(define-method-public (buffer-modified?)
+(define-method (buffer-modified?)
   (buffer-modified? (current-buffer)))
 
 ;;.
-(define-method-public (buffer-modified-tick)
+(define-method (buffer-modified-tick)
   (buffer-modified-tick (current-buffer)))
 
 ;;.
@@ -147,30 +170,30 @@
 ;; @subsection Emacs Compatibility
 
 ;;.
-(define-public (current-local-map)
+(define (current-local-map)
   (local-keymap (current-buffer)))
 
 ;;.
-(define-public (use-local-map keymap)
+(define (use-local-map keymap)
   (set! (local-keymap (current-buffer)) keymap))
 
 ;;.
-(define-public (buffer-list)
+(define (buffer-list)
   (mru-list buffer-stack))
 
 ;;.
-(define-public (current-buffer)
+(define (current-buffer)
   ;; Perhaps instead of returning #f for no buffer there should be an
   ;; immutable void-buffer class.
   (or aux-buffer
       (mru-ref buffer-stack)))
 
 ;;.
-(define-public (add-buffer! buffer)
+(define (add-buffer! buffer)
   (mru-add! buffer-stack buffer))
 
 ;;.
-(define-public (remove-buffer! buffer)
+(define (remove-buffer! buffer)
   (mru-remove! buffer-stack buffer))
 
 ;;.
@@ -183,7 +206,7 @@
   (next-buffer (- incr)))
 
 ;;.
-(define-public (set-buffer! buffer)
+(define (set-buffer! buffer)
   ;;(emacsy-log-debug "set-buffer! to ~a" buffer)
   (if (mru-set! buffer-stack buffer)
       (set! aux-buffer #f)
@@ -217,7 +240,7 @@
   (current-buffer))
 
 ;;.
-(define-public switch-to-buffer primitive-switch-to-buffer)
+(define switch-to-buffer primitive-switch-to-buffer)
 
 ;;.
 (define (local-var-ref symbol)
@@ -237,12 +260,12 @@
              (assq-set! (local-variables (current-buffer)) symbol value)))
 
 ;;.
-(define-public local-var
+(define local-var
                (make-procedure-with-setter local-var-ref local-var-set!))
 
 ;;.
 ;; method
-(define-method-public (emacsy-mode-line)
+(define-method (emacsy-mode-line)
   (emacsy-mode-line (current-buffer)))
 
 (define-method (emacsy-mode-line (buffer <buffer>))
