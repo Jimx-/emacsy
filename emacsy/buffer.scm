@@ -206,7 +206,7 @@
 
 ;;.
 (define-interactive (next-buffer #:optional (incr 1))
-  (buffer-next!)
+  (buffer-next! incr)
   (switch-to-buffer (mru-ref buffer-stack)))
 
 ;;.
@@ -227,7 +227,7 @@
 
 ;;.
 (define-interactive (other-buffer #:optional (count 1))
-  (next-buffer count))
+  (prev-buffer count))
 
 ;;; This is our primitive procedure for switching buffers.  It does not
 ;;; handle any user interaction.
