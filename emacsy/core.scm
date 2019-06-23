@@ -533,7 +533,7 @@
         (goto-char (point-min))
         (when (and=> (buffer-file-name (current-buffer)) string?)
           (set! (local-var 'default-directory) (canonize-file-name (dirname (buffer-file-name buffer)))))
-        (set! (buffer-modified-tick buffer) 0)
+        (set! (buffer-modified-tick buffer) -1)
         (set! (buffer-modified? buffer) (not exists?))))
     (lambda (key subr msg args . rest)
       (let ((error-msg

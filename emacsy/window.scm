@@ -273,7 +273,9 @@
 (define-interactive (other-window #:optional (count 1))
   (let* ((lst (window-list root-window))
          (index (member-ref current-window lst)))
-    (set! current-window (list-ref lst (modulo (+ index count) (length lst))))))
+    (set! current-window (list-ref lst (modulo (+ index count) (length lst))))
+    (switch-to-buffer (window-buffer current-window))
+    (run-hook window-configuration-change-hook current-window)))
 
 (define recenter-last-op #f)
 ;; Cycling order for recenter-top-bottom.
