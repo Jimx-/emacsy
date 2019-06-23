@@ -206,7 +206,7 @@
 
 ;;.
 (define-interactive (next-buffer #:optional (incr 1))
-  (mru-next! buffer-stack incr)
+  (buffer-next!)
   (switch-to-buffer (mru-ref buffer-stack)))
 
 ;;.
