@@ -2,6 +2,7 @@
 ;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
 ;;; Copyright (C) 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright (C) 2019 by Amar Singh<nly@disroot.org>
 ;;;
 ;;; This file is part of Emacsy.
 ;;;
@@ -228,14 +229,14 @@
 
 ;;; This is our primitive procedure for switching buffers.  It does not
 ;;; handle any user interaction.
-(define (primitive-switch-to-buffer buffer)
+(define* (primitive-switch-to-buffer buffer #:optional recall?)
   (emacsy-log-debug "Running exit hook for ~a" (current-buffer))
   (run-hook (buffer-exit-hook (current-buffer)))
   (set! last-buffer (current-buffer))
   (if (mru-contains? buffer-stack buffer)
       (begin
         (emacsy-log-debug "Recall buffer ~a" buffer)
-        (mru-recall! buffer-stack buffer)
+        (when recall? (mru-recall! buffer-stack buffer))
         (set! aux-buffer #f))
       (begin
         (emacsy-log-debug "Set buffer to ~a" buffer)
