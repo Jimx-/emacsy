@@ -291,7 +291,7 @@
 ;;.
 (define-interactive (kill-region #:optional (start (point)) (end (mark)))
   (set! kill-ring
-        (cons (delete-region (if (> end start) start (1- end)) (if (> end start) end (1+ start)))
+        (cons (delete-region (if (> end start) start end) (if (> end start) end start))
               kill-ring)))
 
 ;;.
@@ -461,11 +461,15 @@
 
 ;;.
 (define-method-public (buffer:delete-region (buffer <text-buffer>) start end)
-  (let* ((gb (gap-buffer buffer))
-         (point (buffer:point buffer))
+  (let* ((point (buffer:point buffer))
+         (gb (gap-buffer buffer))
          (s (if (< start end) start end))
          (e (if (< start end) end start)))
     (goto-char s)
-    (let ((text (gb-delete-char! (gap-buffer buffer) (- e s))))
+    (let ((text (substring (buffer:buffer-string buffer) (1- s) (1- e)))
+          (point (cond ((> point e) (- point e s))
+                       ((> point s) s)
+                       (else point))))
+      (gb-delete-char! (gap-buffer buffer) (- e s))
       (goto-char point)
       text)))
