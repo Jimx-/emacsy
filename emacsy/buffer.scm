@@ -226,7 +226,7 @@
 
 ;;.
 (define* (other-buffer! #:optional (incr 1))
-  (buffer-prev! incr))
+  (buffer-previous! incr))
 
 (define-interactive (other-buffer #:optional (count 1))
   (other-buffer! count)
