@@ -34,6 +34,7 @@
             prev-buffer
             buffer-previous!
             buffer-next!
+            other-buffer!
             with-buffer
             save-excursion
             <buffer>
@@ -224,8 +225,13 @@
   (remove-buffer! buffer))
 
 ;;.
+(define* (other-buffer! #:optional (incr 1))
+  (buffer-prev! incr))
+
 (define-interactive (other-buffer #:optional (count 1))
-  (prev-buffer count))
+  (other-buffer! count)
+  (switch-to-buffer (mru-ref buffer-stack)) t)
+
 
 ;;; This is our primitive procedure for switching buffers.  It does not
 ;;; handle any user interaction.
