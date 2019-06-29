@@ -294,6 +294,19 @@ am__tar = $${TAR-tar} --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner
 tag:
 	git tag -s v$(PACKAGE_VERSION) -m "$(PACKAGE_NAME) $(PACKAGE_VERSION)."
 
+dist-hook: gen-ChangeLog
+	echo $(VERSION) > $(distdir)/.tarball-version
+	git ls-tree -r --name-only HEAD > $(distdir)/.tarball-manifest
+
+.PHONY: gen-ChangeLog
+gen-ChangeLog $(distdir)/ChangeLog: config.status
+	$(AM_V_GEN)if test -e .git; then		\
+	  $(top_srcdir)/build-aux/gitlog-to-changelog	\
+	    > $(distdir)/cl-t;				\
+	  rm -f $(distdir)/ChangeLog;			\
+	  mv $(distdir)/cl-t $(distdir)/ChangeLog;	\
+	fi
+
 sign-dist: dist
 	gpg -a --output $(distdir).tar.gz.sig --detach-sig $(distdir).tar.gz
 
