@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 EXTRA_DIST =					\
+ COPYING.CC-BY-SA				\
  guix.scm					\
  todo.org
 
@@ -175,6 +176,7 @@ emacsy_TEXINFOS =				\
  doc/fdl-1.3.texi
 
 emacsy_IMAGES =					\
+ doc/images/README				\
  doc/images/emacsy-logo.png			\
  doc/images/minimal-emacsy-example.png		\
  doc/images/screenshot.png			\
