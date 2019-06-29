@@ -95,15 +95,12 @@
   (syntax-rules ()
     ((save-excursion body ...)
      (let ((old-buffer (current-buffer))
-           (old-point (point))
-           ;;(old-mark (mark))
-           )
+           (old-point (point)))
        (in-out-guard
         (lambda _ #t)
         (lambda _ body ...)
         (lambda _
           (set-buffer! old-buffer)
-          ;;(set-mark old-mark)
           (goto-char old-point)))))))
 
 ;;.
