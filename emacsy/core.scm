@@ -521,6 +521,9 @@
     buffer))
 
 ;;.
+(define-interactive (find-file #:optional file-name)
+  #t)
+
 (define-interactive (find-file #:optional (file-name (read-file-name "Find file: ")))
   (catch #t
     (lambda _

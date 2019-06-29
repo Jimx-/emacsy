@@ -33,15 +33,15 @@
    name))) (lambda () ((variable-ref var)))))
 
   - [ ] Come up with a way to export commands so that one can indicate
-    what modules one wants to use.  
+    what modules one wants to use.
 
-    1. Let the user do it by creating their own modules.  
+    1. Let the user do it by creating their own modules.
 
        Nice idea because it requires no new infrastructure.  Might
        encourage the proliferation of new modules.
 
-    2. Let the user export certain symbols as commands.  Pretty much 
-       like a new kind of public interface.  
+    2. Let the user export certain symbols as commands.  Pretty much
+       like a new kind of public interface.
 
        Requires some infrastructure.  Possibly want to use this
        generally to collect up all kinds of other things.  So far I've
@@ -66,16 +66,16 @@
    (resolve-interface '(that-module) #:select (@ (that-module) commands))
 
    (resolve-interface '(that-module %command)
-       
+
    (use-modules ((that-module) #:select (@commands))
-       
+
 
   - [ ] rename read-file-name to EITHER read-filename OR
     read-filename-from-minibuffer
   - [ ] have backtraces go to logs
   - [X] Rethink the commands. Can't we keep them as simple lambdas?
-    Do we have to wrap them?  
-    
+    Do we have to wrap them?
+
     Also, when the user provides the symbol of a function, let's
     create a trampoline to that function.  Otherwise, if they provide
     a lambda, run that lambda.
@@ -94,7 +94,7 @@
   - [ ] Should (emacsy window) always be loaded but default to not
     supporting multiple windows?
 
-  - [ ] 
+  - [ ]
 
   - [ ] get rid of noise in emacsy (noise?) log noise?
   - [ ] Change define-cmd to define-command
@@ -108,9 +108,9 @@
     the split between builtin commands in shell and regular commands.
     God, this is going to be COOL!
 
-    
+
   - [X] make debugging work in emacsy
-    Getting better with debug-on-error?  
+    Getting better with debug-on-error?
   - [ ] fix kill of all buffers bug
   - [X] add universal argument C-u
   - [ ] clear the echo area once other messages start to come.
@@ -137,7 +137,7 @@
   - Note: the noweb filter docs2comments does not work with noweb's line pragmas
   - how to do [[https://github.com/davexunit/gnumaku/blob/rebirth/gnumaku/coroutine.scm][coroutines]] in guile
   - [ ] How do syscalls work when Emacsy is in batch mode?
-    
+
     Populate event buffer from file handle?  Are syscalls even required
     if we're not in interactive mode?
   - [X] In order to terminate potential rogue coroutines, I could set
@@ -184,7 +184,7 @@ ticks."
   (cosignal 'interrupt foreground-cid))
 
 (define (cosignal sig cid)
-  ((cid->resume cid) 'signal   
+  ((cid->resume cid) 'signal
 (case sig
     ((kill)
      (lambda () (coexit -1)))
@@ -211,3 +211,9 @@ cid <-> coroutine
 
 Does suspend happen inside or outside the coroutine?  Signals happened
 from outside the process in unix.
+* legalese
+Copyright © 2012, 2013 Shane Celis <shane.celis@gmail.com>
+
+  Copying and distribution of this file, with or without modification,
+  are permitted in any medium without royalty provided the copyright
+  notice and this notice are preserved.
