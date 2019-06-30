@@ -230,7 +230,7 @@
 
 (define-interactive (other-buffer #:optional (count 1))
   (other-buffer! count)
-  (switch-to-buffer (mru-ref buffer-stack)) t)
+  (switch-to-buffer (mru-ref buffer-stack)) #t)
 
 
 ;;; This is our primitive procedure for switching buffers.  It does not
