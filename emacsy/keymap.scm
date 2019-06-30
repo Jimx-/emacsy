@@ -81,18 +81,23 @@
 
 (define-module (emacsy keymap)
   #:use-module (ice-9 regex)
-  #:use-module (ice-9 optargs)
   #:use-module (oop goops)
   #:use-module (emacsy util)
-  #:use-module (emacsy event))
+  #:use-module (emacsy event)
+  #:export (<keymap>
+            lookup-key?
+            define-key
+            keymap?
+            make-keymap
+            lookup-key-entry?))
 
 ;;.
-(define-class-public <keymap> ()
+(define-class <keymap> ()
   (entries #:getter entries #:init-thunk (lambda () (make-hash-table)))
   (parent #:accessor parent #:init-keyword #:parent #:init-value #f))
 
 ;;.
-(define*-public (lookup-key keymap keys #:optional (follow-parent? #t))
+(define* (lookup-key keymap keys #:optional (follow-parent? #t))
   (define* (lookup-key* keymap keys #:optional (follow-parent? #t))
     (if (null? keys)
         keymap
@@ -125,7 +130,7 @@
       x))
 
 ;;.
-(define*-public (lookup-key? keymap keyspec #:optional (keymap-ok? #f))
+(define* (lookup-key? keymap keyspec #:optional (keymap-ok? #f))
    (let* ((keys (if (string? keyspec)
                     (kbd keyspec)
                     keyspec))
@@ -148,7 +153,7 @@
       proc)))
 
 ;;.
-(define-public (define-key keymap key-list-or-string symbol-or-procedure-or-keymap)
+(define (define-key keymap key-list-or-string symbol-or-procedure-or-keymap)
   (let* ((keys (if (string? key-list-or-string)
                    (kbd key-list-or-string)
                    key-list-or-string))
@@ -180,11 +185,11 @@
 ;;; for predicates which seems more natural.
 
 ;;.
-(define-public (keymap? obj)
+(define (keymap? obj)
   (is-a? obj <keymap>))
 
 ;;.
-(define*-public (make-keymap #:optional (parent #f))
+(define* (make-keymap #:optional (parent #f))
   (make <keymap> #:parent parent))
 
 ;;.
@@ -210,5 +215,5 @@
   (display ">" port))
 
 ;;.
-(define-public (lookup-key-entry? result)
+(define (lookup-key-entry? result)
   (and (not (boolean? result)) (not (number? result))))
