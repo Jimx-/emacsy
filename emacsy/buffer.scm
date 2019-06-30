@@ -226,10 +226,13 @@
 
 ;;.
 (define* (other-buffer! #:optional (incr 1))
-  (buffer-previous! incr))
+  (buffer-previous! incr)
+  (when (mru-contains? buffer-stack (current-buffer))
+    (mru-recall! buffer-stack (current-buffer)))
+  (current-buffer))
 
 (define-interactive (other-buffer #:optional (count 1))
-  (other-buffer! count)
+  (buffer-previous! count)
   (switch-to-buffer (mru-ref buffer-stack)) #t)
 
 
