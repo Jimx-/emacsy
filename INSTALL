@@ -3,11 +3,11 @@
 
 * Get it
 #+BEGIN_EXAMPLE
-    git clone https://gitlab.com/janneke/emacsy.git
+    git clone https://git.savannah.nongnu.org/git/emacsy.git
 #+END_EXAMPLE
 or
 #+BEGIN_EXAMPLE
-    wget http://lilypond.org/janneke/emacsy/emacsy-0.3.tar.gz
+    wget http://download.savannah.nongnu.org/releases/emacsy/emacsy-0.4.tar.gz
 #+END_EXAMPLE
 
 * Prerequisites

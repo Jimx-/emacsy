@@ -1,4 +1,24 @@
-* Emacsy TODO
+-*- mode: org; coding: utf-8; -*-
+
+#+TITLE: What's left to do?
+#+STARTUP: content hidestars
+
+* Finish `untangle/unweb' work
+In 0.3 Noweb was removed; the code was split into pure Guile scheme
+source code and separate texinfo documentation.  This setup is now
+functional and needs lots of work and cleaning up.
+
+* Cleanup examples
+Run GNU indent, use struct_ref etc (see Guimax) instead of `wud*2'.
+Also see guimax branch @ https://gitlab.com/janneke/emacsy-webkit-gtk
+
+* Self-doc/help system
+Figure out the status of self-doc.scm and help.scm, how this works, add
+C-h f, references to code, etc.
+
+* Cleanout and prioritize OLD Emacsy TODO
+
+* OLD Emacsy TODO
   - [X] Defining variables with define-variable leaves warnings about
     that variable not being defined. FIXED. Thanks, Mark Weaver!
   - [ ] Change emacsy-key-event to emacsy-submit-key-event or something.
@@ -164,7 +184,7 @@
     is used as a command mode for scheme. shelly? gash? bashy?
   - [ ] Integrate noweb into guile, such that guile will run off noweb
     files. Guile [[http://draketo.de/light/english/wisp-lisp-indentation-preprocessor#v0.5-repl][wisp]] already shows how to do it.
-* Trying to rework block code into something more malleable.
+** Trying to rework block code into something more malleable.
 (define* (wait #:optional (delay 1))
   "Yield coroutine and schdule the continuation to be run after DELAY
 ticks."
@@ -208,11 +228,12 @@ cid <-> coroutine
 
 (cowait cid-1 cid-2)
 
-
 Does suspend happen inside or outside the coroutine?  Signals happened
 from outside the process in unix.
+
 * legalese
 Copyright © 2012, 2013 Shane Celis <shane.celis@gmail.com>
+Copyright © 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 
   Copying and distribution of this file, with or without modification,
   are permitted in any medium without royalty provided the copyright

@@ -12,12 +12,11 @@ on twitter [@shanecelis](https://twitter.com/shanecelis).
 
 Get it
 #+BEGIN_EXAMPLE
-    git clone https://gitlab.com/janneke/emacsy.git
+    git clone https://git.savannah.nongnu.org/git/emacsy.git
 #+END_EXAMPLE
 
 build it
 #+BEGIN_EXAMPLE
-    git clone https://gitlab.com/janneke/emacsy.git
     guix environment -l guix.scm
     ./autogen.sh
     ./configure
@@ -34,10 +33,13 @@ and
 Emacsy is free software, it is distributed under the terms of the GNU
 General Public Licence version 3 or later.  See the file [[file:COPYING][COPYING]].
 
-* WARNING
+* WARNING/Usage
 
 This project is currently in development.  It is as alpha as can be.
 Not meant for general consumption yet.  Contributors, welcome!
+
+Emacsy usage is being explored in the [[https://savannah.nongnu.org/projects/nomad][Nomad extensible web browser]] and
+in [[https://gitlab.com/janneke/guimax][Guimax]]
 
 * Bugs
 

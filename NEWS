@@ -8,8 +8,33 @@ Copyright © 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
-Please send Emacsy reports to guile-user@gnu.org.
+Please send Emacsy bug reports to guile-user@gnu.org.
 
+* Changes in 0.4 since 0.3
+** Distribution
+*** Emacsy moved to http://savannah.nongnu.org/projects/emacsy
+*** Missing copyright and Licence headers have been added.
+*** A ChangeLog is now generated from the commit messages.
+** Core
+*** <text-buffer> now supports full text editng beyond minibuffer.
+*** The minibuffer now supports file-name completion.
+*** ‘kill-buffer’ is now safe.
+**** 15 New commands:
+backard-kill-word, exchange-point-and-mark, find-file, kill-line,
+kill-region, kill-word, mark-whole-buffer, move-beginning-of-line,
+move-end-of-line, new-buffer, next-line, previous-line,
+set-mark-command, yank, yank-pop.
+**** 18 New functions:
+backard-line, beginning-of-line, buffer-next!, buffer-previous!,
+buffer-substring, contract-file-name, current-column, delete-line,
+delete-region, end-of-line, expand-file-name,
+file-name-completion-function forward-line, line-length, mark,
+other-buffer!, save-excursion, set-mark.
+**** 5 New variables:
+default-directory, fundamental-map, fundamental-mode, kill-ring,
+scratch.
+** Noteworthy bug fixes
+*** next-buffer and previous-buffer now have Emacs semantics.
 * Changes in 0.3 since 0.2
 ** Distribution
 *** Noweb has been removed, source code is been promoted to canonical source.

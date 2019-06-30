@@ -19,8 +19,7 @@
 
 EXTRA_DIST =					\
  COPYING.CC-BY-SA				\
- guix.scm					\
- todo.org
+ guix.scm
 
 dist_emacsy_scm_DATA =				\
  emacsy/advice.scm				\
