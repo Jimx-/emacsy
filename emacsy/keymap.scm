@@ -85,6 +85,7 @@
   #:use-module (emacsy util)
   #:use-module (emacsy event)
   #:export (<keymap>
+            lookup-key
             lookup-key?
             define-key
             keymap?
