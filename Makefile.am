@@ -104,6 +104,11 @@ TESTS =						\
 
 XFAIL_TESTS = test/windows.scm
 
+EXTRA_DIST +=					\
+ $(TESTS)					\
+ test/check.scm\
+ test/minibuffer-test-dir
+
 TEST_EXTENSIONS = .scm
 SCM_LOG_COMPILER = $(top_builddir)/pre-inst-env $(GUILE)
 
