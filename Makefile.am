@@ -311,3 +311,16 @@ sign-dist: dist
 
 verify-sig: $(distdir).tar.gz.sig $(distdir).tar.gz
 	gpg --verify $(distdir).tar.gz.sig
+
+GPG_KEY_ID = 1A858392E331EAFDB8C27FFBF3C1A0D9C1D65273
+GIT_HOME = $(HOME)/src
+gen-announce:
+	$(GIT_HOME)/gnulib/build-aux/announce-gen\
+	    --release-type=alpha\
+	    --package-name=$(PACKAGE_TARNAME)\
+	    --previous-version='0.1.1 '\
+            --current-version=$(PACKAGE_VERSION)\
+	    --gpg-key-id=$(GPG_KEY_ID)\
+	    --url-directory=http://download.savannah.nongnu.org/releases/emacsy\
+	    --news=NEWS\
+            > doc/announce/ANNOUNCE-$(PACKAGE_VERSION)-
