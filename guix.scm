@@ -77,13 +77,14 @@
      ("texinfo" ,texinfo)
      ("texlive" ,texlive)))
   (propagated-inputs
-   `(("guile-lib" ,guile-lib)
+   `(("dbus-glib" ,dbus-glib)
+     ("guile" ,guile-2.2)
+     ("guile-lib" ,guile-lib)
      ("guile-readline" ,guile-readline)
      ("glib-networking" ,glib-networking)
      ("freeglut" ,freeglut)
      ("gssettings-desktop-schemas" ,gsettings-desktop-schemas)
      ("webkitgtk" ,webkitgtk)))
-  (inputs `(("guile" ,guile-2.2)))
   (arguments
    `(#:phases
      (modify-phases %standard-phases
@@ -91,7 +92,7 @@
          (lambda _
            (setenv "GUILE_AUTO_COMPILE" "0")
            #t)))))
-  (home-page "https://github.com/shanecelis/emacsy/")
+  (home-page "https://savannah.nongnu.org/projects/emacsy")
   (synopsis "Embeddable GNU Emacs-like library using Guile")
   (description
    "Emacsy is an embeddable Emacs-like library that uses GNU Guile
