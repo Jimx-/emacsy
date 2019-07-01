@@ -7,7 +7,7 @@
 #+END_EXAMPLE
 or
 #+BEGIN_EXAMPLE
-    wget http://download.savannah.nongnu.org/releases/emacsy/emacsy-0.4.tar.gz
+    wget http://download.savannah.nongnu.org/releases/emacsy/emacsy-0.4.1.tar.gz
 #+END_EXAMPLE
 
 * Prerequisites

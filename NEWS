@@ -10,6 +10,11 @@ Copyright © 2019 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 
 Please send Emacsy bug reports to guile-user@gnu.org.
 
+* Changes in 0.4.1 since 0.4
+** Core
+*** A missing export for `lookup-key' has been added.
+** Distribution
+*** The tarball release includes the test suite again.
 * Changes in 0.4 since 0.3
 ** Distribution
 *** Emacsy moved to http://savannah.nongnu.org/projects/emacsy
