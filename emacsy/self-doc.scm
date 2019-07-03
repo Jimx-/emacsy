@@ -16,17 +16,6 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Emacsy.  If not, see <http://www.gnu.org/licenses/>.
-(define-module (emacsy self-doc)
-  #:use-module (emacsy util)
-  #:use-module (srfi srfi-1)
-  #:use-module (search basic)
-  #:use-module (ice-9 optargs)
-  #:use-module (ice-9 match)
-  #:use-module (ice-9 documentation)
-  #:export (emacsy-collect-kind
-            emacsy-kind-ref
-            emacsy-kind-set!
-            ))
 
 ;;; Commentary:
 
@@ -45,6 +34,20 @@
 ;; check.)
 
 ;;; Code:
+(define-module (emacsy self-doc)
+  #:use-module (emacsy util)
+  #:use-module (srfi srfi-1)
+  #:use-module (search basic)
+  #:use-module (ice-9 optargs)
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 documentation)
+  #:export (emacsy-collect-kind
+            emacsy-kind-ref
+            emacsy-kind-set!
+            documentation
+            define-variable
+            define-documentation
+            define-parameter))
 
 (define (object-documentation-ref object)
   "Return the docstring for OBJECT.
@@ -66,8 +69,7 @@ OBJECT can be a procedure, macro or any object that has its
   "Return the kind for the OBJECT."
   (set-object-property! object 'emacsy-kind kind))
 
-;; XXX Rename from variable-documentation to just documentation.
-(define-public (variable-documentation variable-or-symbol)
+(define (documentation variable-or-symbol)
   (let ((v (cond
             ((symbol? variable-or-symbol)
              ;(format #t "IN current-module ~a~%" (current-module))
@@ -114,7 +116,7 @@ of the interfaces it includes (up to a given depth)."
       results))
 
 ;;.
-(define-syntax-public define-variable
+(define-syntax define-variable
   (syntax-rules ()
     ((define-variable name value documentation)
      (begin
@@ -129,7 +131,7 @@ of the interfaces it includes (up to a given depth)."
      (define-variable name value ""))))
 
 ;;.
-(define-syntax-public define-documentation
+(define-syntax define-documentation
   (syntax-rules ()
     ((define-documentation name documentation)
      (begin
@@ -139,7 +141,7 @@ of the interfaces it includes (up to a given depth)."
 
 ;; Parameters behave similarly to variables; however, whenever they are
 ;; defined, their values are set.
-(define-syntax-public define-parameter
+(define-syntax define-parameter
   (syntax-rules ()
     ((define-parameter name value documentation)
      (begin
