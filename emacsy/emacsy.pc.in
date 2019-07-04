@@ -5,8 +5,8 @@ includedir=@includedir@
 
 Name: Emacsy
 Description: An Emacs-like Library for GNU Guile Scheme
-URL: https://github.com/shanecelis/emacsy
+URL: https://savannah.nongnu.org/projects/emacsy
 Version: @VERSION@
-Requires: guile-2.0
+Requires: guile-@GUILE_EFFECTIVE_VERSION@
 Libs: -L${libdir} -lemacsy
 Cflags: -I${includedir}
