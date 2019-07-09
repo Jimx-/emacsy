@@ -187,8 +187,12 @@ main (int argc, char* argv[])
   scrolled_window = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
                                  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  scm_c_eval_string("(new-tab)");
-  //gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(web_view));
+  // Create one web view buffer
+  scm_call_1(scm_c_public_ref("guile-user", "new-tab"),
+             scm_from_utf8_string(
+                 "http://shanecelis.github.io/2013/06/15/the-garden/"));
+
+  // gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(web_view));
 
   // Set up callbacks so that if either the main window or the browser
   // instance is closed, the program will exit.
@@ -227,10 +231,6 @@ main (int argc, char* argv[])
 
   // Put the scrollable area into the main window.
   gtk_container_add(GTK_CONTAINER(main_window), vbox);
-
-  // Load a web page into the browser instance.
-  webkit_web_view_load_uri(web_view,
-                           "http://shanecelis.github.io/2013/06/15/the-garden/");
 
   // Make sure that when the browser area becomes visible, it will get mouse
   // and keyboard events.
@@ -378,25 +378,43 @@ static gboolean process_and_update_emacsy(void *user_data)
   These C functions are exposed as callable procedures in Scheme.
 */
 
-SCM_DEFINE(scm_set_web_view_x, "set-web-view!", 1, 0, 0,
-           (SCM web_view_pointer),
-           "Set the current web view to the given pointer.")
-{
+SCM_DEFINE(scm_destroy_web_view_x, "destroy-web-view!", 1, 0, 0,
+           (SCM web_view_pointer), "Destroys the web view pointer.") {
+
+  GtkWidget *view = GTK_WIDGET(scm_to_pointer(web_view_pointer));
+
+  if (view) {
+    gtk_widget_destroy(view);
+  }
+
+  return SCM_UNDEFINED;
+}
+
+SCM_DEFINE(scm_set_web_view_x, "set-web-view!", 1, 0, 0, (SCM web_view_pointer),
+           "Set the current web view to the given pointer.") {
 #if HAVE_SCM_POINTER_P
-  if (scm_is_true (scm_pointer_p (web_view_pointer)))
+  if (scm_is_true(scm_pointer_p(web_view_pointer)))
 #else
-  if (SCM_POINTER_P (web_view_pointer))
+  if (SCM_POINTER_P(web_view_pointer))
 #endif
-    {
-      // Remove the current one from the window.
-      if (web_view)
-        gtk_container_remove(GTK_CONTAINER(scrolled_window), GTK_WIDGET(web_view));
-      web_view = WEBKIT_WEB_VIEW(scm_to_pointer(web_view_pointer));
-      gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(web_view));
-      gtk_widget_show_all(GTK_WIDGET(web_view));
-      //gtk_widget_grab_focus(GTK_WIDGET(web_view));
+  {
+    GList *children = gtk_container_get_children(scrolled_window);
+    GtkWidget *current = g_list_nth_data(children, 0);
+
+    // Remove the current one from the window.
+    if (current) {
+      // Reference the web view so it is not destroyed once removed
+      // from the container.
+      g_object_ref(current);
+      gtk_container_remove(GTK_CONTAINER(scrolled_window), current);
     }
-  else
+    // FIXME: mutating the current web_view is dangerous convert global
+    // variable web_view to current_web_view function. And update the
+    // webkit procedures.
+    web_view = WEBKIT_WEB_VIEW(scm_to_pointer(web_view_pointer));
+    gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(web_view));
+    gtk_widget_show_all(GTK_WIDGET(scrolled_window));
+  } else
     fprintf(stderr, "error: not given a pointer in set-web-view!\n");
   return SCM_UNSPECIFIED;
 }

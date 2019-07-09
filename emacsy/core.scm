@@ -512,6 +512,7 @@
 ;;.
 (define-interactive (kill-buffer #:optional (buffer (current-buffer)))
   "Safe variant of kill-buffer."
+  (run-hook (buffer-kill-hook (current-buffer)))
   (remove-buffer! buffer)
   (when (null? (buffer-list))
     (set! scratch (make-text-buffer))))
