@@ -22,26 +22,33 @@
              (srfi srfi-1) ;;any
              )
 
-(define-interactive (new-tab)
+(define-interactive (new-tab #:optional
+        (url (read-from-minibuffer "URL: ")))
   (define (on-enter)
     (when (local-var 'web-view)
       (format #t "Setting web-view to ~a~%" (local-var 'web-view))
       (set-web-view! (local-var 'web-view))))
-  (let ((buffer (switch-to-buffer "*new-tab*")))
+  (define (on-kill)
+    (when (local-var 'web-view)
+      (format #t "Destroying web-view ~a~%" (local-var 'web-view))
+      (destroy-web-view! (local-var 'web-view))))
+  (let ((buffer (switch-to-buffer url)))
     (set! (local-var 'web-view) (make-web-view))
     (add-hook! (buffer-enter-hook buffer)
                on-enter)
+    (add-hook! (buffer-kill-hook buffer)
+               on-kill)
     (on-enter)
-    (load-url "http://duckduckgo.com")))
+    (load-url url)))
 
-(define-interactive 
-  (load-url #:optional 
-        (url (read-from-minibuffer "URL: "))) 
+(define-interactive
+  (load-url #:optional
+        (url (read-from-minibuffer "URL: ")))
   (webkit-load-url url))
 
 ;; Load-url is all right, but it requires an actual URL.
 ;; Let's fix that with a new command: GOTO.
-(define-interactive 
+(define-interactive
   (goto #:optional
         (urlish (read-from-minibuffer "GOTO: ")))
   (set-buffer-name! urlish)
@@ -101,3 +108,5 @@
 (define-key global-map (kbd "s-b") 'go-back)
 (define-key global-map (kbd "C-s") 'search-forward)
 (define-key global-map (kbd "C-r") 'search-backward)
+(define-key global-map (kbd "C-b") 'next-buffer)
+(define-key global-map (kbd "C-x k") 'kill-buffer)
