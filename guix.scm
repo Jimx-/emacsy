@@ -1,5 +1,6 @@
 ;;; Emacsy --- An embeddable Emacs-like library using GNU Guile.
 ;;; Copyright (C) 2019 Jan Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright (C) 2019 by Amar Singh<nly@disroot.org>
 ;;;
 ;;; This file is part of Emacsy.
 ;;;
@@ -38,7 +39,9 @@
 
 (use-modules ((guix licenses) #:prefix license:)
              (guix build-system gnu)
+             (guix build-system glib-or-gtk)
              (guix gexp)
+             (guix download)
              (guix git-download)
              (guix packages)
              (gnu packages)
@@ -58,47 +61,76 @@
 
 (define %source-dir (dirname (current-filename)))
 
-(package
-  (name "emacsy")
-  (version "git")
-  (source (local-file %source-dir
-                      #:recursive? #t
-                      #:select? (git-predicate %source-dir)))
-  (build-system gnu-build-system)
-  (native-inputs
-   `(("autoconf" ,autoconf)
-     ("automake" ,automake)
-     ("bzip2" ,bzip2)
-     ("guile" ,guile-2.2)
-     ("gettext" ,gnu-gettext)
-     ("libtool" ,libtool)
-     ("perl" ,perl)
-     ("pkg-config" ,pkg-config)
-     ("texinfo" ,texinfo)
-     ("texlive" ,texlive)))
-  (propagated-inputs
-   `(("dbus-glib" ,dbus-glib)
-     ("guile" ,guile-2.2)
-     ("guile-lib" ,guile-lib)
-     ("guile-readline" ,guile-readline)
-     ("glib-networking" ,glib-networking)
-     ("freeglut" ,freeglut)
-     ("gssettings-desktop-schemas" ,gsettings-desktop-schemas)
-     ("webkitgtk" ,webkitgtk)))
-  (arguments
-   `(#:phases
-     (modify-phases %standard-phases
-       (add-before 'configure 'setenv
-         (lambda _
-           (setenv "GUILE_AUTO_COMPILE" "0")
-           #t)))))
-  (home-page "https://savannah.nongnu.org/projects/emacsy")
-  (synopsis "Embeddable GNU Emacs-like library using Guile")
-  (description
-   "Emacsy is an embeddable Emacs-like library that uses GNU Guile
+(define-public emacsy
+  (package
+    (name "emacsy")
+    (version "git")
+    (source (local-file %source-dir
+                        #:recursive? #t
+                        #:select? (git-predicate %source-dir)))
+    (build-system glib-or-gtk-build-system)
+    (native-inputs
+     `(("autoconf" ,autoconf)
+       ("automake" ,automake)
+       ("bzip2" ,bzip2)
+       ("guile" ,guile-2.2)
+       ("gettext" ,gnu-gettext)
+       ("libtool" ,libtool)
+       ("perl" ,perl)
+       ("pkg-config" ,pkg-config)
+       ("texinfo" ,texinfo)
+       ("texlive" ,(texlive-union (list texlive-generic-epsf)))))
+    (inputs
+     `(("dbus-glib" ,dbus-glib)
+       ("guile" ,guile-2.2)
+       ("guile-lib" ,guile-lib)
+       ("guile-readline" ,guile-readline)
+       ("freeglut" ,freeglut)
+       ("webkitgtk" ,webkitgtk)))
+    (propagated-inputs
+     `(("glib-networking" ,glib-networking)
+       ("gssettings-desktop-schemas" ,gsettings-desktop-schemas)))
+    (arguments
+     `(#:tests? #t
+       #:modules ((guix build gnu-build-system)
+                  (guix build glib-or-gtk-build-system)
+                  (guix build utils)
+                  (ice-9 popen)
+                  (ice-9 rdelim)
+                  (srfi srfi-26))
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'configure 'setenv
+           (lambda _
+             (setenv "GUILE_AUTO_COMPILE" "0")
+             #t))
+         (add-after 'install 'wrap-binaries
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (effective (read-line
+                                (open-pipe* OPEN_READ
+                                            "guile" "-c"
+                                            "(display (effective-version))")))
+                    (scm-path (string-append out "/share/guile/site/" effective))
+                    (go-path (string-append out "/lib/guile/" effective "/site-ccache/"))
+                    (progs (map (cut string-append out "/bin/" <>)
+                                '("emacsy-webkit-gtk"
+                                  "emacsy-webkit-gtk-w-buffers"
+                                  "emacsy-webkit-gtk-w-windows"
+                                  "hello-emacsy"))))
+               (map (cut wrap-program <>
+                       `("GUILE_LOAD_PATH" ":" prefix (,scm-path))
+                       `("GUILE_LOAD_COMPILED_PATH" ":" prefix (,go-path))) progs)
+               #t))))))
+    (home-page "https://savannah.nongnu.org/projects/emacsy")
+    (synopsis "Embeddable GNU Emacs-like library using Guile")
+    (description
+     "Emacsy is an embeddable Emacs-like library that uses GNU Guile
 as extension language.  Emacsy can give a C program an Emacsy feel with
 keymaps, minibuffer, recordable macros, history, tab completion, major
 and minor modes, etc., and can also be used as a pure Guile library.  It
 comes with a simple counter example using FreeGLUT and browser examples
 in C using Gtk+-3 and WebKitGtk.")
-  (license license:gpl3+))
+    (license license:gpl3+)))
+
+emacsy
