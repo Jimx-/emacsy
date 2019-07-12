@@ -307,8 +307,13 @@ static gboolean key_press(GtkWidget* widget, GdkEventKey* event, gpointer user_d
          separately in Emacsy.  However, in this case, it's convenient
          to do some processing in the event handling here so we know
          whether or not to pass the event on to the browser.
-       */
+
+         FIXME: emacsy_tick won't get EMACSY_RAN_UNDEFINED_COMMAND_P on
+         first tick need at least two, other wise unknown keys are not
+         passed to the browser widget
+      */
       int flags = emacsy_tick();
+      flags = emacsy_tick();
 
       printf("flags = %d\n", flags);
       if (flags & EMACSY_RAN_UNDEFINED_COMMAND_P) {
