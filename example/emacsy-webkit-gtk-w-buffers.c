@@ -217,7 +217,7 @@ main (int argc, char* argv[])
 
 
   // While idle, process events in Emacsy and upate the echo-area.
-  g_idle_add((GSourceFunc) process_and_update_emacsy, NULL);
+  g_timeout_add_full(G_PRIORITY_LOW, 100, process_and_update_emacsy, NULL, NULL);
 
   // Handle key press and release events.
   g_signal_connect(main_window, "key_press_event", G_CALLBACK(key_press), NULL);
