@@ -111,16 +111,17 @@
                                 (open-pipe* OPEN_READ
                                             "guile" "-c"
                                             "(display (effective-version))")))
-                    (scm-path (string-append out "/share/guile/site/" effective))
-                    (go-path (string-append out "/lib/guile/" effective "/site-ccache/"))
+                    (deps (map (cut assoc-ref inputs <>) '("guile-lib" "guile-readline")))
+                    (scm-path (map (cut string-append <> "/share/guile/site/" effective) `(,out ,@deps)))
+                    (go-path (map (cut string-append <> "/lib/guile/" effective "/site-ccache/") `(,out ,@deps)))
                     (progs (map (cut string-append out "/bin/" <>)
                                 '("emacsy-webkit-gtk"
                                   "emacsy-webkit-gtk-w-buffers"
                                   "emacsy-webkit-gtk-w-windows"
                                   "hello-emacsy"))))
                (map (cut wrap-program <>
-                       `("GUILE_LOAD_PATH" ":" prefix (,scm-path))
-                       `("GUILE_LOAD_COMPILED_PATH" ":" prefix (,go-path))) progs)
+                         `("GUILE_LOAD_PATH" ":" prefix ,scm-path)
+                         `("GUILE_LOAD_COMPILED_PATH" ":" prefix ,go-path)) progs)
                #t))))))
     (home-page "https://savannah.nongnu.org/projects/emacsy")
     (synopsis "Embeddable GNU Emacs-like library using Guile")
