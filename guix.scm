@@ -86,10 +86,10 @@
        ("guile-lib" ,guile-lib)
        ("guile-readline" ,guile-readline)
        ("freeglut" ,freeglut)
+       ("glib-networking" ,glib-networking)
+       ("gssettings-desktop-schemas"
+        ,gsettings-desktop-schemas)
        ("webkitgtk" ,webkitgtk)))
-    (propagated-inputs
-     `(("glib-networking" ,glib-networking)
-       ("gssettings-desktop-schemas" ,gsettings-desktop-schemas)))
     (arguments
      `(#:tests? #t
        #:modules ((guix build gnu-build-system)
