@@ -216,10 +216,7 @@ main (int argc, char* argv[])
   gtk_label_set_max_width_chars(GTK_LABEL(modeline), 160);
 
 
-  // While idle, process events in Emacsy and upate the echo-area.
-  g_timeout_add_full(G_PRIORITY_LOW, 100, process_and_update_emacsy, NULL, NULL);
-
-  // Handle key press and release events.
+  // Handle Emacsy key press and release events.
   g_signal_connect(main_window, "key_press_event", G_CALLBACK(key_press), NULL);
   g_signal_connect(main_window, "key_release_event", G_CALLBACK(key_press), NULL);
 
@@ -308,12 +305,11 @@ static gboolean key_press(GtkWidget* widget, GdkEventKey* event, gpointer user_d
          to do some processing in the event handling here so we know
          whether or not to pass the event on to the browser.
 
-         FIXME: emacsy_tick won't get EMACSY_RAN_UNDEFINED_COMMAND_P on
-         first tick need at least two, other wise unknown keys are not
-         passed to the browser widget
+         So we call process_and_update_emacsy to actually do the processing.
       */
+      process_and_update_emacsy(NULL);
+
       int flags = emacsy_tick();
-      flags = emacsy_tick();
 
       printf("flags = %d\n", flags);
       if (flags & EMACSY_RAN_UNDEFINED_COMMAND_P) {
