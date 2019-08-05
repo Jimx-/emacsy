@@ -37,8 +37,10 @@
 #else
 #include <GL/glut.h>
 #endif
-#include <stdlib.h>
 #include <emacsy.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #endif
 #include <libguile.h>
 

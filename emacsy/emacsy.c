@@ -36,6 +36,7 @@
 
 #include "emacsy.h"
 #include <libguile.h>
+#include <stdio.h>
 
 /*
  * Emacsy provides a C API to ease integration with C and C++
