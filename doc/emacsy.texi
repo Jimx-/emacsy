@@ -598,9 +598,9 @@ Now we can @verb{|telnet localhost 37146|} to get a REPL.
 @subsection hello-emacsy.c
 @verbatiminclude example/hello-emacsy.c
 
-@c @node hello-emacsy.c.x
-@subsection hello-emacsy.c.x
-@verbatiminclude example/hello-emacsy.c.x
+@c @c @node hello-emacsy.c.x
+@c @subsection hello-emacsy.c.x
+@c @verbatiminclude example/hello-emacsy.c.x
 
 @c @node hello-emacsy.scm
 @subsection hello-emacsy.scm
