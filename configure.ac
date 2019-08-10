@@ -61,13 +61,21 @@ AC_HEADER_STDC
 AC_CHECK_PROG([HAVE_PDFLATEX], [pdflatex], [yes], [no])
 AM_CONDITIONAL([HAVE_PDFLATEX], [test x$HAVE_PDFLATEX = xyes])
 
+dnl '--with-examples=no' to disable building examples
+AC_ARG_WITH([examples],
+  AS_HELP_STRING([--without-examples], [Ignore and don't build examples]))
+
+AS_IF([test x$with_examples != xno],
+  [BUILD_EXAMPLES=yes],
+  [BUILD_EXAMPLES=no])
+
 PKG_CHECK_MODULES([FREEGLUT], [freeglut >= 3.0], [HAVE_FREEGLUT=yes], [HAVE_FREEGLUT=no])
 PKG_CHECK_MODULES([GL], [gl >= 18.0.0], [HAVE_GL=yes], [HAVE_GL=no])
 PKG_CHECK_MODULES([GLU], [glu >= 9.0.0], [HAVE_GLU=yes], [HAVE_GLU=no])
-AM_CONDITIONAL([HELLO_EMACSY], [test x$HAVE_FREEGLUT$HAVE_GL$HAVE_GLU = xyesyesyes])
+AM_CONDITIONAL([HELLO_EMACSY], [test x$BUILD_EXAMPLES$HAVE_FREEGLUT$HAVE_GL$HAVE_GLU = xyesyesyesyes])
 
 PKG_CHECK_MODULES([WEBKIT], [webkit2gtk-4.0], [HAVE_WEBKIT=yes], [HAVE_WEBKIT=no])
-AM_CONDITIONAL([EMACSY_WEBKIT_GTK], [test x$HAVE_WEBKIT = xyes])
+AM_CONDITIONAL([EMACSY_WEBKIT_GTK], [test x$BUILD_EXAMPLES$HAVE_WEBKIT = xyesyes])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([emacsy/emacsy.pc])
