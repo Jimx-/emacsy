@@ -30,6 +30,13 @@ and
     ./pre-inst-env emacsy-webkit-gtk
 #+END_EXAMPLE
 
+To build a minimal Emacsy, perhaps packaging it for a new distro:
+#+BEGIN_EXAMPLE
+    ./autogen.sh
+    ./configure --with-examples=no
+    make
+#+END_EXAMPLE
+
 Emacsy is free software, it is distributed under the terms of the GNU
 General Public Licence version 3 or later.  See the file [[file:COPYING][COPYING]].
 
