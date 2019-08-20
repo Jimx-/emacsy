@@ -97,6 +97,8 @@
                   (guix build utils)
                   (ice-9 popen)
                   (ice-9 rdelim)
+                  (ice-9 regex)
+                  (ice-9 ftw)
                   (srfi srfi-26))
        #:phases
        (modify-phases %standard-phases
@@ -114,11 +116,10 @@
                     (deps (map (cut assoc-ref inputs <>) '("guile-lib" "guile-readline")))
                     (scm-path (map (cut string-append <> "/share/guile/site/" effective) `(,out ,@deps)))
                     (go-path (map (cut string-append <> "/lib/guile/" effective "/site-ccache/") `(,out ,@deps)))
+                    (examples (filter (cut string-match "emacsy" <>)
+                                      (scandir (string-append out "/bin/"))))
                     (progs (map (cut string-append out "/bin/" <>)
-                                '("emacsy-webkit-gtk"
-                                  "emacsy-webkit-gtk-w-buffers"
-                                  "emacsy-webkit-gtk-w-windows"
-                                  "hello-emacsy"))))
+                                examples)))
                (map (cut wrap-program <>
                          `("GUILE_LOAD_PATH" ":" prefix ,scm-path)
                          `("GUILE_LOAD_COMPILED_PATH" ":" prefix ,go-path)) progs)
