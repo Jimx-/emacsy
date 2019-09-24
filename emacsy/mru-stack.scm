@@ -29,6 +29,7 @@
 
 (define-module (emacsy mru-stack)
   #:use-module (ice-9 q)
+  #:use-module (srfi srfi-1)
   #:use-module (oop goops)
   #:use-module (emacsy util)
   #:export (<mru-stack>
@@ -75,7 +76,9 @@
   ;; Should this add the buffer if it's not already there? No.
   (if (mru-empty? s)
       #f
-      (let ((i (member-ref x (mru-list s))))
+      (let ((i (list-index (lambda (e)
+                              (eq? x e))
+                            (mru-list s))))
         (if i
             (begin (set! (index s) i)
                    #t)
