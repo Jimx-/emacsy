@@ -88,7 +88,8 @@
 ;;.
 (define-method (mru-ref (s <mru-stack>))
   (and (not (mru-empty? s))
-       (list-ref (mru-list s) (index s))))
+       (list-ref (mru-list s)
+                 (index s))))
 
 ;;.
 (define-method (mru-list (s <mru-stack>))
@@ -105,11 +106,11 @@
 ;; The order of the elements may not change yet the index may be moved
 ;; around.
 (define-method (mru-next! (s <mru-stack>) count)
-  (when (not (mru-empty?  s))
-   (set! (index s)
-         (modulo (+ (index s) count)
-                 (length (mru-list s))))
-   (mru-ref s)))
+  (when (not (mru-empty? s))
+    (set! (index s)
+          (modulo (+ (index s) count)
+                  (length (mru-list s))))
+    (mru-ref s)))
 
 ;;.
 (define-method (mru-prev! (s <mru-stack>) count)
