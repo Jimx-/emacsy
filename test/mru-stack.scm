@@ -1,12 +1,12 @@
-;;; <file:mru-stack-test.scm>=                                              
-;;; @subsection Legal Stuff                                                
-;;;                                                                         
+;;; <file:mru-stack-test.scm>=
+;;; @subsection Legal Stuff
+;;;
 ;;; Emacsy --- An embeddable Emacs-like library using GNU Guile
-;;;                                                          
+;;;
 ;;; Copyright (C) 2012, 2013 Shane Celis <shane.celis@gmail.com>
 ;;;
 ;;; This file is part of Emacsy.
-;;;                                                            
+;;;
 ;;; Emacsy is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@
              (check))
 
 (use-private-modules (emacsy mru-stack))
-;;; <mru-stack:test>=                                                       
+;;; <mru-stack:test>=
 (define s (make <mru-stack>))
 (mru-add! s 'a)
 (mru-add! s 'b)
