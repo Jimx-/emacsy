@@ -59,10 +59,13 @@
 
 ;;.
 (define-method (mru-remove! (s <mru-stack>) x)
+  (when (and (mru-contains? s x)
+             (equal? 1 (length (mru-list s))))
+    (begin (set! (index s) 0)))
   (let ((orig-x (mru-ref s)))
     (q-remove! (q s) x)
-    (if (not (eq? orig-x x))
-        (mru-set! s orig-x))))
+    (unless (eq? orig-x x)
+      (mru-set! s orig-x))))
 
 ;;.
 (define-method (mru-recall! (s <mru-stack>) x)
