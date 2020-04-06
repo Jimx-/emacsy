@@ -154,7 +154,7 @@
 (define reader-request-queue (make-q))
 
 (define (block-read-event prompt resume)
-  (format #t "block-read-event ~a~%" (list prompt resume))
+  (emacsy-log-info "block-read-event ~a~%" (list prompt resume))
   (enq! reader-request-queue (list prompt resume)))
 
 (codefine (fulfill-read-requests)

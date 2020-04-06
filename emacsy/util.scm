@@ -31,6 +31,12 @@
 (define-public continue-command-loop? (make-unbound-fluid))
 ;;; <util:state>=
 (define-public debug-on-error? #f)
+
+;;; When emacsy-log? is set to #t all output is logged to
+;;; (current-error-port).  If emacsy-log? is set to #f all logging
+;;; output is ignored.
+(define-public emacsy-log? #t)
+
 ;;; % -*- mode: Noweb; noweb-code-mode: scheme-mode -*-
 ;;; @section Utility Module
 ;;;
@@ -187,8 +193,9 @@ second argument."
   (reverse (cdr (reverse lst))))
 ;;; <util:procedure>=
 (define-public (emacsy-log-info format-msg . args)
-  (apply format (current-error-port) format-msg args)
-  (newline (current-error-port)))
+  (when emacsy-log?
+    (apply format (current-error-port) format-msg args)
+    (newline (current-error-port))))
 ;;; [[member-ref]] returns the index of the element in the list if there
 ;;; is one.
 ;;;
@@ -259,12 +266,14 @@ second argument."
 ;;;
 ;;; <util:procedure>=
 (define-public (emacsy-log-error format-msg . args)
-  (apply format (current-error-port) format-msg args)
-  (newline (current-error-port)))
+  (when emacsy-log?
+    (apply format (current-error-port) format-msg args)
+    (newline (current-error-port))))
 
 (define-public (emacsy-log-trace format-msg . args)
-  (apply format (current-error-port) format-msg args)
-  (newline (current-error-port)))
+  (when emacsy-log?
+    (apply format (current-error-port) format-msg args)
+    (newline (current-error-port))))
 ;;; Let's define a convenience procedure to [[pretty-print]] to a string.
 ;;;
 ;;;
@@ -273,8 +282,9 @@ second argument."
   (call-with-output-string (lambda (port) (pp obj port))))
 ;;; <util:procedure>=
 (define-public (emacsy-log-debug format-msg . args)
-  (apply format (current-error-port) format-msg args)
-  (newline (current-error-port)))
+  (when emacsy-log?
+    (apply format (current-error-port) format-msg args)
+    (newline (current-error-port))))
 ;;; <util:procedure>=
 (define-public (list-insert! lst k val)
   "Insert val into list such that (list-ref list k) => val."
@@ -310,5 +320,6 @@ second argument."
 ;;;
 ;;; <util:procedure>=
 (define-public (emacsy-log-warning format-msg . args)
-  (apply format (current-error-port) format-msg args)
-  (newline (current-error-port)))
+  (when emacsy-log?
+    (apply format (current-error-port) format-msg args)
+    (newline (current-error-port))))
