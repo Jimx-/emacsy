@@ -162,7 +162,7 @@
      (when (getenv "EMACSY_DEBUG") (format #t "fulfill-read-requests CHECK~%"))
      (when (and (not (q-empty? event-queue))
                 (not (q-empty? reader-request-queue)))
-       (format #t "fulfill-read-requests DO~%")
+       (emacsy-log-info "fulfill-read-requests DO~%")
        (match (deq! reader-request-queue)
          ((prompt resume)
           ;; Do I need to schedule this with the agenda to make it
