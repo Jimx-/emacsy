@@ -156,7 +156,7 @@
   (set! switch-to-buffer
         (lambda-cmd args
                     (let ((result (apply old-func args)))
-                      (format #t "Setting current window to buffer ~a~%" (current-buffer))
+                      (emacsy-log-info "Setting current window to buffer ~a~%" (current-buffer))
                       (set! (window-buffer current-window) (current-buffer))
                       result))))
 
