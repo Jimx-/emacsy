@@ -243,7 +243,8 @@
   (emacsy-log-debug "Running exit hook for ~a" (current-buffer))
   (run-hook (buffer-exit-hook (current-buffer)))
   (set! last-buffer (current-buffer))
-  (if (mru-contains? buffer-stack buffer)
+  (if (and recall?
+           (mru-contains? buffer-stack buffer))
       (begin
         (emacsy-log-debug "Recall buffer ~a" buffer)
         (when recall? (mru-recall! buffer-stack buffer))

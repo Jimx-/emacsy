@@ -489,7 +489,8 @@
        ("C-p" previous-line)
        ("DEL" delete-backward-char)
        ("RET" ,(lambda _ (insert #\newline)))
-       ("C-k" kill-line)))
+       ("C-k" kill-line)
+       ("C-M-w" append-next-kill)))
     keymap))
 
 (define-public fundamental-mode (make <mode> #:mode-name "fundamental" #:mode-map fundamental-map))

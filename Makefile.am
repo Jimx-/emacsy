@@ -33,6 +33,7 @@ dist_emacsy_scm_DATA =				\
  emacsy/emacsy.scm				\
  emacsy/event.scm				\
  emacsy/help.scm				\
+ emacsy/introspection.scm			\
  emacsy/job.scm					\
  emacsy/kbd-macro.scm				\
  emacsy/keymap.scm				\

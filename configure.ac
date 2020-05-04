@@ -48,7 +48,7 @@ AS_IF([test "x$GUILD" = "x"],
   [PKG_CHECK_VAR([GUILD], [guile-$GUILE_EFFECTIVE_VERSION], [guild], [],
     [AC_MSG_ERROR(m4_normalize([
       'guild' binary not found; please check your Guile installation.]))])])
-AC_PATH_PROG([guile_snarf], guile-snarf)
+AC_PATH_PROGS([guile_snarf], [guile-snarf guile-snarf$GUILE_EFFECTIVE_VERSION])
 AC_SUBST(guile_snarf)
 
 GUILE_MODULE_AVAILABLE([have_guile_lib], [(debugging assert)])

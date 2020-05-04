@@ -43,6 +43,16 @@
 (remove-buffer! b)
 (check (current-buffer) => #f)
 
+(add-buffer! b)
+(warn 'buffer-list (buffer-list))
+(define a (make <buffer> #:name "*a*"))
+(add-buffer! a)
+(check (current-buffer) => a)
+(switch-to-buffer b)
+(check (current-buffer) => b)
+(switch-to-buffer a)
+(check (current-buffer) => a)
+
 ;;; <+ Test Postscript>=
 ;(run-tests)
 (check-report)

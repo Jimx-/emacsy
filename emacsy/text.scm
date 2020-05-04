@@ -238,8 +238,22 @@
        (insert (command-char this-command-event))))
 
 ;; .
-(define-variable kill-ring '()
+(define-variable kill-ring '("")
   "List of killed text sequences.")
+
+(define (kill-command? command)
+  (memq command '(kill-region-trampoline kill-line-trampoline kill-word-trampoline)))
+
+(define-interactive (append-next-kill #:optional interactive?)
+  #t)
+
+(define (append-kill?)
+  (memq last-command '(append-next-kill-trampoline kill-region-trampoline kill-line-trampoline kill-word-trampoline)))
+
+(define (add-kill! text)
+  (set! kill-ring
+        (if (append-kill?) (cons (string-append (car kill-ring) text) (cdr kill-ring))
+            (cons text kill-ring))))
 
 (define-interactive (yank)
   (when (pair? kill-ring)
@@ -290,9 +304,8 @@
 
 ;;.
 (define-interactive (kill-region #:optional (start (point)) (end (mark)))
-  (set! kill-ring
-        (cons (delete-region (if (> end start) start end) (if (> end start) end start))
-              kill-ring)))
+  (add-kill!
+   (delete-region (if (> end start) start end) (if (> end start) end start))))
 
 ;;.
 (define-public (delete-line n)
@@ -308,7 +321,7 @@
 
 ;;.
 (define-interactive (kill-line #:optional (n 1))
-  (set! kill-ring (cons (delete-line n) kill-ring)))
+  (add-kill! (delete-line n)))
 
 ;;.
 (define-public (delete-word n)
@@ -318,7 +331,7 @@
 
 ;;.
 (define-interactive (kill-word #:optional (n 1))
-  (set! kill-ring (cons (delete-word n) kill-ring)))
+  (add-kill! (delete-word n)))
 
 ;;.
 (define-interactive (backward-kill-word #:optional (n 1))
