@@ -33,7 +33,8 @@
   #:use-module (emacsy block)
   #:use-module (emacsy coroutine)
   #:use-module (emacsy agenda)
-  #:export (command-loop))
+  #:export (command-loop)
+  #:declarative? #f)
 
 ;;; Commentary:
 
