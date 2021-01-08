@@ -497,6 +497,9 @@
 
 (define*-public (make-text-buffer #:optional (name "*scratch*"))
   (let ((buffer (make <text-buffer> #:name name #:buffer-modes `(,fundamental-mode) #:keymap global-map)))
+    (with-buffer buffer
+      (set! (local-var 'before-change-functions) (make-hook 2))
+      (set! (local-var 'after-change-functions) (make-hook 3)))
     (add-buffer! buffer)
     buffer))
 

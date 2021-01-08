@@ -213,6 +213,16 @@
   (backward-line n))
 
 ;;.
+(define (signal-before-change start end)
+  (run-hook before-buffer-change-hook (current-buffer))
+  (run-hook (local-var 'before-change-functions) start end))
+
+;;.
+(define (signal-after-change charpos lendel lenins)
+  (run-hook after-buffer-change-hook (current-buffer))
+  (run-hook (local-var 'after-change-functions) charpos (+ charpos lenins) lendel))
+
+;;.
 (define-method-public (insert-char char)
   (buffer:insert-string (current-buffer) char))
 
@@ -220,8 +230,9 @@
 (define-interactive (insert #:rest args)
   (and (current-buffer)
        (if (null? args) 0
-           (let ((arg (car args)))
-             (run-hook before-buffer-change-hook (current-buffer))
+           (let ((arg (car args))
+                 (opoint (point)))
+             (signal-before-change opoint opoint)
              (cond
               ((string? arg)
                (buffer:insert-string (current-buffer) arg))
@@ -230,7 +241,7 @@
               (else #f))
              (set! (buffer-modified? (current-buffer)) #t)
              (incr! (buffer-modified-tick (current-buffer)))
-             (run-hook after-buffer-change-hook (current-buffer))))))
+             (signal-after-change opoint 0 (- (point) opoint))))))
 
 ;;.
 (define-interactive (self-insert-command #:optional (n 1))
@@ -287,7 +298,11 @@
 ;;.
 (define-interactive (delete-backward-char #:optional (n 1))
   "Delete the previous N characters (following if N is negative)."
-  (buffer:delete-char (current-buffer) (- n)))
+  (let ((start (max (- (point) n) 0))
+        (end (point)))
+    (signal-before-change start end)
+    (buffer:delete-char (current-buffer) (- n))
+    (signal-after-change start n 0)))
 
 ;; Alias for delete-backward-char
 (define-interactive (backward-delete-char #:optional (n 1))
@@ -296,10 +311,12 @@
 
 ;;.
 (define-interactive (delete-region #:optional (start (point)) (end (mark)))
+  (signal-before-change start end)
   (let ((text (buffer:delete-region (current-buffer) start end)))
     (when text
       (set! (buffer-modified? (current-buffer)) #t)
-      (incr! (buffer-modified-tick (current-buffer))))
+      (incr! (buffer-modified-tick (current-buffer)))
+      (signal-after-change start (- end start) 0))
     text))
 
 ;;.
