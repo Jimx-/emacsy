@@ -438,8 +438,9 @@
 ;;.
 (define-class-public <text-buffer> (<buffer>)
   ;;define-class <text-buffer> (<buffer>)
-  (gap-buffer #:accessor gap-buffer #:init-form (make-gap-buffer "")))
-(export gap-buffer)
+  (gap-buffer #:accessor gap-buffer #:init-form (make-gap-buffer ""))
+  (intervals #:accessor buffer-intervals #:init-form '()))
+(export gap-buffer buffer-intervals)
 
 ;;.
 (define-method-public (buffer:buffer-string (buffer <text-buffer>))
