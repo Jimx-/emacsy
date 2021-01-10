@@ -398,9 +398,22 @@
         (end (or (save-excursion (re-search-forward newline-regex #f #t)) (point-max))))
     (- end start)))
 
+
+;;.
+(define (move-to-last-newline)
+  (let ((c (char-after)))
+    (cond
+     ((= (point) (point-min))
+      #f)
+     ((eqv? c #\newline)
+      (point))
+     (else
+      (backward-char)
+      (move-to-last-newline)))))
+
 ;;.
 (define-method-public (buffer:current-column (buffer <buffer>))
-  (let ((start (1+ (or (save-excursion (re-search-backward newline-regex #f #t)) 0))))
+  (let ((start (1+ (or (save-excursion (move-to-last-newline)) 0))))
     (- (point) start)))
 
 ;;.
