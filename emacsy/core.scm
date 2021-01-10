@@ -57,7 +57,8 @@
   #:use-module (emacsy agenda)
   #:replace (switch-to-buffer
              kill-buffer)
-  #:export (read-from-mouse))
+  #:export (read-from-mouse)
+  #:declarative? #f)
 
 ;;; <core:macro>=
 (define-syntax-public track-mouse
@@ -328,7 +329,8 @@
 (define-interactive (execute-extended-command #:optional (n 1))
   ;(display "HERE!\n")
   (let ((str (completing-read "M-x " (completer global-cmdset))))
-    (call-interactively (module-ref (current-module) (string->symbol str)))))
+    (call-interactively (or (module-variable (current-module) (string->symbol str))
+                            (module-ref (resolve-module '(zem core commands)) (string->symbol str))))))
 
 ;;.
 (define-interactive (quit-application)
