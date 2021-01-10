@@ -401,11 +401,12 @@
 
 ;;.
 (define (move-to-last-newline)
-  (let ((c (char-after)))
+  (let ((c (char-before)))
     (cond
      ((= (point) (point-min))
       #f)
      ((eqv? c #\newline)
+      (backward-char)
       (point))
      (else
       (backward-char)
