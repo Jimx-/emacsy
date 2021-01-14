@@ -524,6 +524,8 @@
     (switch-to-buffer buffer)
     buffer))
 
+(define-public find-file-hook (make-hook))
+
 ;;.
 (define-interactive (find-file #:optional file-name)
   #t)
@@ -541,7 +543,8 @@
         (when (and=> (buffer-file-name (current-buffer)) string?)
           (set! (local-var 'default-directory) (canonize-file-name (dirname (buffer-file-name buffer)))))
         (set! (buffer-modified-tick buffer) -1)
-        (set! (buffer-modified? buffer) (not exists?))))
+        (set! (buffer-modified? buffer) (not exists?))
+        (run-hook find-file-hook)))
     (lambda (key subr msg args . rest)
       (let ((error-msg
              (with-output-to-string

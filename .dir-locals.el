@@ -33,8 +33,7 @@
 
  (scheme-mode
   .
-  ((geiser-active-implementations . (guile))
-   (eval . (put 'with-buffer 'scheme-indent-function 1))
+  ((eval . (put 'with-buffer 'scheme-indent-function 1))
    (eval . (put 'save-excursion 'scheme-indent-function 1))
    (eval
     .
