@@ -97,6 +97,8 @@
   (entries #:getter entries #:init-thunk (lambda () (make-hash-table)))
   (parent #:accessor parent #:init-keyword #:parent #:init-value #f))
 
+(define-public keymap-parent parent)
+
 ;;.
 (define* (lookup-key keymap keys #:optional (follow-parent? #t))
   (define* (lookup-key* keymap keys #:optional (follow-parent? #t))
