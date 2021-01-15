@@ -497,9 +497,15 @@
 
 (define-public fundamental-mode (make <mode> #:mode-name "fundamental" #:mode-map fundamental-map))
 
+(define (enter-fundamental-mode)
+  (set! (local-var 'major-mode) fundamental-mode)
+  (set! (local-var 'mode-name) "Fundamental"))
+
 (define*-public (make-text-buffer #:optional (name "*scratch*"))
-  (let ((buffer (make <text-buffer> #:name name #:buffer-modes `(,fundamental-mode) #:keymap global-map)))
+  (let ((buffer (make <text-buffer> #:name name #:buffer-modes '() #:keymap global-map)))
     (add-buffer! buffer)
+    (with-buffer buffer
+      (enter-fundamental-mode))
     buffer))
 
 ;; The *scratch* buffer.

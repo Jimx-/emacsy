@@ -287,4 +287,4 @@
   (emacsy-mode-line (current-buffer)))
 
 (define-method (emacsy-mode-line (buffer <buffer>))
-  (format #f "-:~a- ~a    (~{~a~^ ~})" (if (buffer-modified? buffer) "**" "--") (buffer-name buffer) (map mode-name (buffer-modes buffer))))
+  (format #f "-:~a- ~a    (~a ~{~a~^ ~})" (if (buffer-modified? buffer) "**" "--") (buffer-name buffer) (local-var 'mode-name) (map mode-name (buffer-modes buffer))))
