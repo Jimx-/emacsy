@@ -329,8 +329,10 @@
 (define-interactive (execute-extended-command #:optional (n 1))
   ;(display "HERE!\n")
   (let ((str (completing-read "M-x " (completer global-cmdset))))
-    (call-interactively (or (module-variable (current-module) (string->symbol str))
-                            (module-ref (resolve-module '(zem core commands)) (string->symbol str))))))
+    (call-interactively (let ((command (module-variable (current-module) (string->symbol str))))
+                          (if command
+                              (variable-ref command)
+                              (module-ref (resolve-module '(zem core commands)) (string->symbol str)))))))
 
 ;;.
 (define-interactive (quit-application)
