@@ -42,7 +42,8 @@
   #:use-module (emacsy kbd-macro)
   #:use-module (emacsy agenda)
   #:use-module (emacsy coroutine)
-  #:use-module (emacsy cursor-list))
+  #:use-module (emacsy cursor-list)
+  #:declarative? #f)
 
 ;;; Commentary:
 
@@ -124,6 +125,12 @@
 ;;.
 (define*-public (delete-minibuffer-contents #:optional (buffer minibuffer))
   (gb-erase! (gap-buffer buffer)))
+
+;;.
+(define*-public (clear-minibuffer #:optional (buffer minibuffer))
+  (set! (minibuffer-prompt buffer) "")
+  (delete-minibuffer-contents buffer)
+  (set! (minibuffer-message-string buffer) ""))
 
 ;; For the point methods, we're going to make [[(goto-char 1)]] the
 ;; beginning of the prompt, but [[(point-min)]] where the user editable
@@ -240,7 +247,8 @@ available. Otherwise returns default-ticks."
      (read-from-minibuffer-internal prompt read)
      (begin
        (set! (local-keymap minibuffer) original-keymap)
-       (set! minibuffer-history original-history))
+       (set! minibuffer-history original-history)
+       (clear-minibuffer))
      '(quit-command keyboard-quit))))
 
 (define (readline-completer->stream completer string)

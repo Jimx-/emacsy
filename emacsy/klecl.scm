@@ -34,6 +34,7 @@
   #:use-module (emacsy coroutine)
   #:use-module (emacsy agenda)
   #:use-module (emacsy text)
+  #:autoload (emacsy minibuffer) (clear-minibuffer)
   #:export (command-loop)
   #:declarative? #f)
 
@@ -421,6 +422,7 @@
 
 ;;.
 (define-interactive (keyboard-quit)
+  (clear-minibuffer)
   (set-mark #f)
   (message "Quit!")
   (throw 'quit-command))
