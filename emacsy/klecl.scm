@@ -33,6 +33,7 @@
   #:use-module (emacsy block)
   #:use-module (emacsy coroutine)
   #:use-module (emacsy agenda)
+  #:use-module (emacsy text)
   #:export (command-loop)
   #:declarative? #f)
 
@@ -420,6 +421,7 @@
 
 ;;.
 (define-interactive (keyboard-quit)
+  (set-mark #f)
   (message "Quit!")
   (throw 'quit-command))
 

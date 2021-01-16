@@ -453,7 +453,8 @@
 (define-class-public <text-buffer> (<buffer>)
   ;;define-class <text-buffer> (<buffer>)
   (gap-buffer #:accessor gap-buffer #:init-form (make-gap-buffer ""))
-  (intervals #:accessor buffer-intervals #:init-form '()))
+  (intervals #:accessor buffer-intervals #:init-form '())
+  (marker #:accessor buffer-marker #:init-value #f))
 (export gap-buffer buffer-intervals)
 
 ;;.
@@ -478,11 +479,11 @@
 
 ;;.
 (define-method-public (buffer:set-mark (buffer <text-buffer>) pos)
-  (message "buffer:set-mark not implemented"))
+  (set! (buffer-marker buffer) pos))
 
 ;;.
 (define-method-public (buffer:mark (buffer <text-buffer>))
-  (message "buffer:mark not implemented"))
+  (buffer-marker buffer))
 
 ;;.
 (define-method-public (buffer:char-before (buffer <text-buffer>) point)
