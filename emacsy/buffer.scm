@@ -55,6 +55,7 @@
             set-buffer!
             switch-to-buffer
             local-var
+            local-var-bound?
             emacsy-mode-line))
 
 ;;; Commentary:
@@ -282,9 +283,18 @@
                (make-procedure-with-setter local-var-ref local-var-set!))
 
 ;;.
+(define (local-var-bound? symbol)
+  (assq symbol (local-variables (current-buffer))))
+
+;;.
 ;; method
 (define-method (emacsy-mode-line)
   (emacsy-mode-line (current-buffer)))
 
 (define-method (emacsy-mode-line (buffer <buffer>))
-  (format #f "-:~a- ~a    (~a ~{~a~^ ~})" (if (buffer-modified? buffer) "**" "--") (buffer-name buffer) (local-var 'mode-name) (map mode-name (buffer-modes buffer))))
+  (format #f "-:~a- ~a    (~a~a~{~a~^ ~})"
+          (if (buffer-modified? buffer) "**" "--")
+          (buffer-name buffer)
+          (if (local-var-bound? 'mode-name) (local-var 'mode-name) "")
+          (if (null? (buffer-modes buffer)) "" " ")
+          (map mode-name (buffer-modes buffer))))
