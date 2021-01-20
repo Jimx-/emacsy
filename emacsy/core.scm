@@ -546,7 +546,9 @@
              (file-name (expand-file-name file-name))
              (exists? (access? file-name R_OK))
              (text (if exists? (with-input-from-file (expand-file-name file-name) read-string) "")))
-        (set! (buffer-file-name buffer) file-name)
+        (set! (buffer-file-name buffer) (if exists?
+                                            (canonicalize-path file-name)
+                                            file-name))
         (insert text)
         (goto-char (point-min))
         (when (and=> (buffer-file-name (current-buffer)) string?)

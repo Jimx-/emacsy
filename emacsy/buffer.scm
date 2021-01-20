@@ -119,7 +119,7 @@
   (buffer-exit-hook #:accessor buffer-exit-hook #:init-form (make-hook 0))
   (buffer-kill-hook #:accessor buffer-kill-hook #:init-form (make-hook 0))
   (buffer-modes #:accessor buffer-modes #:init-form '() #:init-keyword #:buffer-modes))
-(export local-keymap local-variables buffer-file-name buffer-enter-hook buffer-exit-hook buffer-kill-hook before-buffer-change-hook after-buffer-change-hook after-change-hook before-change-hook buffer-modified-tick buffer-modes)
+(export local-keymap local-variables buffer-file-name buffer-modified? buffer-enter-hook buffer-exit-hook buffer-kill-hook before-buffer-change-hook after-buffer-change-hook after-change-hook before-change-hook buffer-modified-tick buffer-modes)
 
 ;;.
 (define-variable before-buffer-change-hook (make-hook 1) "This hook is called prior to the buffer being changed with one argument, the buffer.")
