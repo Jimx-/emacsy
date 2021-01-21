@@ -62,6 +62,7 @@
 (define-class-public <minibuffer> (<text-buffer>)
   (prompt #:accessor minibuffer-prompt #:init-form "")
   (message #:accessor minibuffer-message-string #:init-form ""))
+(export minibuffer-prompt minibuffer-message-string)
 
 ;; We define a keymap with all the typical self-insert-commands that
 ;; would be expected in an editable buffer
