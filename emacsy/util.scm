@@ -24,6 +24,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (debugging assert)
   #:use-module (system repl error-handling)
+  #:declarative? #f
   ;#:export-syntax (define-syntax-public)
 )
 ;;; <util:state>=
